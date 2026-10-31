@@ -14,6 +14,9 @@
 //     if (Deb && Deb != PreviousDeb) { assert(List.back() == Deb); … }
 //   apt-pkg/init.cc         Host tablosu: archive.ubuntu.com, .archive.ubuntu.com, security.ubuntu.com (ports yok)
 // Güncellemede her deb-src girdisi için listeler dizinine apt'nin adlandırdığı gibi bir Sources dosyası yazılır.
+// Anlık görüntü kipinde asıl (canlı) depo SHADOWED girdi olarak kalır ve onun Sources dosyası da iner (apt
+// test/integration/test-snapshot: anlık görüntülü update'te asıl depo da "Hit: … InRelease"; release 41184626823'te
+// listelerde archive.ubuntu.com_ubuntu_dists_noble-backports_main_source_Sources.lz4 vardı).
 const test = require('brittle')
 const fs = require('fs')
 const os = require('os')
@@ -45,6 +48,7 @@ for (let i = 0; i < a.length; i++) {
   else if (!a[i].startsWith('-') && komut === null) komut = a[i]
 }
 fs.appendFileSync(path.join(KOK, 'apt-cagrilari.txt'), JSON.stringify(a) + '\\n')
+if (process.env.HF_SAHTE_HOST_YOK) cfg.delete(H + process.env.HF_SAHTE_HOST_YOK) // tabloyu bilmeyen apt
 if (komut === 'source') process.exit(0)
 if (komut !== 'update') { console.error('sahte apt-get: ' + komut); process.exit(100) }
 
@@ -82,10 +86,12 @@ const ekle = (src, uri, dist, comp) => {
     } else {
       snap = snap.slice(0, -1)
       const yol = new URL(uri).pathname.replace(/^\\/+|\\/+$/g, '')
-      uri = s.replace('@SNAPSHOTID@', snap).replace('@PATH@', yol)
-      al(uri, dist)
+      const suri = s.replace('@SNAPSHOTID@', snap).replace('@PATH@', yol)
+      al(suri, dist)
+      girdiler.push({ src, uri: suri, dist, comp })
     }
   }
+  // nosnapshot: asıl depo da (anlık görüntü varsa SHADOWED olarak) listede kalır; update onun dizinlerini de indirir
   al(uri, dist)
   girdiler.push({ src, uri, dist, comp })
 }
@@ -131,7 +137,7 @@ function icBetik () {
   return m[1]
 }
 
-function calistir (t, sources) {
+function calistir (t, sources, ekEnv = {}) {
   const kok = fs.mkdtempSync(path.join(os.tmpdir(), 'hf-kaynak-'))
   t.teardown(() => fs.rmSync(kok, { recursive: true, force: true }))
   for (const d of ['etc/apt/sources.list.d', 'var/lib/apt/lists', 'kaynak', 'kaynak-liste', 'bin', 'usr/share/doc/bash']) fs.mkdirSync(path.join(kok, d), { recursive: true })
@@ -151,7 +157,7 @@ function calistir (t, sources) {
     .split('/usr/share/doc/').join(path.join(kok, 'usr/share/doc') + '/')
   const r = spawnSync('bash', ['-c', ic], {
     encoding: 'utf8',
-    env: { ...process.env, PATH: bin + path.delimiter + process.env.PATH, SNAP, HEPSI: '0', HF_SAHTE_KOK: kok }
+    env: { ...process.env, PATH: bin + path.delimiter + process.env.PATH, SNAP, HEPSI: '0', HF_SAHTE_KOK: kok, ...ekEnv }
   })
   const oku = (f) => { try { return fs.readFileSync(path.join(kok, f), 'utf8') } catch { return '' } }
   return {
@@ -164,8 +170,11 @@ function calistir (t, sources) {
   }
 }
 
-const beklenenListeler = (suites) => suites.flatMap((s) => ['main', 'multiverse', 'restricted', 'universe']
+const BILESEN = ['main', 'multiverse', 'restricted', 'universe']
+const beklenenListeler = (suites) => suites.flatMap((s) => BILESEN
   .map((c) => `snapshot.ubuntu.com_ubuntu_${SNAP}_dists_${s}_${c}_source_Sources.lz4`)).sort()
+const canliListeler = (onek, suites) => suites.flatMap((s) => BILESEN.map((c) => `${onek}_dists_${s}_${c}_source_Sources.lz4`))
+const anlik = (listeler) => listeler.filter((f) => f.startsWith('snapshot.ubuntu.com_'))
 const HEPSI = ['noble', 'noble-backports', 'noble-security', 'noble-updates']
 
 test('source-archive.sh: arm64 (ports.ubuntu.com) deb-src anlık görüntüden, apt çökmez', (t) => {
@@ -173,7 +182,9 @@ test('source-archive.sh: arm64 (ports.ubuntu.com) deb-src anlık görüntüden, 
   t.is(r.kod, 0, r.hata)
   t.absent(/Assertion/.test(r.hata), 'debmetaindex.cc:1350 iddiası yok')
   t.ok(/^Types: deb deb-src$/m.test(r.sources), 'deb-src eklendi')
-  t.alike(r.listeler, beklenenListeler(HEPSI), 'bütün kaynak dizinleri snapshot.ubuntu.com/ubuntu altından (ports yolu yok)')
+  t.alike(anlik(r.listeler), beklenenListeler(HEPSI), 'her deb-src dizini snapshot.ubuntu.com/ubuntu altından (ports yolu yok)')
+  t.alike(r.listeler, [...beklenenListeler(HEPSI), ...canliListeler('ports.ubuntu.com_ubuntu-ports', HEPSI)].sort(),
+    'gölge (canlı) dizinler de iner ve hata sayılmaz (release 41184626823)')
   t.ok(/^bash\t5\.2\.21-2ubuntu4\tgpl$/m.test(r.kaynaklarTxt), 'kaynak paket indirildi')
   t.ok(/^glibc\t2\.39-0ubuntu8\.6\tcopyright-yok$/m.test(r.kaynaklarTxt), 'mimari ekli ikili paketin kaynağı')
   for (const c of r.cagrilar) t.ok(c.includes(`APT::Snapshot=${SNAP}`), 'her apt-get çağrısı aynı anlık görüntüyle: ' + c.slice(-2).join(' '))
@@ -182,7 +193,8 @@ test('source-archive.sh: arm64 (ports.ubuntu.com) deb-src anlık görüntüden, 
 test('source-archive.sh: amd64 davranışı aynı (apt tablosundaki sunucu)', (t) => {
   const r = calistir(t, AMD64)
   t.is(r.kod, 0, r.hata)
-  t.alike(r.listeler, beklenenListeler(HEPSI), 'archive ve security aynı anlık görüntü adresinde')
+  t.alike(anlik(r.listeler), beklenenListeler(HEPSI), 'archive ve security aynı anlık görüntü adresinde')
+  t.ok(r.listeler.includes('archive.ubuntu.com_ubuntu_dists_noble-backports_main_source_Sources.lz4'), 'gölge canlı dizin yerinde, hata değil')
   t.ok(/^bash\t5\.2\.21-2ubuntu4\tgpl$/m.test(r.kaynaklarTxt))
 })
 
@@ -191,4 +203,19 @@ test('source-archive.sh: anlık görüntü sunucusu bilinmeyen depo açık hatay
   t.is(r.kod, 2, 'kod 2')
   t.ok(r.hata.includes('HATA: anlık görüntü sunucusu bilinmeyen depo: http://ayna.example.org/ubuntu/'), r.hata)
   t.is(r.cagrilar.length, 0, 'apt-get çağrılmadı')
+})
+
+test('source-archive.sh: apt anlık görüntüyü sessizce bırakırsa durur', (t) => {
+  // Tek Suite'li bölümde apt çökmez, ports için sunucu bulamazsa canlı arşive döner (ör. -o ayarını tanımayan apt)
+  const tek = `Types: deb
+URIs: http://ports.ubuntu.com/ubuntu-ports/
+Suites: noble
+Components: main
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+`
+  const r = calistir(t, tek, { HF_SAHTE_HOST_YOK: 'ports.ubuntu.com' })
+  t.is(r.kod, 2, 'kod 2')
+  t.alike(r.listeler, ['ports.ubuntu.com_ubuntu-ports_dists_noble_main_source_Sources.lz4'], 'yalnız canlı dizin indi')
+  t.ok(r.hata.includes(`HATA: anlık görüntüden kaynak dizini inmedi: noble/main (${SNAP})`), r.hata)
+  t.absent(r.cagrilar.some((c) => c.includes('source')), 'kaynak indirilmeye başlanmadı')
 })

@@ -84,17 +84,25 @@ for uri in $(sed -n 's/^URIs://p' "$LISTE"); do
   esac
 done
 apt-get "${APT_SNAP[@]}" update >/dev/null
-# Her kaynak dizini anlık görüntüden gelmeli: apt sunucu bulamazsa canlı arşive sessizce döner, sürümler kayar.
-shopt -s nullglob
-dizinler=(/var/lib/apt/lists/*_source_Sources*)
-[ "${#dizinler[@]}" -gt 0 ] || { echo "HATA: deb-src dizini indirilmedi" >&2; exit 2; }
-for f in "${dizinler[@]}"; do
-  case "${f##*/}" in
-    "snapshot.ubuntu.com_ubuntu_${SNAP}_dists_"*) ;;
-    *) echo "HATA: kaynak dizini anlık görüntüden değil: ${f##*/}" >&2; exit 2 ;;
-  esac
+# Her deb-src Suite/Component'i için anlık görüntü dizini inmiş olmalı: apt sunucu bulamazsa o depoda canlı arşive
+# sessizce döner, sürümler kayar. Canlı arşivin Sources dosyaları da iner ve kalır: apt anlık görüntü kipinde asıl
+# depoyu gölge (SHADOWED) girdi olarak tutar ve onun dizinlerini de indirir. Bu yüzden canlı dosyanın varlığı hata
+# değildir, anlık görüntü dosyasının yokluğu hatadır.
+beklenen=$(awk 'BEGIN { RS = "" }
+  { t = 0; s = ""; c = ""; n = split($0, L, "\n")
+    for (i = 1; i <= n; i++) {
+      if (L[i] ~ /^Types:/ && L[i] ~ /[ \t]deb-src([ \t]|$)/) t = 1
+      if (L[i] ~ /^Suites:/) s = substr(L[i], 8)
+      if (L[i] ~ /^Components:/) c = substr(L[i], 12)
+    }
+    if (!t) next
+    ns = split(s, S, " "); nc = split(c, C, " ")
+    for (i = 1; i <= ns; i++) for (j = 1; j <= nc; j++) print S[i] "_" C[j] }' "$LISTE")
+[ -n "$beklenen" ] || { echo "HATA: $LISTE içinde deb-src yok" >&2; exit 2; }
+for sc in $beklenen; do
+  compgen -G "/var/lib/apt/lists/snapshot.ubuntu.com_ubuntu_${SNAP}_dists_${sc}_source_Sources*" >/dev/null \
+    || { echo "HATA: anlık görüntüden kaynak dizini inmedi: ${sc/_//} ($SNAP)" >&2; exit 2; }
 done
-shopt -u nullglob
 hata=0
 while IFS=$'\t' read -r kaynak ksurum neden; do
   if apt-get "${APT_SNAP[@]}" source --download-only "${kaynak}=${ksurum}" >/dev/null 2>&1; then
