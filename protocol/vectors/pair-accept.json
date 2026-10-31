@@ -1,0 +1,12 @@
+{
+  "aciklama": "D105: RFC-0017 §6.2 adım 6 — aynı telefonda ikinci uygulamanın kabul adımı. 365 ESLES_KABUL (yeni uygulama) ve 366 YEREL_ESITLE (eski uygulama) yöntemleri worklet/yerel-eslesme.js'te; durumlar worklet/test/esles-kabul.js'te çalıştırılır. Beklenenler RFC'den elle yazıldı. Not: 365 ve 366 kanal numaraları RFC-0027 §1a'daki VAULT_STATUS ve VAULT_PAPER_SHARE ile çakışıyor (İstek 184); numaralar komut-araliklari.json'a yazılmadı.",
+  "rfc": "RFC-0017",
+  "yontemler": { "ESLES_KABUL": "eslesKabul", "YEREL_ESITLE": "yerelEsitle" },
+  "beklenen": { "ayniAile": true, "kimlikSayisi": 2, "uygulamalar": ["yuva-acil", "yuva-hat"] },
+  "durumlar": [
+    { "no": "a", "aciklama": "Hat ana kimlik; Acil 360 → Hat 361 → Acil 365 → Acil aile üyesi (ek kimlik); 362 iki kimlik" },
+    { "no": "b", "aciklama": "Eski (5 dakikadan) ya da yanlış nonce ile 365", "hata": "INVALID_TRANSCRIPT" },
+    { "no": "c", "aciklama": "366 sonrası Acil, Hat'ın yazdığı kaydı ağ olmadan okur" }
+  ],
+  "hatalar": ["INVALID_TRANSCRIPT", "FAMILY_EXISTS", "OUT_OF_GROUP"]
+}

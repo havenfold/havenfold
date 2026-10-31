@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# havenfold-ekran.service — RFC-0007 §4.3, §9 adım 12: tty1'de durum ekranı ve tören QR'ı
+[Unit]
+Description=Havenfold durum ekranı
+After=havenfold-denetci.service getty@tty1.service
+Conflicts=getty@tty1.service
+
+[Service]
+Type=simple
+# RFC-0026 f: ayrı kullanıcı; denetçi kimliğini paylaşmaz. Durumu yönetim soketlerinden okur.
+User=havenfold-ekran
+Group=havenfold-ekran
+SupplementaryGroups=havenfold-yonetim
+ExecStart=/opt/havenfold/guncel/bin/havenfold ekran
+# Komut kendisi düşmez (denetçi yoksa bekler); beklenmedik bir çıkışta ekran boş kalmasın
+Restart=on-failure
+RestartSec=5
+StandardInput=tty
+StandardOutput=tty
+TTYPath=/dev/tty1
+TTYReset=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

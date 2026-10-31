@@ -1,0 +1,11 @@
+#!/usr/sbin/nft -f
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# /etc/havenfold/ag-kapali.nft — silme ortamı (RFC-0007 §13.2): geri döngü dışında her şey düşer. Rapor yalnız QR ile çıkar.
+flush ruleset
+table inet havenfold-sil {
+  chain gelen { type filter hook input priority filter; policy drop; iif "lo" accept; }
+  chain giden { type filter hook output priority filter; policy drop; oif "lo" accept; }
+  chain ileri { type filter hook forward priority filter; policy drop; }
+}

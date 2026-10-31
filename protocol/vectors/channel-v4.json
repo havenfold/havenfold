@@ -1,0 +1,404 @@
+{
+ "aciklama": "Geçerli kanal komut tablosu (D28, RFC-0027 §1, §1a, §2): SDK CHANNEL_COMMAND'un tamamı (D33: 387 VAULT_SETUP_BK, 388 VAULT_SETUP_VRK; D40: 389 VAULT_ARCHIVE_MOVE; D45: 280–287 ekip, RFC-0005 §17, TeamApi.create statik yöntem; D46: 288–289 kişisel köprü; D77: Bakım Masası sınıfı CareDeskApi, RFC-0029 §6; D67: 400–405 kasa kurtarma ve döndürme, RFC-0004 §5–§6; D79: 410–413 misafirin sınırlı yazması, RFC-0030 §8.1). kanal.json, kanal-v2.json ve kanal-v3.json kalır; çakışan yerde bu dosya geçerlidir (yerine alanı). Ayrıca kasa kilidi (VAULT_COMMAND), yapay zeka (AI_COMMAND, RFC-0013) ve SDK ortak (KOMUT, RFC-0015) komutları. Aralıklar protocol/komut-araliklari.json.",
+ "komutlar": [
+  {
+   "no": 3,
+   "ad": "INVITE_START",
+   "sdk": "CeremonyApi.startInvite"
+  },
+  {
+   "no": 4,
+   "ad": "INVITE_CONFIRM",
+   "sdk": "CeremonyApi.confirm"
+  },
+  {
+   "no": 5,
+   "ad": "JOIN",
+   "sdk": "CeremonyApi.join"
+  },
+  {
+   "no": 14,
+   "ad": "LEDGER_SIGN",
+   "sdk": "LedgerApi.sign"
+  },
+  {
+   "no": 205,
+   "ad": "INVITE_CANCEL",
+   "sdk": "CeremonyApi.cancel"
+  },
+  {
+   "no": 225,
+   "ad": "PROPOSALS",
+   "sdk": "LedgerApi.listProposals"
+  },
+  {
+   "no": 226,
+   "ad": "PROPOSAL_REJECT",
+   "sdk": "LedgerApi.rejectProposal"
+  },
+  {
+   "no": 249,
+   "ad": "RECORD_MOVE",
+   "sdk": "RecordApi.move"
+  },
+  {
+   "no": 254,
+   "ad": "TASK_CONSENT",
+   "sdk": "TaskApi.consent"
+  },
+  {
+   "no": 280,
+   "ad": "TEAM_CREATE",
+   "sdk": "TeamApi.create"
+  },
+  {
+   "no": 281,
+   "ad": "TEAM_ROLE",
+   "sdk": "TeamApi.role"
+  },
+  {
+   "no": 282,
+   "ad": "TEAM_ASSIGN",
+   "sdk": "TeamApi.assign"
+  },
+  {
+   "no": 283,
+   "ad": "TEAM_TERM",
+   "sdk": "TeamApi.setTerm"
+  },
+  {
+   "no": 284,
+   "ad": "TEAM_NOTICE",
+   "sdk": "TeamApi.privacyNotice"
+  },
+  {
+   "no": 285,
+   "ad": "TEAM_REMOVE",
+   "sdk": "TeamApi.remove"
+  },
+  {
+   "no": 286,
+   "ad": "TEAM_EXIT_STATUS",
+   "sdk": "TeamApi.exitStatus"
+  },
+  {
+   "no": 287,
+   "ad": "TEAM_PLACES",
+   "sdk": "TeamApi.places"
+  },
+  {
+   "no": 288,
+   "ad": "BRIDGE_PREPARE",
+   "sdk": "BridgeApi.prepare"
+  },
+  {
+   "no": 289,
+   "ad": "BRIDGE_RECEIVE",
+   "sdk": "BridgeApi.receive"
+  },
+  {
+   "no": 352,
+   "ad": "LOCAL_DRAFT",
+   "sdk": "LocalApi.dropDraft"
+  },
+  {
+   "no": 353,
+   "ad": "PERSONAL_MODE_START",
+   "sdk": "PersonalMode.start"
+  },
+  {
+   "no": 354,
+   "ad": "PERSONAL_MODE_MOVE",
+   "sdk": "PersonalMode.move"
+  },
+  {
+   "no": 355,
+   "ad": "CARE_PROCESS",
+   "sdk": "CareDeskApi.process"
+  },
+  {
+   "no": 356,
+   "ad": "CARE_MISSED",
+   "sdk": "CareDeskApi.missed"
+  },
+  {
+   "no": 357,
+   "ad": "CARE_CLAIM",
+   "sdk": "CareDeskApi.imHandling"
+  },
+  {
+   "no": 358,
+   "ad": "SHIELD_ENABLE",
+   "sdk": "ShieldApi.enable"
+  },
+  {
+   "no": 359,
+   "ad": "SHIELD_REPORT",
+   "sdk": "ShieldApi.report"
+  },
+  {
+   "no": 365,
+   "ad": "VAULT_STATUS",
+   "sdk": "VaultApi.status"
+  },
+  {
+   "no": 366,
+   "ad": "VAULT_PAPER_SHARE",
+   "sdk": "VaultApi.paperShare"
+  },
+  {
+   "no": 367,
+   "ad": "VAULT_PAPER_PRINTED",
+   "sdk": "VaultApi.paperPrinted"
+  },
+  {
+   "no": 368,
+   "ad": "VAULT_PERSONAL",
+   "sdk": "LedgerApi.myPersonalVault"
+  },
+  {
+   "no": 369,
+   "ad": "VAULT_CHILD_BACKUP",
+   "sdk": "VaultApi.childBackup"
+  },
+  {
+   "no": 370,
+   "ad": "CARE_STATUS",
+   "sdk": "CareDeskApi.status"
+  },
+  {
+   "no": 371,
+   "ad": "CARE_DOSES",
+   "sdk": "CareDeskApi.doses"
+  },
+  {
+   "no": 372,
+   "ad": "CARE_DOSE_MARK",
+   "sdk": "CareDeskApi.markDose"
+  },
+  {
+   "no": 373,
+   "ad": "CARE_HEALTH_SETUP",
+   "sdk": "CareDeskApi.setupHealthCollection"
+  },
+  {
+   "no": 374,
+   "ad": "SHIELD_STATUS",
+   "sdk": "ShieldApi.status"
+  },
+  {
+   "no": 375,
+   "ad": "SHIELD_DISABLE",
+   "sdk": "ShieldApi.close"
+  },
+  {
+   "no": 376,
+   "ad": "SHIELD_GUARDIANS",
+   "sdk": "ShieldApi.setGuardians"
+  },
+  {
+   "no": 377,
+   "ad": "SHIELD_INVITE_ANSWER",
+   "sdk": "ShieldApi.answerInvite"
+  },
+  {
+   "no": 378,
+   "ad": "SHIELD_RESULT",
+   "sdk": "ShieldApi.writeResult"
+  },
+  {
+   "no": 379,
+   "ad": "SHIELD_NOTIFICATIONS",
+   "sdk": "ShieldApi.notifications"
+  },
+  {
+   "no": 380,
+   "ad": "SHIELD_VISIBILITY",
+   "sdk": "ShieldApi.setVisibility"
+  },
+  {
+   "no": 381,
+   "ad": "LOCAL_MESSAGE",
+   "sdk": "LocalApi.dropMessage"
+  },
+  {
+   "no": 382,
+   "ad": "VAULT_PENDING_CHANGES",
+   "sdk": "LedgerApi.departed"
+  },
+  {
+   "no": 383,
+   "ad": "COLLECTION_SENSITIVITY",
+   "sdk": "LedgerApi.setSensitivity"
+  },
+  {
+   "no": 384,
+   "ad": "AI_PLAN_EXTRACT",
+   "sdk": "AiApi.extractPlan"
+  },
+  {
+   "no": 385,
+   "ad": "CAREGIVER_PREPARE",
+   "sdk": "LedgerApi.prepareCaregiver"
+  },
+  {
+   "no": 386,
+   "ad": "CAREGIVER_PROPOSE",
+   "sdk": "LedgerApi.proposeCaregiver"
+  },
+  {
+   "no": 387,
+   "ad": "VAULT_SETUP_BK",
+   "sdk": "VaultApi.setupBackupKey"
+  },
+  {
+   "no": 388,
+   "ad": "VAULT_SETUP_VRK",
+   "sdk": "VaultApi.setupRecoveryKey"
+  },
+  {
+   "no": 389,
+   "ad": "VAULT_ARCHIVE_MOVE",
+   "sdk": "VaultApi.moveArchive"
+  },
+  {
+   "no": 390,
+   "ad": "EXPORT",
+   "sdk": "ExportApi.export"
+  },
+  {
+   "no": 391,
+   "ad": "IMPORT",
+   "sdk": "ExportApi.import"
+  },
+  {
+   "no": 400,
+   "ad": "VAULT_RECOVERY_START",
+   "sdk": "VaultApi.startRecovery"
+  },
+  {
+   "no": 401,
+   "ad": "VAULT_RECOVERY_SHARE",
+   "sdk": "VaultApi.recoveryShare"
+  },
+  {
+   "no": 402,
+   "ad": "VAULT_RECOVERY_FINISH",
+   "sdk": "VaultApi.finishRecovery"
+  },
+  {
+   "no": 403,
+   "ad": "VAULT_ROTATE",
+   "sdk": "VaultApi.rotateVault"
+  },
+  {
+   "no": 404,
+   "ad": "VAULT_RECOVERY_STATUS",
+   "sdk": "VaultApi.recoveryStatus"
+  },
+  {
+   "no": 405,
+   "ad": "VAULT_SHARE_APPROVE",
+   "sdk": "VaultApi.approveShare"
+  },
+  {
+   "no": 410,
+   "ad": "CAREGIVER_WRITE_GRANT",
+   "sdk": "LedgerApi.grantCaregiverWrite"
+  },
+  {
+   "no": 411,
+   "ad": "GUEST_PERMISSIONS",
+   "sdk": "GuestWriteApi.permissions"
+  },
+  {
+   "no": 412,
+   "ad": "GUEST_DROP",
+   "sdk": "GuestWriteApi.drop"
+  },
+  {
+   "no": 413,
+   "ad": "GUEST_MY_WRITES",
+   "sdk": "GuestWriteApi.myWrites"
+  }
+ ],
+ "kasa": [
+  {
+   "no": 19,
+   "ad": "LOCK",
+   "sdk": "VaultApi.lock"
+  },
+  {
+   "no": 224,
+   "ad": "UNLOCK",
+   "sdk": "VaultApi.unlock"
+  }
+ ],
+ "yz": [
+  {
+   "no": 270,
+   "ad": "AI_STATUS"
+  },
+  {
+   "no": 271,
+   "ad": "AI_ASK"
+  },
+  {
+   "no": 272,
+   "ad": "AI_EXTRACT"
+  },
+  {
+   "no": 273,
+   "ad": "AI_SAVE"
+  },
+  {
+   "no": 274,
+   "ad": "AI_SEARCH"
+  },
+  {
+   "no": 275,
+   "ad": "AI_INDEX"
+  },
+  {
+   "no": 276,
+   "ad": "AI_MODEL"
+  },
+  {
+   "no": 277,
+   "ad": "AI_EXTERNAL"
+  },
+  {
+   "no": 278,
+   "ad": "AI_SETTINGS"
+  },
+  {
+   "no": 279,
+   "ad": "AI_QUOTA"
+  }
+ ],
+ "ortak": [
+  {
+   "no": 350,
+   "ad": "PRESENCE_GET"
+  },
+  {
+   "no": 351,
+   "ad": "MEMBER_RESOLVE"
+  }
+ ],
+ "yerine": {
+  "VAULT_STATUS": {
+   "eski": 229,
+   "yeni": 365
+  },
+  "EXPORT": {
+   "eski": 280,
+   "yeni": 390
+  },
+  "IMPORT": {
+   "eski": 281,
+   "yeni": 391
+  }
+ },
+ "bos": []
+}

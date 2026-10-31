@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# calistir — YALNIZ TEST ISO'SU: kurulum komutunu çıktısı ve soruları ikinci seri kapıda (ttyS1) olacak biçimde
+# çalıştırır. CI sürücüsü (installer/test/vm/driver.js) ttyS1'i okur ve hf-on-kontrol'ün "SIL" sorusunu yanıtlar.
+# Üretim komutu değişmeden çalışır; yalnız HF_TTY ve çıktı yönü farklıdır.
+T=/dev/ttyS1
+[ -c "$T" ] || { echo "calistir: $T yok" >&2; exec "$@"; }
+exec >"$T" 2>&1
+printf '\n[hf-test] %s %s\n' "$(date -u +%H:%M:%S)" "$*"
+export HF_TTY=$T
+"$@"
+s=$?
+printf '[hf-test] çıkış %s: %s\n' "$s" "$1"
+exit "$s"

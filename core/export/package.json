@@ -1,0 +1,26 @@
+{
+  "name": "@havenfold/export",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Havenfold export container: an Argon2id and XChaCha20-Poly1305 stream around a ZIP archive (RFC-0014)",
+  "license": "MPL-2.0",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "*.js"
+  ],
+  "scripts": {
+    "test": "brittle-node test/*.js"
+  },
+  "dependencies": {
+    "@havenfold/core": "0.0.0",
+    "b4a": "1.9.0",
+    "sodium-native": "5.2.0"
+  },
+  "devDependencies": {
+    "brittle": "4.5.0"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}

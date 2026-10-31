@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# havenfold-pil.service — RFC-0007 §10.1, RFC-0026 g: pil şarj eşiği her açılışta yeniden yazılır (sürücüler
+# sıfırlayabilir). Yardımcının sabit yolundan çalışır, güncellenen sürümden değil; yardımcı birimi gibi sertleştirilir.
+[Unit]
+Description=Havenfold pil şarj sınırı
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/havenfold/yetki/node /usr/lib/havenfold/yetki/ana.js pil-uygula
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictRealtime=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallFilter=@system-service
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX
+UMask=0077
+ReadWritePaths=-/sys/class/power_supply
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,161 @@
+{
+ "aciklama": "RFC-0036 §9 vektör 1–6 ve 5a: JOIN_HELLO'da aile adı. JOIN_HELLO = deviceCert, name, device, eph, mac, [caps], [familyName]; familyName c.string (UTF-8, 1–256 bayt), yalnız caps'te AILE_ADI (32768) varken. mac = derive(sec, \"hf/toren/mac\", el sıkışma özeti, taraf[, u64be(caps)][, familyName UTF-8 baytları]). Tören akışı durumları core/tasiyici/test/toren-aile-adi.js'te sahte DHT üstünde çalıştırılır; beklenenler RFC'den elle yazıldı.",
+ "rfc": "RFC-0036",
+ "AILE_ADI": 32768,
+ "enUzun": 256,
+ "capsYeni": 57568,
+ "capsEski": 24800,
+ "sec": "000102030405060708090a0b0c0d0e0f",
+ "handshakeHash": "a0a1a2a3a4a5a6a7a8a9aaabacadaeafa0a1a2a3a4a5a6a7a8a9aaabacadaeaf",
+ "mac": [
+  {
+   "taraf": "s",
+   "caps": 57568,
+   "aileAdi": "Eser ailesi",
+   "mac": "c181a7d44c6d4ebb3d1b731f42d124a3c732070c07ce2078be204ca416060c58"
+  },
+  {
+   "taraf": "s",
+   "caps": 57568,
+   "aileAdi": "Saadet'in evi",
+   "mac": "b1e8c426e7d951c71ccdc491d31810ca08d1ae8eaabaa6810581f12580c7dead"
+  },
+  {
+   "taraf": "s",
+   "caps": 57568,
+   "aileAdi": null,
+   "mac": "f3e1cfdbbffc46c4701f268e85c30936944b1a59d362e38d32892a82a250d1d1"
+  },
+  {
+   "taraf": "c",
+   "caps": 57568,
+   "aileAdi": null,
+   "mac": "109914e7ec4f23d7cdcf8dd6635c5f94b2ba1065de056a8c86a65072f73c19aa"
+  }
+ ],
+ "kodlama": {
+  "kimlikTohumu": "toren-aile-adi/kerem",
+  "ad": "Kerem",
+  "cihaz": "Pixel",
+  "eph": "e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+  "adli": {
+   "aileAdi": "Eser ailesi",
+   "caps": 57568,
+   "hex": "00b52db8de01ddadaa8115ccf2f94a4dc3bb189b03aa263e13173fca3ee14b1df14654de31a194c815103068df9efb600fd958731355fd54aff0bd0a36b0a4372d04746573740000054b6572656d05506978656ce1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1c181a7d44c6d4ebb3d1b731f42d124a3c732070c07ce2078be204ca416060c58fde0e00b457365722061696c657369"
+  },
+  "adsiz": {
+   "caps": 57568,
+   "hex": "00b52db8de01ddadaa8115ccf2f94a4dc3bb189b03aa263e13173fca3ee14b1df14654de31a194c815103068df9efb600fd958731355fd54aff0bd0a36b0a4372d04746573740000054b6572656d05506978656ce1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f3e1cfdbbffc46c4701f268e85c30936944b1a59d362e38d32892a82a250d1d1fde0e0"
+  },
+  "gecersiz": [
+   {
+    "no": 1,
+    "aciklama": "bit yokken ad",
+    "hex": "00b52db8de01ddadaa8115ccf2f94a4dc3bb189b03aa263e13173fca3ee14b1df14654de31a194c815103068df9efb600fd958731355fd54aff0bd0a36b0a4372d04746573740000054b6572656d05506978656ce1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1c181a7d44c6d4ebb3d1b731f42d124a3c732070c07ce2078be204ca416060c58fde0600445736572",
+    "hata": "INVALID_MESSAGE"
+   },
+   {
+    "no": 1,
+    "aciklama": "boş ad",
+    "hex": "00b52db8de01ddadaa8115ccf2f94a4dc3bb189b03aa263e13173fca3ee14b1df14654de31a194c815103068df9efb600fd958731355fd54aff0bd0a36b0a4372d04746573740000054b6572656d05506978656ce1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f3e1cfdbbffc46c4701f268e85c30936944b1a59d362e38d32892a82a250d1d1fde0e000",
+    "hata": "INVALID_MESSAGE"
+   },
+   {
+    "no": 1,
+    "aciklama": "257 bayt ad",
+    "hex": "00b52db8de01ddadaa8115ccf2f94a4dc3bb189b03aa263e13173fca3ee14b1df14654de31a194c815103068df9efb600fd958731355fd54aff0bd0a36b0a4372d04746573740000054b6572656d05506978656ce1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f3e1cfdbbffc46c4701f268e85c30936944b1a59d362e38d32892a82a250d1d1fde0e0fd01016161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161",
+    "hata": "INVALID_MESSAGE"
+   }
+  ],
+  "sinir": {
+   "no": 1,
+   "aciklama": "256 bayt ad geçerli",
+   "hex": "00b52db8de01ddadaa8115ccf2f94a4dc3bb189b03aa263e13173fca3ee14b1df14654de31a194c815103068df9efb600fd958731355fd54aff0bd0a36b0a4372d04746573740000054b6572656d05506978656ce1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1f3e1cfdbbffc46c4701f268e85c30936944b1a59d362e38d32892a82a250d1d1fde0e0fd0001c59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59fc59f"
+  }
+ },
+ "durumlar": [
+  {
+   "no": 2,
+   "aciklama": "Bugünkü (adı bilmeyen) çözücü adlı JOIN_HELLO'yu reddeder",
+   "hata": "INVALID_MESSAGE"
+  },
+  {
+   "no": 2,
+   "aciklama": "Aile tarafı bitsiz karşıya adı yazmaz",
+   "yeniGelen": "eski",
+   "aile": "yeni",
+   "aileAdi": null
+  },
+  {
+   "no": 3,
+   "aciklama": "Yolda ad değiştirilir",
+   "hata": "INVALID_CEREMONY"
+  },
+  {
+   "no": 3,
+   "aciklama": "Yolda ad silinir",
+   "hata": "INVALID_CEREMONY"
+  },
+  {
+   "no": 4,
+   "aciklama": "JOIN_LEDGER'daki ad farklı: bağlanmaz",
+   "hata": "FAMILY_NAME_MISMATCH"
+  },
+  {
+   "no": 5,
+   "aciklama": "kind 1 ve 2 (aile tarayan): ad yok",
+   "kinds": [
+    1,
+    2
+   ],
+   "aileAdi": null
+  },
+  {
+   "no": 5,
+   "aciklama": "Yeni gelen ad gönderir",
+   "hata": "INVALID_CEREMONY"
+  },
+  {
+   "no": "5a",
+   "aciklama": "Misafir töreni: ad gelir, GUEST_VIEW sonrası karşılaştırma yok, ad misafir örneğinde saklanır",
+   "aileAdi": "Eser ailesi"
+  },
+  {
+   "no": "5a",
+   "aciklama": "Misafir bit göndermez: ad yok",
+   "yeniGelen": "eski",
+   "aileAdi": null
+  },
+  {
+   "no": 6,
+   "aciklama": "sas.aileAdi; eski aile tarafıyla null",
+   "karisimlar": [
+    [
+     "yeni",
+     "yeni",
+     "Eser ailesi"
+    ],
+    [
+     "eski",
+     "yeni",
+     null
+    ],
+    [
+     "yeni",
+     "eski",
+     null
+    ],
+    [
+     "eski",
+     "eski",
+     null
+    ]
+   ]
+  }
+ ],
+ "hatalar": [
+  "FAMILY_NAME_MISMATCH",
+  "INVALID_MESSAGE",
+  "INVALID_CEREMONY"
+ ]
+}

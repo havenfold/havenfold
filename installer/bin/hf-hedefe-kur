@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# hf-hedefe-kur — kurulan sisteme Havenfold'u yerleştirir (RFC-0007 §8.3 late-commands, §8.5, §10).
+#
+#   hf-hedefe-kur /target                   paket doğrulama ve açma, kullanıcılar, birimler, laptop ayarları, Clevis
+#   hf-hedefe-kur --gunluk-temizle /target  kurulum günlüklerinden geçici LUKS parolasını içeren dosyaları siler
+#
+# Kurulum ortamında kök olarak, subiquity late-commands adımında çalışır. Özetler USB'deki havenfold/ozetler
+# listesine göre (derlemede imzalı bildirimle denetlendi) b2sum ile yeniden denetlenir. Ubuntu paketleri USB'den
+# çevrimdışı kurulur. TPM varsa disk Clevis ile TPM'ye PCR'sız bağlanır (kurulum ortamı USB'den açıldığı için);
+# ilk açılışta havenfold-luks-yenile bağı PCR 7'ye taşır, kurtarma anahtarını ekler, geçici parolanın yuvasını siler.
+set -euo pipefail
+
+USB=${HF_USB:-/cdrom}
+RAM=${HF_RAM:-/run/havenfold-kurulum}
+KURULUM=$USB/havenfold/kurulum
+PAKET_DIZ=$USB/havenfold
+# shellcheck source=../target/common.sh
+. "$KURULUM/target/common.sh"
+
+BAGLAR=()
+hedefte () {
+  local d
+  for d in dev dev/pts proc sys run; do
+    if ! mountpoint -q "$KOK/$d"; then mkdir -p "$KOK/$d"; mount --bind "/$d" "$KOK/$d"; BAGLAR+=("$KOK/$d"); fi
+  done
+  chroot "$KOK" "$@"
+}
+baglari_kaldir () {
+  local i
+  for ((i = ${#BAGLAR[@]} - 1; i >= 0; i--)); do umount "${BAGLAR[$i]}" 2>/dev/null || umount -l "${BAGLAR[$i]}" || true; done
+}
+
+gunluk_temizle () {
+  KOK=$1
+  local p="$RAM/luks-gecici" f
+  rm -f "$KOK/var/log/installer/autoinstall-user-data"
+  if [ -s "$p" ] && grep -qxE '[A-Z2-7]{52}' "$p"; then
+    # Parolayı içeren her günlük dosyası silinir (parola argüman olarak verilmez: grep -f)
+    while IFS= read -r -d '' f; do shred -u "$f" 2>/dev/null || rm -f "$f"; done \
+      < <(grep -rlZF -f "$p" "$KOK/var/log" "$KOK/etc" "$KOK/root" 2>/dev/null || true)
+    shred -u "$p" 2>/dev/null || rm -f "$p"
+  fi
+  echo "Kurulum günlükleri temizlendi."
+}
+
+if [ "${1:-}" = "--gunluk-temizle" ]; then gunluk_temizle "${2:?hedef kök gerekli}"; exit 0; fi
+KOK=${1:?hedef kök gerekli (/target)}
+[ -d "$KOK/etc" ] || { echo "HATA: hedef kök değil: $KOK" >&2; exit 1; }
+trap baglari_kaldir EXIT
+
+hf_adim "1. Özetler (b2sum, imzalı bildirimdeki değerler)"
+hf_ozetleri_denetle "$PAKET_DIZ" "$PAKET_DIZ/ozetler"
+echo "tamam"
+
+hf_adim "2. Kurulum aracı: /usr/lib/havenfold/kurulum"
+hf_kurulum_kopyala
+
+hf_adim "3. Ubuntu paketleri (USB'den, çevrimdışı)"
+mkdir -p "$KOK/var/cache/havenfold-deb"
+cp "$PAKET_DIZ"/deb/*.deb "$KOK/var/cache/havenfold-deb/"
+hedefte sh -c 'DEBIAN_FRONTEND=noninteractive dpkg -i /var/cache/havenfold-deb/*.deb'
+rm -rf "$KOK/var/cache/havenfold-deb"
+hedefte sh -c 'if dpkg -s fwupd >/dev/null 2>&1; then DEBIAN_FRONTEND=noninteractive apt-get purge -y fwupd; fi' # §8.5
+
+hf_adim "4. Düğüm paketi"
+hf_paket_ac
+
+hf_adim "5. Kullanıcılar, gruplar, dizinler"
+hf_kullanicilar
+# yonetici kullanıcısını ilk açılışta cloud-init açar (user-data); havenfold-yonetim grubu orada verilir
+
+hf_adim "6. Kökün durumu ve yetki yardımcısı"
+hf_yetki
+
+hf_adim "7. Laptop ve sistem ayarları (§10)"
+hf_laptop
+hf_sistem_ayarlari
+hf_nft usb
+hf_dugum_toml isci kararli "$HF_PIL_SINIR"
+
+TPM=$(hf_cli bilgi --dosya "$RAM/karar.json" --alan tpm)
+hf_adim "8. systemd birimleri"
+BIRIMLER=(havenfold-denetci.service havenfold-kutu.service havenfold-isci.service havenfold-yetki.socket
+  havenfold-pil.service havenfold-acilis.service havenfold-deneme.timer havenfold-nft.service havenfold-ilk-acilis.service)
+[ "$TPM" = "true" ] && BIRIMLER+=(havenfold-luks-yenile.service)
+hf_birimler "${BIRIMLER[@]}"
+
+hf_adim "9. Disk şifreleme: Clevis TPM bağı (PCR'sız; ilk açılışta PCR 7)"
+if [ "$TPM" = "true" ]; then
+  [ -s "$RAM/luks-gecici" ] || { echo "HATA: geçici LUKS parolası yok" >&2; exit 1; }
+  UUID=$(awk '!/^#/ && NF >= 2 { sub(/^UUID=/, "", $2); print $2; exit }' "$KOK/etc/crypttab")
+  [ -n "$UUID" ] || { echo "HATA: /etc/crypttab'da LUKS aygıtı yok" >&2; exit 1; }
+  # Parola dosyası /run altında (tmpfs, bağlı); chroot içinden aynı yolla okunur
+  hedefte clevis luks bind -y -d "/dev/disk/by-uuid/$UUID" -k "$RAM/luks-gecici" tpm2 '{}'
+  hedefte update-initramfs -u -k all
+  echo "TPM bağı kuruldu."
+else
+  echo "TPM yok: disk şifrelenmedi (kurucu belge §9.2)."
+fi
+
+hf_adim "10. Düğümün ilk ayarı (hostId; kimlikler ilk açılışta, rol seçilince)"
+hedefte /usr/local/bin/havenfold ilk-ayar --kurulum
+
+printf '\nHavenfold yerleştirildi. Yeniden başlatınca ilk açılış ekranı gelir.\n'

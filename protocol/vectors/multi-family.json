@@ -1,0 +1,259 @@
+{
+  "aciklama": "RFC-0034 §11: bir telefonda birden çok aile. D92 (adım 1 ve 2) maddeleri 1, 2, 3, 4, 5, 6, 9, 10; D93 (adım 3 ve 4) 7, 8, 14, 15; D94 (adım 5 ve 6) 11, 12, 13. Durumlar worklet/test/coklu-aile.js ve core/tasiyici/test/coklu-aile.js'te çalıştırılır; beklenen hata kodları buradan okunur.",
+  "rfc": "RFC-0034",
+  "sinirlar": {
+    "aileEnCok": 3,
+    "katilimAyniAnda": 1,
+    "katilimDakika": 10,
+    "cihazOrnek": 1
+  },
+  "komutlar": [
+    {
+      "no": 420,
+      "ad": "FAMILIES",
+      "sdk": "worklet"
+    },
+    {
+      "no": 421,
+      "ad": "FAMILY_ADD",
+      "sdk": "worklet"
+    },
+    {
+      "no": 422,
+      "ad": "JOIN_PREPARE",
+      "sdk": "worklet"
+    },
+    {
+      "no": 423,
+      "ad": "FAMILY_LEAVE",
+      "sdk": "worklet"
+    },
+    {
+      "no": 424,
+      "ad": "FAMILY_LOCAL_REMOVE",
+      "sdk": "worklet"
+    },
+    {
+      "no": 425,
+      "ad": "FAMILY_PERMIT_GRANT",
+      "sdk": "worklet"
+    }
+  ],
+  "dizin": {
+    "kok": [
+      "kilit",
+      "kimlik",
+      "hlc",
+      "durum",
+      "arsiv",
+      "dosyalar/",
+      "gomme/"
+    ],
+    "ek": "aileler/<yerelNo>/",
+    "yerelNo": "16 bayt rastgele, hex (32 karakter); telefondan çıkmaz",
+    "anahtarKok": "derive(platform anahtarı, 'hf/worklet/kalici')",
+    "anahtarEk": "derive(platform anahtarı, 'hf/worklet/kalici', yerelNo)",
+    "adEk": "'HFW1' ‖ sürüm ‖ kip ‖ 'aileler/<yerelNo>/' ‖ dosya adı",
+    "durumSurumu": 3
+  },
+  "baglantisizlik": {
+    "madde": 1,
+    "aciklama": "iki örneğin kimliklerinde ve defterlerinde 16 bayt ve üstü ortak alan yok (memberId, ÜKA, ÜDA, personId, sertifika, aile kimliği)",
+    "ortakOlabilir": [
+      "platform",
+      "appId",
+      "yetenek bitleri"
+    ]
+  },
+  "secim": [
+    {
+      "madde": 2,
+      "aciklama": "tek örnekte aile alanı olmayan komut geçerli",
+      "ornek": 1,
+      "aile": null,
+      "hata": null
+    },
+    {
+      "madde": 2,
+      "aciklama": "birden çok örnekte aile alanı olmayan aileye özgü komut",
+      "ornek": 2,
+      "aile": null,
+      "hata": "FAMILY_AMBIGUOUS"
+    },
+    {
+      "madde": 2,
+      "aciklama": "bilinmeyen yerelNo",
+      "ornek": 2,
+      "aile": "abababababababababababababababab",
+      "hata": "NO_FAMILY"
+    }
+  ],
+  "sinir": {
+    "madde": 3,
+    "aciklama": "3 ailede 421 ve 422 reddedilir; bozuk örnek de sayılır (üyelik sürüyor). D92 yalnız bu uygulamanın örneklerini sayar; yerel kanaldaki başka uygulamaların aileleri ve 'ayrılınca yeniden geçerli' D93'te",
+    "aileSayisi": 3,
+    "hata": "FAMILY_LIMIT"
+  },
+  "ayniAile": [
+    {
+      "madde": 4,
+      "aciklama": "QR famHint'i (familyId'nin ilk 8 baytı) telefondaki bir aileninki: tören başlamaz, katılım örneği silinir",
+      "hata": "FAMILY_EXISTS"
+    },
+    {
+      "madde": 4,
+      "aciklama": "famHint aile listesinde değil: tören başlar",
+      "hata": null
+    },
+    {
+      "madde": 4,
+      "aciklama": "JOIN_LEDGER.familyId telefondaki bir aileninki: katılım örneği silinir",
+      "hata": "FAMILY_EXISTS"
+    }
+  ],
+  "dosyaTakasi": {
+    "madde": 5,
+    "aciklama": "A'nın durum dosyası B'nin klasörüne konur: B açılmaz, A ve kök açılır",
+    "hata": "STATE_CORRUPT"
+  },
+  "silinenOrnek": {
+    "madde": 6,
+    "aciklama": "sayaç haritasında olan B'nin klasörü silinir: B açılmaz (aile-hata), diğerleri açılır",
+    "hata": "STATE_ROLLED_BACK"
+  },
+  "goc": {
+    "madde": 9,
+    "aciklama": "bugünkü biçimde dizin (durum v2, yerelNo yok) kök örnek olarak aynı memberId ve sayaçla açılır; dosya yer değiştirmez; durum v3 ile yazılır",
+    "eskiSurum": 2,
+    "yeniSurum": 3
+  },
+  "tasiyici": {
+    "madde": 10,
+    "aciklama": "tek dht, iki örnek: bir ailenin çiftinin arama anahtarı öbür ailenin sunucusunun güvenlik duvarında reddedilir; öbür ailenin üyesinin HELLO'su reddedilir; testnette iki ailede eşitleme aynı anda yürür"
+  },
+  "hatalar": [
+    "FAMILY_LIMIT",
+    "FAMILY_EXISTS",
+    "FAMILY_AMBIGUOUS",
+    "NO_FAMILY",
+    "JOIN_IN_PROGRESS",
+    "DEVICE_SINGLE_COMMUNITY",
+    "STATE_CORRUPT",
+    "STATE_ROLLED_BACK",
+    "MEMBERSHIP_IN_PROGRESS",
+    "NO_MEMBERSHIP",
+    "ROOT_CORRUPT",
+    "FAMILY_PERMISSION_REQUIRED",
+    "PARENT_REQUIRED",
+    "NOT_CHILD",
+    "SOS_SHARED_MID"
+  ],
+  "ayrilmisKomutlar": [
+    426,
+    427,
+    428,
+    429
+  ],
+  "cikarilma": {
+    "madde": 7,
+    "aciklama": "bir ailede REMOVE_MEMBER { wipe: true }: yalnız o örnek silinir (aile-silindi, sayac: null); öbür örneğin oturumları kopmaz, eşitleme sürer"
+  },
+  "yarimSilme": {
+    "madde": 8,
+    "aciklama": "silinecek işareti 'siliniyor' ve dosyalar yarım: açılışta silme tamamlanır, örnek listede yok; kökte kök sıfırlanır",
+    "isaret": "silinecek",
+    "asama": [
+      "bekliyor",
+      "siliniyor"
+    ]
+  },
+  "kasa": {
+    "madde": 15,
+    "aciklama": "A'da UNLOCK B'nin kasasını açmaz (kilit örnek başına, §5.3)"
+  },
+  "ayrilma": {
+    "aciklama": "423: LEAVE yazılır, örnek 'silinecek' (işaret 'bekliyor'); LEAVE doğrulanmış bir oturuma yazılınca ya da 72 saat sonra silinir; kökte kök sıfırlanır",
+    "saat": 72
+  },
+  "yerelKanal": [
+    {
+      "madde": 14,
+      "aciklama": "APP_PAIR_REQ2.familyId eski uygulamanın örneklerinde yok",
+      "hata": "NO_FAMILY"
+    },
+    {
+      "madde": 14,
+      "aciklama": "0xEB ağdan (doğrudan oturum, emanet, Posta Kutusu) gelir: atılır",
+      "hata": "TYPE_NOT_ALLOWED"
+    },
+    {
+      "madde": 14,
+      "aciklama": "tek aileli uygulamayla 0xE8: tek ailesine eklenir",
+      "hata": null
+    }
+  ],
+  "zarf": {
+    "APP_PAIR_REQ2": "0xEB",
+    "govde": "{ deviceCert, appId: string, nonce: fixed32, familyId: fixed32 }",
+    "yalnizYerel": true
+  },
+  "cocuk": [
+    {
+      "madde": 12,
+      "aciklama": "A'da cocuk olan telefon izinsiz 422 (ve 421)",
+      "hata": "FAMILY_PERMISSION_REQUIRED"
+    },
+    {
+      "madde": 12,
+      "aciklama": "ebeveyn izniyle geçerli",
+      "tekKullanim": "izin ikinci kez kullanılamaz",
+      "hata": null
+    },
+    {
+      "madde": 12,
+      "aciklama": "süresi geçmiş izin",
+      "hata": "FAMILY_PERMISSION_REQUIRED"
+    },
+    {
+      "madde": 12,
+      "aciklama": "izni çocuk ya da yetişkin yazmış: yok sayılır",
+      "hata": "FAMILY_PERMISSION_REQUIRED"
+    }
+  ],
+  "izin": {
+    "tur": "hf.aile-izni",
+    "koleksiyon": "Tüm Aile",
+    "alanlar": {
+      "_subj": "uye:<çocuk>",
+      "gecerli": "ms; yazılıştan en çok 7 gün sonra"
+    },
+    "yazar": "o ailenin ebeveyni",
+    "komut": 425
+  },
+  "cihazRolu": {
+    "madde": 13,
+    "aciklama": "kutu, uç ya da işçi platformundaki ya da defterde rolü kutu olan telefonda 421/422",
+    "hata": "DEVICE_SINGLE_COMMUNITY"
+  },
+  "bildirim": [
+    {
+      "madde": 11,
+      "aciklama": "A ve B'de aynı ortakMid'li iki hf.sos: tek bildirim (ikincisi ekrandakini günceller)"
+    },
+    {
+      "madde": 11,
+      "aciklama": "farklı ortakMid: iki bildirim"
+    },
+    {
+      "madde": 11,
+      "aciklama": "A'da aynı (vaka, basamak, sira) iki kez: tek bildirim; küme (aile, vaka, basamak, sira)"
+    }
+  ],
+  "sosOrtakMid": {
+    "alan": "ortak_mid",
+    "sdk": "ortakMid",
+    "deger": "bytes 16, isteğe bağlı",
+    "hata": "SOS_SHARED_MID",
+    "tekil": "7 gün (RFC-0031 §6 afet_mid kuralı)"
+  }
+}

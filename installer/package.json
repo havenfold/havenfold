@@ -1,0 +1,11 @@
+{
+  "name": "havenfold-installer",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Havenfold installer USB, installation on an existing Ubuntu (havenfold-kur) and erase mode (RFC-0007 §8–10, §13)",
+  "license": "MPL-2.0",
+  "scripts": {
+    "test": "brittle-node test/*.js",
+    "vector": "node test/helpers/erasure-vector.js > ../protocol/vectors/erasure.json"
+  }
+}

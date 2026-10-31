@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# gecici-sakla — YALNIZ TEST ISO'SU: geçici LUKS parolasının bir kopyasını hedefte /var/lib/hf-test/gecici'ye (0600)
+# koyar. hf-test-denetim ilk açılışta bununla (1) parolanın kurulum günlüklerinde kalıp kalmadığını, (2) geçici
+# parolanın yuvasının silindiğini denetler. Parola ekrana ve günlüğe yazılmaz. Sanal makineye özgü test değeridir.
+set -euo pipefail
+K=${1:?hedef kök}
+install -d -m 0700 "$K/var/lib/hf-test"
+if [ -s /run/havenfold-kurulum/luks-gecici ]; then
+  install -m 0600 /run/havenfold-kurulum/luks-gecici "$K/var/lib/hf-test/gecici"
+  echo "gecici-sakla: kopya alındı"
+else
+  echo "gecici-sakla: geçici parola yok (TPM'siz kurulum?)"
+fi

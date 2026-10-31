@@ -1,0 +1,175 @@
+{
+ "aciklama": "RFC-0005 §15.4, RFC-0027 §7 KOPRU { v: uint, from: string, type: string, text: string (≤ 280 bayt), at: uint, nonce: fixed16 }; taşıma metni \"hfkopru1:\" + base64url (dolgusuz, kanonik), ≤ 1 KB. Ağa çıkmaz; kriptografi yok. durumlar sırayla uygulanır; kendi: alan uygulamanın topluluk türü (aile: Yuva Hat, ekip: Mekan Hat), her biri kendi nonce defteriyle; simdi = AT + 10 sn. tazelik: at geçmişe 7 gün (BRIDGE_STALE), ileriye 5 dakika (BRIDGE_AHEAD); sürüm alanı önce okunur (BRIDGE_VERSION).",
+ "turler": {
+  "ekip": [
+   "mekan.durum.giris",
+   "mekan.durum.cikis",
+   "mekan.durum.gec",
+   "mekan.durum.serbest"
+  ],
+  "aile": [
+   "yuva.durum.gec",
+   "yuva.durum.serbest"
+  ]
+ },
+ "gecerli": [
+  {
+   "alanlar": {
+    "from": "ekip",
+    "type": "mekan.durum.cikis",
+    "text": "İşten çıktım",
+    "at": 1790000000000,
+    "nonce": "01010101010101010101010101010101"
+   },
+   "bytes": "0104656b6970116d656b616e2e647572756d2e63696b697311c4b0c59f74656e20c3a7c4b16b74c4b16dff006c50c4a001000001010101010101010101010101010101",
+   "metin": "hfkopru1:AQRla2lwEW1la2FuLmR1cnVtLmNpa2lzEcSwxZ90ZW4gw6fEsWt0xLFt_wBsUMSgAQAAAQEBAQEBAQEBAQEBAQEBAQ"
+  },
+  {
+   "alanlar": {
+    "from": "aile",
+    "type": "yuva.durum.gec",
+    "text": "Geç kalacağım",
+    "at": 1790000001000,
+    "nonce": "02020202020202020202020202020202"
+   },
+   "bytes": "010461696c650e797576612e647572756d2e676563104765c3a7206b616c616361c49fc4b16dffe86f50c4a001000002020202020202020202020202020202",
+   "metin": "hfkopru1:AQRhaWxlDnl1dmEuZHVydW0uZ2VjEEdlw6cga2FsYWNhxJ_EsW3_6G9QxKABAAACAgICAgICAgICAgICAgIC"
+  },
+  {
+   "alanlar": {
+    "from": "ekip",
+    "type": "mekan.durum.serbest",
+    "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "at": 1790000002000,
+    "nonce": "03030303030303030303030303030303"
+   },
+   "bytes": "0104656b6970136d656b616e2e647572756d2e73657262657374fd180178787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878ffd07350c4a001000003030303030303030303030303030303",
+   "metin": "hfkopru1:AQRla2lwE21la2FuLmR1cnVtLnNlcmJlc3T9GAF4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4_9BzUMSgAQAAAwMDAwMDAwMDAwMDAwMDAw"
+  }
+ ],
+ "durumlar": [
+  {
+   "kendi": "aile",
+   "aciklama": "Mekan Hat → Yuva Hat: işten çıktım",
+   "metin": "hfkopru1:AQRla2lwEW1la2FuLmR1cnVtLmNpa2lzEcSwxZ90ZW4gw6fEsWt0xLFt_wBsUMSgAQAAAQEBAQEBAQEBAQEBAQEBAQ",
+   "beklenen": "gecerli"
+  },
+  {
+   "kendi": "aile",
+   "aciklama": "aynı nonce ikinci kez",
+   "metin": "hfkopru1:AQRla2lwEW1la2FuLmR1cnVtLmNpa2lzEcSwxZ90ZW4gw6fEsWt0xLFt_wBsUMSgAQAAAQEBAQEBAQEBAQEBAQEBAQ",
+   "beklenen": "BRIDGE_REPLAY"
+  },
+  {
+   "kendi": "ekip",
+   "aciklama": "Yuva Hat → Mekan Hat: geç kalacağım",
+   "metin": "hfkopru1:AQRhaWxlDnl1dmEuZHVydW0uZ2VjEEdlw6cga2FsYWNhxJ_EsW3_6G9QxKABAAACAgICAgICAgICAgICAgIC",
+   "beklenen": "gecerli"
+  },
+  {
+   "kendi": "aile",
+   "aciklama": "280 baytlık metin",
+   "metin": "hfkopru1:AQRla2lwE21la2FuLmR1cnVtLnNlcmJlc3T9GAF4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4_9BzUMSgAQAAAwMDAwMDAwMDAwMDAwMDAw",
+   "beklenen": "gecerli"
+  },
+  {
+   "kendi": "aile",
+   "aciklama": "281 baytlık metin",
+   "metin": "hfkopru1:AQRla2lwE21la2FuLmR1cnVtLnNlcmJlc3T9GQF4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eP_Qc1DEoAEAAAQEBAQEBAQEBAQEBAQEBAQ",
+   "beklenen": "BRIDGE_TEXT"
+  },
+  {
+   "kendi": "aile",
+   "aciklama": "listede olmayan tür (iş verisi)",
+   "metin": "hfkopru1:AQRla2lwEW1la2FuLmthbWVyYS5vbGF5EcSwxZ90ZW4gw6fEsWt0xLFt_wBsUMSgAQAABQUFBQUFBQUFBQUFBQUFBQ",
+   "beklenen": "BRIDGE_TYPE"
+  },
+  {
+   "kendi": "aile",
+   "aciklama": "aile türü ekipten gelmiş gibi",
+   "metin": "hfkopru1:AQRla2lwDnl1dmEuZHVydW0uZ2VjEcSwxZ90ZW4gw6fEsWt0xLFt_wBsUMSgAQAABgYGBgYGBgYGBgYGBgYGBg",
+   "beklenen": "BRIDGE_TYPE"
+  },
+  {
+   "kendi": "ekip",
+   "aciklama": "kendi tarafından gelen paket",
+   "metin": "hfkopru1:AQRla2lwEW1la2FuLmR1cnVtLmNpa2lzEcSwxZ90ZW4gw6fEsWt0xLFt_wBsUMSgAQAABwcHBwcHBwcHBwcHBwcHBw",
+   "beklenen": "BRIDGE_DIRECTION"
+  },
+  {
+   "kendi": "aile",
+   "aciklama": "sürüm 2",
+   "metin": "hfkopru1:AgRla2lwEW1la2FuLmR1cnVtLmNpa2lzEcSwxZ90ZW4gw6fEsWt0xLFt_wBsUMSgAQAACAgICAgICAgICAgICAgICA",
+   "beklenen": "BRIDGE_VERSION"
+  },
+  {
+   "kendi": "aile",
+   "aciklama": "sonda fazla bayt",
+   "metin": "hfkopru1:AQRla2lwEW1la2FuLmR1cnVtLmNpa2lzEcSwxZ90ZW4gw6fEsWt0xLFt_wBsUMSgAQAACQkJCQkJCQkJCQkJCQkJCQA",
+   "beklenen": "INVALID_BRIDGE"
+  },
+  {
+   "kendi": "aile",
+   "aciklama": "önek yok",
+   "metin": "AQRla2lwEW1la2FuLmR1cnVtLmNpa2lzEcSwxZ90ZW4gw6fEsWt0xLFt_wBsUMSgAQAAAQEBAQEBAQEBAQEBAQEBAQ",
+   "beklenen": "INVALID_BRIDGE"
+  },
+  {
+   "kendi": "aile",
+   "aciklama": "boş metin",
+   "metin": "hfkopru1:AQRla2lwEW1la2FuLmR1cnVtLmNpa2lzASD_AGxQxKABAAAKCgoKCgoKCgoKCgoKCgoK",
+   "beklenen": "BRIDGE_TEXT"
+  },
+  {
+   "kendi": "aile",
+   "aciklama": "yalnız görünmez karakter (U+200B)",
+   "metin": "hfkopru1:AQRla2lwEW1la2FuLmR1cnVtLmNpa2lzA-KAi_8AbFDEoAEAAAsLCwsLCwsLCwsLCwsLCws",
+   "beklenen": "BRIDGE_TEXT"
+  },
+  {
+   "kendi": "aile",
+   "aciklama": "bidi denetim karakteri (U+202E)",
+   "metin": "hfkopru1:AQRla2lwEW1la2FuLmR1cnVtLmNpa2lzDMOHxLFrdMSxbeKArv8AbFDEoAEAAAwMDAwMDAwMDAwMDAwMDAw",
+   "beklenen": "BRIDGE_TEXT"
+  },
+  {
+   "kendi": "aile",
+   "aciklama": "from __proto__",
+   "metin": "hfkopru1:AQlfX3Byb3RvX18RbWVrYW4uZHVydW0uY2lraXMRxLDFn3RlbiDDp8Sxa3TEsW3_AGxQxKABAAANDQ0NDQ0NDQ0NDQ0NDQ0N",
+   "beklenen": "INVALID_BRIDGE"
+  },
+  {
+   "kendi": "aile",
+   "aciklama": "sürüm 2, ek alanlı",
+   "metin": "hfkopru1:AgRla2lwEW1la2FuLmR1cnVtLmNpa2lzEcSwxZ90ZW4gw6fEsWt0xLFt_wBsUMSgAQAADg4ODg4ODg4ODg4ODg4ODgNhYmM",
+   "beklenen": "BRIDGE_VERSION"
+  }
+ ],
+ "tazelik": [
+  {
+   "aciklama": "7 gün + 1 ms sonra aynı paket",
+   "metin": "hfkopru1:AQRla2lwEW1la2FuLmR1cnVtLmNpa2lzEcSwxZ90ZW4gw6fEsWt0xLFt_wBsUMSgAQAAAQEBAQEBAQEBAQEBAQEBAQ",
+   "simdi": 1790604800001,
+   "beklenen": "BRIDGE_STALE"
+  },
+  {
+   "aciklama": "7 gün içinde (sınırda)",
+   "metin": "hfkopru1:AQRla2lwE21la2FuLmR1cnVtLnNlcmJlc3T9GAF4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4_9BzUMSgAQAAAwMDAwMDAwMDAwMDAwMDAw",
+   "simdi": 1790604802000,
+   "beklenen": "gecerli"
+  },
+  {
+   "aciklama": "5 dakika + 1 ms ileride",
+   "metin": "hfkopru1:AQRla2lwEW1la2FuLmR1cnVtLmNpa2lzEcSwxZ90ZW4gw6fEsWt0xLFt_wBsUMSgAQAAAQEBAQEBAQEBAQEBAQEBAQ",
+   "simdi": 1789999699999,
+   "beklenen": "BRIDGE_AHEAD"
+  },
+  {
+   "aciklama": "5 dakika ileride (sınırda)",
+   "metin": "hfkopru1:AQRla2lwEW1la2FuLmR1cnVtLmNpa2lzEcSwxZ90ZW4gw6fEsWt0xLFt_wBsUMSgAQAAAQEBAQEBAQEBAQEBAQEBAQ",
+   "simdi": 1789999700000,
+   "beklenen": "gecerli"
+  }
+ ],
+ "yediGunSonra": "BRIDGE_STALE"
+}

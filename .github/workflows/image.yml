@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# Görev imajı: images/ değişince PR'da ve elle, hf.task.ocr imajı Podman ile derlenir, oci-archive olarak kaydedilir,
+# düğümün yolundan (node/podman.js: özet denetimi, podman load, ociDigest, düğümdeki konteyner bayrakları) yüklenip
+# örnek PNG ve PDF ile çalıştırılır; CONTRACT.md'deki çıkış kodları ve çıktılar denetlenir (RFC-0002 §11.1,
+# RFC-0007 §12.1). amd64'te; depo herkese açıkken arm64'te de (GitHub'ın arm64 makineleri kapalı depoda ücretli).
+name: image
+
+on:
+  pull_request:
+    paths:
+      - 'images/**'
+      - 'node/podman.js'
+      - 'node/scripts/image-try.js'
+      - 'node/scripts/release-*.js'
+      - '.github/workflows/image.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: imaj-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ocr:
+    name: hf.task.ocr (${{ matrix.makine }})
+    strategy:
+      fail-fast: false
+      matrix:
+        makine: ${{ fromJSON(github.event.repository.private && '["ubuntu-24.04"]' || '["ubuntu-24.04","ubuntu-24.04-arm"]') }}
+    runs-on: ${{ matrix.makine }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - name: Podman
+        run: |
+          podman --version
+          podman info --format 'çalıştırıcı {{.Host.OCIRuntime.Name}} · cgroup {{.Host.CgroupsVersion}} · {{.Host.CgroupManager}}'
+      - name: Derle (podman build, oci-archive, ociDigest)
+        run: bash images/image-build.sh images/task-ocr "$RUNNER_TEMP/imaj"
+      - name: Bildirim satırı
+        run: |
+          . "$RUNNER_TEMP/imaj/imaj.env"
+          # Kaynak arşivi bu denemede derlenmez (sürüm iş akışı derler); satır için yer tutucu dosya
+          echo "yalnız deneme" > "$RUNNER_TEMP/imaj/kaynak-yok.tar"
+          node node/scripts/release-build.js imaj-satiri --imaj-bildirimi images/task-ocr/imaj-bildirimi.json \
+            --arch "$ARCH" --oci-digest "$OCI_DIGEST" --arsiv "$ARSIV" --kaynak "$RUNNER_TEMP/imaj/kaynak-yok.tar" \
+            --cikti "$RUNNER_TEMP/imaj/satir.json"
+          cat "$RUNNER_TEMP/imaj/satir.json"
+      - name: Düğümün yolundan dene (ağsız, salt okunur, keep-id)
+        run: |
+          . "$RUNNER_TEMP/imaj/imaj.env"
+          podman rmi --force "$REF" >/dev/null
+          SOKET="$RUNNER_TEMP/podman.sock"
+          podman system service --time=0 "unix://$SOKET" &
+          for _ in $(seq 50); do [ -S "$SOKET" ] && break; sleep 0.2; done
+          node node/scripts/image-try.js --url "unix://$SOKET" --arsiv "$ARSIV" --satir "$RUNNER_TEMP/imaj/satir.json"

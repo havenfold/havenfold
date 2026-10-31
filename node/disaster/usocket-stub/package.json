@@ -1,0 +1,8 @@
+{
+  "name": "usocket",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Empty stand-in for dbus-next's optional native part (usocket): throws when loaded, so dbus-next falls back to net.createConnection",
+  "license": "MPL-2.0",
+  "main": "index.js"
+}

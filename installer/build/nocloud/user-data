@@ -1,0 +1,38 @@
+#cloud-config
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# Havenfold otomatik kurulum dosyası (RFC-0007 §8.3). USB'de sır yoktur: parola, anahtar, Wi-Fi parolası, davet yok.
+# hf-on-kontrol ağ adını (havenfold-XXXX), hf-depolama-yaz depolama bölümünü (TPM varsa geçici LUKS parolasıyla)
+# kurulum ortamının belleğindeki /autoinstall.yaml'a yazar; subiquity early-commands'tan sonra dosyayı yeniden okur.
+autoinstall:
+  version: 1
+  interactive-sections: []
+  refresh-installer: { update: false }
+  locale: tr_TR.UTF-8
+  keyboard: { layout: tr }
+  timezone: Europe/Istanbul
+  source: { id: ubuntu-server-minimal }
+  network:
+    version: 2
+    ethernets:
+      kablolu: { match: { name: "en*" }, dhcp4: true, dhcp6: true, optional: true }
+  apt:
+    fallback: offline-install
+  drivers: { install: false }
+  ssh: { install-server: false }
+  updates: security
+  user-data:
+    hostname: havenfold-XXXX
+    users:
+      - name: yonetici
+        groups: [sudo, havenfold-yonetim]
+        lock_passwd: true
+        shell: /bin/bash
+  early-commands:
+    - /cdrom/havenfold/bin/hf-on-kontrol
+    - /cdrom/havenfold/bin/hf-depolama-yaz
+  late-commands:
+    - /cdrom/havenfold/bin/hf-hedefe-kur /target
+    - /cdrom/havenfold/bin/hf-hedefe-kur --gunluk-temizle /target
+  shutdown: reboot

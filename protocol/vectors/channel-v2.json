@@ -1,0 +1,31 @@
+{
+ "aciklama": "D24: Yuva Defteri'nin son dilimi için kanal komutları (kanal.json'un devamı; var olan dosya değişmez). Tören numaraları Yuva Hat çizelgesindekilerdir (packages/protocol/komutlar.js, RFC-0024 §3a gerekçesi); diğerleri SDK ortak aralığından (352–359), RFC-0027'ye işlenecek. Olaylar: 'ceremony' { adim: 'qr' | 'sas' | 'tamam' | 'kapandi' }, 'bakim' { type: 'degisti' | 'kacirilan' | 'doz' }, 'kalkan' { type: 'davet' | 'bildirim' }.",
+ "komutlar": [
+  { "no": 3, "ad": "INVITE_START", "govde": ["tur", "rol"], "sonuc": ["ttlSec"], "sdk": "CeremonyApi.startInvite" },
+  { "no": 4, "ad": "INVITE_CONFIRM", "govde": ["ayni"], "sonuc": null, "sdk": "CeremonyApi.confirm" },
+  { "no": 5, "ad": "JOIN", "govde": ["kod"], "sonuc": ["tur"], "sdk": "CeremonyApi.join" },
+  { "no": 205, "ad": "INVITE_CANCEL", "govde": [], "sonuc": null, "sdk": "CeremonyApi.cancel" },
+  { "no": 352, "ad": "LOCAL_DRAFT", "govde": ["hedef", "metin"], "sonuc": ["yol"], "sdk": "LocalApi.dropDraft" },
+  { "no": 353, "ad": "PERSONAL_MODE_START", "govde": [], "sonuc": null, "sdk": "PersonalMode.start" },
+  { "no": 354, "ad": "PERSONAL_MODE_MOVE", "govde": [], "sonuc": "[{ tur, sayi }]", "sdk": "PersonalMode.move" },
+  { "no": 355, "ad": "CARE_PROCESS", "govde": [], "sonuc": "sayı", "sdk": "BakimApi.isle" },
+  { "no": 356, "ad": "CARE_MISSED", "govde": [], "sonuc": "KacirilanDoz[]", "sdk": "BakimApi.kacirilanlar" },
+  { "no": 357, "ad": "CARE_CLAIM", "govde": ["vakaId"], "sonuc": "recordId", "sdk": "BakimApi.benBakiyorum" },
+  { "no": 358, "ad": "SHIELD_ENABLE", "govde": ["koruyucular", "haberVer"], "sonuc": "collectionId", "sdk": "ShieldApi.enable" },
+  { "no": 359, "ad": "SHIELD_REPORT", "govde": ["sonuc", "goruntuyuEkle"], "sonuc": ["recordId", "yol"], "sdk": "ShieldApi.report" }
+ ],
+ "yerelZarf": {
+  "taslak": { "v": 1, "tur": "taslak", "hedef": { "tur": "sohbet", "convId": "abababababababababababababababababababababababababababababababab" }, "metin": "[YZ] Kombi servisi yarın 10:00", "at": 5 },
+  "mesaj": ["v", "tur", "alicilar", "metin", "at"],
+  "metinMaxBayt": 4096
+ },
+ "bakim": {
+  "olayTuru": "yuva.bakim.doz-kacirildi",
+  "kural": [["yuva.bakim.doz-kacirildi", "sayi", "", 60, "ge", 1]],
+  "onem": 2,
+  "gecikmeDk": 30,
+  "pencereSaat": 48,
+  "saatOfsetiDk": 180,
+  "planlanan": { "gun": "2026-10-24", "saat": "08:00", "ms": 1792818000000 }
+ }
+}

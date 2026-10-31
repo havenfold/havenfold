@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# havenfold-sil.service — silme ortamının aracı tty1'de (RFC-0007 §13.2). Çıkış 10: Havenfold'u yeniden kur (yeniden
+# başlatılır, Kurulum USB'si menüsüne dönülür); 0 ve 3: kapatılır; hata: ileti 2 dakika ekranda kalır, sonra
+# kapatılır. Rapor anahtarı süreçle birlikte biter.
+[Unit]
+Description=Havenfold silme modu
+After=systemd-udev-settle.service local-fs.target havenfold-ag-kapali.service
+Wants=systemd-udev-settle.service
+Conflicts=getty@tty1.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/havenfold-sil/bin/node /opt/havenfold-sil/installer/erase/havenfold-sil
+# Hata çıkışında ekrandaki ileti okunabilsin: kapanmadan önce 2 dakika beklenir
+ExecStopPost=/bin/sh -c 'case "$EXIT_STATUS" in 10) systemctl reboot ;; 0|3) systemctl poweroff ;; *) printf "\\nSilme modu hata verdi (%%s). Bilgisayar 2 dakika sonra kapanacak.\\n" "$EXIT_STATUS" > /dev/tty1; sleep 120; systemctl poweroff ;; esac'
+StandardInput=tty-force
+StandardOutput=tty
+StandardError=tty
+TTYPath=/dev/tty1
+TTYReset=yes
+TimeoutStartSec=infinity
+SuccessExitStatus=3 10
+
+[Install]
+WantedBy=multi-user.target

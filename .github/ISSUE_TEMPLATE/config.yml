@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/havenfold/havenfold/security/policy
+    about: Do not open an issue. Report it privately as described in SECURITY.md.
+  - name: Ask a question or discuss an idea
+    url: https://github.com/havenfold/havenfold/discussions
+    about: Questions and open-ended ideas go to GitHub Discussions.

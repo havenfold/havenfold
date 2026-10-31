@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# havenfold-nft.service — RFC-0007 §10: nftables `inet havenfold` tablosu. Sistemin /etc/nftables.conf'una dokunmaz;
+# tablo kendi dosyasından (/etc/havenfold/havenfold.nft) yüklenir, yeniden yüklemede silinip yeniden kurulur.
+# HyperDHT için sabit port yok (RFC-0007): `hyperdht_udp` kümesi boş başlar. Taşıyıcı yerel UDP portunu çalışma anında
+# ekler ve kapanınca siler (kök yetkisi gerekir; yetki yardımcısı üzerinden):
+#   nft add element inet havenfold hyperdht_udp { <port> }
+#   nft delete element inet havenfold hyperdht_udp { <port> }
+# Birim yeniden başlarsa küme boşalır; taşıyıcı portunu yeniden ekler.
+[Unit]
+Description=Havenfold güvenlik duvarı tablosu
+After=nftables.service network-pre.target
+Before=network.target havenfold-denetci.service
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/nft -f /etc/havenfold/havenfold.nft
+ExecStop=/usr/sbin/nft delete table inet havenfold
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,108 @@
+{
+ "aciklama": "RFC-0027 §8 b (D69): deriveLP(key, label, ...parts) ve hashLP(label, ...parts). Girdi: etiket (önek yuva/v2/ ile) ve her parça u32be(uzunluk) ‖ bayt, sırayla; tamsayı parça u64be. deriveLP anahtarlı BLAKE2b-256, hashLP anahtarsız. girdi alanı birleşik baytlardır (hex); cikti 32 bayt. Bundan sonraki yeni etiketler bunu kullanır; var olan derive/hash değişmez.",
+ "onek": "yuva/v2/",
+ "durumlar": [
+  {
+   "ad": "parçasız",
+   "islem": "hashLP",
+   "etiket": "hf/lp-ornek/",
+   "parcalar": [],
+   "girdi": "00000014797576612f76322f68662f6c702d6f726e656b2f",
+   "cikti": "3f188a7d6c9fa0beab2262508fc2a0105a10a818e7aee3d0e686e619c9a84070"
+  },
+  {
+   "ad": "iki değişken parça (ab, c)",
+   "islem": "hashLP",
+   "etiket": "hf/lp-ornek/",
+   "parcalar": [
+    {
+     "hex": "6162"
+    },
+    {
+     "hex": "63"
+    }
+   ],
+   "girdi": "00000014797576612f76322f68662f6c702d6f726e656b2f0000000261620000000163",
+   "cikti": "2c624f2b89cdb91fba466e3f4830aa20a318d13c9f9914ce2afaa363a8b737f4"
+  },
+  {
+   "ad": "iki değişken parça (a, bc): öncekinden farklı",
+   "islem": "hashLP",
+   "etiket": "hf/lp-ornek/",
+   "parcalar": [
+    {
+     "hex": "61"
+    },
+    {
+     "hex": "6263"
+    }
+   ],
+   "girdi": "00000014797576612f76322f68662f6c702d6f726e656b2f0000000161000000026263",
+   "cikti": "7d07a5742ec3828989092ad0904e7f6fd7f06b8822bac7b11ff4502b15e76a93"
+  },
+  {
+   "ad": "kimlik ve u64",
+   "islem": "hashLP",
+   "etiket": "hf/lp-ornek/",
+   "parcalar": [
+    {
+     "hex": "07070707070707070707070707070707"
+    },
+    {
+     "u64": 41
+    }
+   ],
+   "girdi": "00000014797576612f76322f68662f6c702d6f726e656b2f0000001007070707070707070707070707070707000000080000000000000029",
+   "cikti": "e2eb802cf6ad158440472d13d5f6098275d897c56f83479fd62b33d23b5d551b"
+  },
+  {
+   "ad": "boş parça",
+   "islem": "hashLP",
+   "etiket": "hf/lp-ornek/",
+   "parcalar": [
+    {
+     "hex": ""
+    },
+    {
+     "hex": "61"
+    }
+   ],
+   "girdi": "00000014797576612f76322f68662f6c702d6f726e656b2f000000000000000161",
+   "cikti": "25608c60c8c23a7608254419815033f9edaff493c44a353745a8709c52bcd08e"
+  },
+  {
+   "ad": "anahtarlı",
+   "islem": "deriveLP",
+   "anahtar": "1111111111111111111111111111111111111111111111111111111111111111",
+   "etiket": "hf/lp-ornek/",
+   "parcalar": [
+    {
+     "hex": "6162"
+    },
+    {
+     "hex": "63"
+    }
+   ],
+   "girdi": "00000014797576612f76322f68662f6c702d6f726e656b2f0000000261620000000163",
+   "cikti": "f45a10627b26982b385b4c8ef5b7a80f8ce7e965cc8ab02b84c805e482b3adc3"
+  },
+  {
+   "ad": "anahtarlı, etiket sınırı kayık (hf/lp-ornek/a + bc)",
+   "islem": "deriveLP",
+   "anahtar": "1111111111111111111111111111111111111111111111111111111111111111",
+   "etiket": "hf/lp-ornek/a",
+   "parcalar": [
+    {
+     "hex": "6263"
+    }
+   ],
+   "girdi": "00000015797576612f76322f68662f6c702d6f726e656b2f61000000026263",
+   "cikti": "91407f4375baa8ce2936492827114e9b3b87276f4ba59287a32a615b465a7beb"
+  }
+ ],
+ "eski": {
+  "aciklama": "karşılaştırma: eski hash parça sınırını taşımaz, (ab, c) ile (a, bc) aynı özeti verir",
+  "ab_c": "ce240821ddc669e408434c41019f6b9209884b60fbf892d28db71227a9b9815f",
+  "a_bc": "ce240821ddc669e408434c41019f6b9209884b60fbf892d28db71227a9b9815f"
+ }
+}

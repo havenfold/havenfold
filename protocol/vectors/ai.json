@@ -1,0 +1,602 @@
+{
+ "3": {
+  "yetenekler": {
+   "tr": {
+    "isletim": {
+     "id": "apple-fm",
+     "surum": "26.1",
+     "tr": true
+    },
+    "bildirim": {
+     "platform": [
+      {
+       "id": "apple-fm",
+       "surum": "26.1",
+       "tr": true,
+       "baglamToken": 4096
+      }
+     ]
+    }
+   },
+   "yok": {},
+   "isci": {
+    "isciler": [
+     {
+      "deviceId": "d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1",
+      "aday": true,
+      "modeller": [
+       {
+        "modelHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kullanilir": true
+       }
+      ],
+      "maxTaskRamMB": 6000,
+      "onay": true
+     }
+    ]
+   },
+   "onaysiz": {
+    "isciler": [
+     {
+      "deviceId": "d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1",
+      "aday": true,
+      "modeller": [
+       {
+        "modelHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kullanilir": true
+       }
+      ],
+      "maxTaskRamMB": 6000,
+      "onay": false
+     }
+    ]
+   }
+  },
+  "durumlar": [
+   {
+    "aciklama": "kasa, cikar, platform.tr, 1 KB → telefon",
+    "is": "cikar",
+    "sinif": "kasa",
+    "girdi": {
+     "token": 342
+    },
+    "yetenek": "tr",
+    "beklenen": {
+     "yol": "telefon",
+     "satir": 1
+    }
+   },
+   {
+    "aciklama": "kasa, ozet, platform modeli yok → yapılamıyor",
+    "is": "ozet",
+    "sinif": "kasa",
+    "girdi": {
+     "token": 342
+    },
+    "yetenek": "yok",
+    "beklenen": {
+     "yol": null,
+     "satir": 5,
+     "hata": "VAULT_NOT_POSSIBLE"
+    }
+   },
+   {
+    "aciklama": "aile, ozet, 20 KB, uygun işçi → işçi",
+    "is": "ozet",
+    "sinif": "aile",
+    "girdi": {
+     "token": 6827,
+     "model": {
+      "modelHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "ramMB": 4000
+     },
+     "izin": true,
+     "koleksiyon": {
+      "taskAccess": true,
+      "sensitivity": "normal"
+     }
+    },
+    "yetenek": "isci",
+    "beklenen": {
+     "yol": "isci",
+     "satir": 10,
+     "isci": "d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1"
+    }
+   },
+   {
+    "aciklama": "aile, ozet, 20 KB, ilk kullanım onayı yok → yapılamıyor",
+    "is": "ozet",
+    "sinif": "aile",
+    "girdi": {
+     "token": 6827,
+     "model": {
+      "modelHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "ramMB": 4000
+     },
+     "izin": true,
+     "koleksiyon": {
+      "taskAccess": true,
+      "sensitivity": "normal"
+     }
+    },
+    "yetenek": "onaysiz",
+    "beklenen": {
+     "yol": null,
+     "satir": 12,
+     "hata": "NO_ELIGIBLE_DEVICE",
+     "mesaj": "Bu iş için evde uygun cihaz yok."
+    }
+   },
+   {
+    "aciklama": "aile, cikar, platform modeli yok, işçi yok → kural",
+    "is": "cikar",
+    "sinif": "aile",
+    "girdi": {
+     "token": 342
+    },
+    "yetenek": "yok",
+    "beklenen": {
+     "yol": "kural",
+     "satir": 11
+    }
+   }
+  ],
+  "cocuk": {
+   "aciklama": "genel, rol cocuk → \"Dışarı sor\" yok",
+   "uye": {
+    "paket": true,
+    "rol": "cocuk",
+    "bulutAyar": true
+   },
+   "sinif": "genel",
+   "engel": [],
+   "rol": "cocuk",
+   "disariSor": false
+  }
+ },
+ "4": [
+  {
+   "metin": "@asistan wifi şifresi",
+   "beklenen": true
+  },
+  {
+   "metin": "  @Asistan: kombi",
+   "beklenen": true
+  },
+  {
+   "metin": "@ASİSTAN ne var",
+   "beklenen": true
+  },
+  {
+   "metin": "@asistanlar",
+   "beklenen": false
+  },
+  {
+   "metin": "@YUVA",
+   "takma": "yuva",
+   "beklenen": true
+  }
+ ],
+ "5": [
+  {
+   "metin": "İSTANBUL  Kombi Servisi",
+   "beklenen": "istanbul kombi servisi"
+  },
+  {
+   "metin": "IŞIK",
+   "beklenen": "ışık"
+  },
+  {
+   "metin": "Ali’nin",
+   "beklenen": "alinin"
+  }
+ ],
+ "6": [
+  {
+   "metin": "14 Mart 2028",
+   "beklenen": "2028-03-14"
+  },
+  {
+   "metin": "14.03.2028",
+   "beklenen": "2028-03-14"
+  },
+  {
+   "metin": "14/3/28",
+   "beklenen": null
+  },
+  {
+   "metin": "3 eyl 2027",
+   "beklenen": "2027-09-03"
+  }
+ ],
+ "7": {
+  "satirlar": [
+   {
+    "aciklama": "alıntı bulundu, model",
+    "g": {
+     "dayanak": "alinti",
+     "yol": "telefon",
+     "bulundu": true
+    },
+    "beklenen": 85
+   },
+   {
+    "aciklama": "alıntı bulunamadı",
+    "g": {
+     "dayanak": "alinti",
+     "yol": "telefon",
+     "bulundu": false
+    },
+    "beklenen": 40
+   },
+   {
+    "aciklama": "IBAN, kural, denetim hanesi tutuyor",
+    "g": {
+     "dayanak": "alinti",
+     "yol": "kural",
+     "bulundu": true,
+     "denetimHanesi": true
+    },
+    "beklenen": 95
+   },
+   {
+    "aciklama": "cikarim, model",
+    "g": {
+     "dayanak": "cikarim",
+     "yol": "telefon"
+    },
+    "beklenen": 60
+   }
+  ],
+  "ayni": {
+   "model": 85,
+   "kural": 90,
+   "beklenen": 100
+  },
+  "onay": {
+   "sema": {
+    "id": "test.odeme",
+    "v": 1,
+    "hedef": "test.odeme",
+    "alanlar": [
+     {
+      "ad": "alici",
+      "tur": "metin",
+      "zorunlu": true,
+      "dayanak": "alinti"
+     },
+     {
+      "ad": "iban",
+      "tur": "iban",
+      "zorunlu": false,
+      "dayanak": "alinti"
+     },
+     {
+      "ad": "son",
+      "tur": "tarih",
+      "zorunlu": false,
+      "dayanak": "alinti"
+     },
+     {
+      "ad": "tutar",
+      "tur": "tutar",
+      "zorunlu": false,
+      "dayanak": "alinti"
+     }
+    ]
+   },
+   "cikarim": {
+    "sema": "test.odeme@1",
+    "alanlar": [
+     {
+      "ad": "alici",
+      "deger": "Kombi servisi",
+      "conf": 85
+     },
+     {
+      "ad": "iban",
+      "deger": "TR330006100519786457841326",
+      "conf": 95
+     },
+     {
+      "ad": "son",
+      "deger": "2028-03-15",
+      "conf": 40
+     },
+     {
+      "ad": "tutar",
+      "deger": 125050,
+      "conf": 60
+     }
+    ],
+    "kaynak": [
+     "msg:abababababababababababababababababababababababababababababababab/cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+    ],
+    "model": "telefon/apple-fm@26.1"
+   },
+   "ekran": [
+    {
+     "ad": "alici",
+     "tur": "metin",
+     "zorunlu": true,
+     "deger": "Kombi servisi",
+     "conf": 85,
+     "isaret": null
+    },
+    {
+     "ad": "iban",
+     "tur": "iban",
+     "zorunlu": false,
+     "deger": "TR330006100519786457841326",
+     "conf": 95,
+     "isaret": null
+    },
+    {
+     "ad": "son",
+     "tur": "tarih",
+     "zorunlu": false,
+     "deger": null,
+     "conf": 40,
+     "isaret": "bos"
+    },
+    {
+     "ad": "tutar",
+     "tur": "tutar",
+     "zorunlu": false,
+     "deger": 125050,
+     "conf": 60,
+     "isaret": "sari"
+    }
+   ],
+   "son": {
+    "alici": "Kombi servisi",
+    "iban": "TR330006100519786457841326",
+    "son": "2028-03-14",
+    "tutar": 120000
+   },
+   "kayit": {
+    "type": "test.odeme",
+    "fields": {
+     "alici": "Kombi servisi",
+     "iban": "TR330006100519786457841326",
+     "son": "2028-03-14",
+     "tutar": 120000,
+     "_src": [
+      "msg:abababababababababababababababababababababababababababababababab/cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+     ],
+     "_conf": 85,
+     "_ai": [
+      "alici",
+      "iban"
+     ],
+     "_aiyol": "telefon/apple-fm@26.1"
+    }
+   }
+  }
+ },
+ "8": [
+  {
+   "metin": "10000000146 nedir",
+   "beklenen": [
+    "tckn"
+   ]
+  },
+  {
+   "metin": "TR33 0006 1005 1978 6457 8413 26",
+   "beklenen": [
+    "iban"
+   ]
+  },
+  {
+   "metin": "Kombi E1 hatası ne demek",
+   "beklenen": []
+  },
+  {
+   "metin": "Coki neden kusar",
+   "adlar": [
+    "Coki"
+   ],
+   "beklenen": [
+    "ad"
+   ]
+  },
+  {
+   "metin": "0532 123 45 67",
+   "beklenen": [
+    "telefon"
+   ]
+  }
+ ],
+ "9": [
+  {
+   "girdi": {
+    "yol": "telefon",
+    "metin": "Kombi servisi 0212 555 66 77.",
+    "kaynakAdlari": [
+     "Defter › Ev › Kombi"
+    ]
+   },
+   "govde": "[YZ] cihazda\nKombi servisi 0212 555 66 77.\nKaynak: Defter › Ev › Kombi",
+   "cozum": {
+    "yol": "telefon",
+    "metin": "Kombi servisi 0212 555 66 77.",
+    "kaynakAdlari": [
+     "Defter › Ev › Kombi"
+    ]
+   }
+  },
+  {
+   "girdi": {
+    "yol": "isci",
+    "metin": "Kombiler yılda bir bakım ister."
+   },
+   "govde": "[YZ] evde\nKombiler yılda bir bakım ister.",
+   "cozum": {
+    "yol": "isci",
+    "metin": "Kombiler yılda bir bakım ister.",
+    "kaynakAdlari": []
+   }
+  }
+ ],
+ "10": {
+  "girdi": {
+   "metin": "Coki dün aşı oldu.",
+   "yol": "telefon",
+   "model": "telefon/apple-fm@26.1",
+   "sinif": "aile",
+   "adlar": [
+    "Coki",
+    "İrem Eser"
+   ]
+  },
+  "beklenen": "Defterde bununla ilgili bir kayıt bulamadım."
+ },
+ "11": {
+  "indexKey": "29bfe649bab6b57c1663006bbd02e30338c46ef17d462e1ce51ceb2cfb0f0297",
+  "ad": "68792d8fdf293cd6cb3771c80a77cdf66ced68bee9ce6ffab4254dfadc461ca6",
+  "blok": {
+   "K": "5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a",
+   "keyId": "01010101010101010101010101010101",
+   "collectionId": "31313131313131313131313131313131",
+   "blokNo": 3,
+   "modelHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "nonce": "777777777777777777777777777777777777777777777777",
+   "parcalar": [
+    {
+     "ref": "kayit:31313131313131313131313131313131/01010101010101010101010101010101",
+     "vec": [
+      127,
+      -127,
+      0,
+      5
+     ]
+    }
+   ],
+   "bytes": "777777777777777777777777777777777777777777777777969ca3944c1f92b16127a20bc4337e2247d0ea7a4236471ad96f90f3da02ef6b7467e1a2519f4fe3a5aff208517c0f449a228c3f556f9cfd69b0057789c8504e8825a5d8f6444192189f9bb00433c97567930adeee877fc235bb69b69456"
+  },
+  "zincir": [
+   "0200000000000000000000000000000000000000000000000000000000000000000000ff006c50c4a00100008e044573657208b4fe803a090001196d616a6f726974792d6578636c7564696e672d746172676574166d616a6f726974792d696e636c7564696e672d6e6577070e00fe5369e3dfd4d38bb06261d1f0ebf5851e79d960e343fcac82ddeb7905abe7f4f973a9b0ef7e6ddc222118ee523610923b5eae13b1e50c8d016e62f4ef15687704746573740000054b6572656d01ee5dcee7a71a87c7bd1c2dc3a5748e2e1808f7c77d8812107461a27de494b903af37418e274e09cede2fbfa1036bb2a81ee70459a668181325159972f71975ac8820dff314dba78fa4e5f1ed2cf54e02",
+   "020147037bdb84ed2c513a38ad9d395cf6ac74ba8cd3107b684bf8edf9c9ff184ccf14ffe86f50c4a0010000050461696c6501ee5dcee7a71a87c7bd1c2dc3a5748e2e5653de33ad8fdf2fbf8daa534425f79e51b2c3dfeaba206a95e7ec5ef0df93d706ce065901d93145410154832a39201f03e3fa83770535105746678f7a6e1a04",
+   "020277f02c3f01aa77b8c8c86a76a483c66b1f42f45880b9046b6ec6faba7e2b17bc01ffd07350c4a00100008b00a9353caf6f6752260612fcb50f36a40e28a59de75ed33068220384d99ac2fb43c0be5385cc47630c7aa9d1423f037fc79c7e182a2a1736737e0f83a19e8ca65a047465737400000848c3bc736e697965076562657665796eee5dcee7a71a87c7bd1c2dc3a5748e2e0707070707070707070707070707070707070707070707070707070707070707000002ee5dcee7a71a87c7bd1c2dc3a5748e2e40d41a3ba2a8fd77f31098aebbfa7186d847db3a8a92789c7566715fdfd579387ec5cb58b208f8f81297f4d74c2b160d8092b0f4910f18189280fa923a0b6303b6f91e50fdc5a36b9b251d03b722f5975c852d8e0ab2e695466207b5ac2f7f7c7e26212bd63a9bef27ad76807d83e7216af089e7b10c2e0fa49704524b5836d8f59171e2d249e820ab09c2356ebaf201",
+   "0203bebf8e82bb218bbf2fc3785fadd7d368cf06e5d4de00317215a0447c09ddc48801ffb87750c4a001000089001a4725dfd162527038964a880324e144689c5f50a45524749fb3a7eb13e91df27d5d6c49e5b32d16a18acaf10854310b59c757fc6c071925dc223594aff1b2210474657374000005c4b072656d0879657469736b696eee5dcee7a71a87c7bd1c2dc3a5748e2e0707070707070707070707070707070707070707070707070707070707070707000003ee5dcee7a71a87c7bd1c2dc3a5748e2e30fea5a54a92221928a2aef50778bc0475de3a22967c52a6393b3db3acdc1487f90882e969582f6b4af4a179cd33152726b52bf807ac7a0e364fc39c2b2b7d06b6f91e50fdc5a36b9b251d03b722f597b22ad7207d39d93c7df6eaf0f34ca94965dfe92e37482c663b5500e8f192d1fd1606356edc3acb6ad0675370a30c34025bd57ca1046bf148fc3b7f8d6845d605c277a4ade5c09e1afb524e33bb17470e33cdae5eb3524b0e2389ac8f85dd117672f6e00d1523928b5c9d496a869b5429a5a037daa72214328d6a1a65f9a73996c76c65a38fd73e50e10685f1845db90b",
+   "0204780661949d5e76cf24dcaa826cabeadf29df45f75b7d9e61bac31f45d7d7412b01ffa07b50c4a001000085005fdc09c3460943e0a13d6905046a7d1e0e35a39738984b649c4d072c413f224ff743bb750797c72dbf2a97fa0dfc4901eff854706742f41609458e9701cba54504746573740000044563656d05636f63756bee5dcee7a71a87c7bd1c2dc3a5748e2e0707070707070707070707070707070707070707070707070707070707070707000003ee5dcee7a71a87c7bd1c2dc3a5748e2e388ab1d56781c2d28b37015fc78ef6753f887166b117af2c4bdc73f9928e3c2a5a987779dd194e735abfe2294d8ff3feac355e4647032544f3bd32c1ceb27707b6f91e50fdc5a36b9b251d03b722f5976c12259dae16007cb16a12aa61e3cb0f8aa5d74524a6f52c1c1d7ef5a999202edcee9793e3a65ea351cbdc343ce7e3e397c15c70c405404176fb742b0287ec037a529486fcd357ff9c1fd1beb682f8600d561e64fda4a2869ddb91c1ba2862df51d9e42f8172eab96419bb27f89569e303285126007c493071d12f66c578015c2a69e08f1feb715fa914f661d3b53708",
+   "0205a04cfc191a084d7a9cc37b1bd79807da9dc5e0c6f5327e0f9dbf14f9f0f516b901ff887f50c4a00100008400340fe0972832ec96003cc23bd5c3f5f22026c8ae5548aa5f07115d89bb816a99a6930163bc45cb5b6ee299fa59bf8d27110ebf505428e94efb02bc6cbcac603504746573740000046b757475046b757475b6f91e50fdc5a36b9b251d03b722f5970707070707070707070707070707070707070707070707070707070707070707000002b6f91e50fdc5a36b9b251d03b722f597a278f078b646f01bcf2890648b3c1099ddbf4d465dc10f8606daecc3d7e1e1cdba320f578d9a52c518368922d0fa6da81737756148c8e823c0922f0d31f2030290820b6879c75698852a021cbc93f95d756e59cf75057ccc0b6e3629de50563cf0577911e80f783287a33d893fb344ed7163b0c2ad91dc4aeb9137a1a2e0335f5ba23416968068d56cdec384a24e2309",
+   "0206c629d0d385343cb569ca2b522e75355c3274e8d760167bcac9039af1f518638d16ff708350c4a00100000403322e3101ee5dcee7a71a87c7bd1c2dc3a5748e2e9345d9549f2a096bba2c1dcbacc6e683a9c5c03df75033f8220d266359a237ae172c2ce6212693103a3794b7d7efe86b7f5633236dbdd753ce982f2dc4b6f600",
+   "020761fa456b6f36a4a4ef42cdf10774795cfd9ebc905bb99e4d36f25b58811673b80fff588750c4a001000017111111111111111111111111111111110245760265760001ee5dcee7a71a87c7bd1c2dc3a5748e2e35981d6e810cf4650132c4df3a1ffec0c11ae06e722778093d9d6f37f213b48906e48c995cca84f6eaccdcc4b82736b5d5ce181a9188e9d0c5e6655610233d06",
+   "0208942e44957b31345f2880b968582236fe50b3e0525e94aeba9c4bae9ed23bd2fd10ff408b50c4a00100002b21212121212121212121212121212121046b65646904436f6b69111111111111111111111111111111110001b6f91e50fdc5a36b9b251d03b722f5973da0d1373f97f7f4385f9cfa727e0756d5c694615f5cf4e44983d54aaef1fd3da3dba977a707c161626c92f62c8cea83d3d726f8fb79e56ad02c93a75c131b07",
+   "020903af2569470d307e2b63338a118cdbc96c47e08fa5429fd359e34b67f5120e9515ff288f50c4a001000091313131313131313131313131313131310954c3bc6d2041696c650567656e656c030b726f6c3a6562657665796e0c726f6c3a79657469736b696e09726f6c3a636f63756b030b726f6c3a6562657665796e0c726f6c3a79657469736b696e09726f6c3a636f63756b066e6f726d616c0101000000000000000000000000000000000000000000000000000000000000000001ee5dcee7a71a87c7bd1c2dc3a5748e2e4b0ec2b717d2928341bac383b56db1a5d1561768f441eaa6e5d95ba6bdc3ffedfea7a55cbb30517da8644ef2c5425b97f7059e655a339ae3d84640b5f7c5b300",
+   "020ad5e2822079b923fd68183d51ce4c7e92b0ce796dca0684052bdc07d434a65a0b15ff109350c4a00100009632323232323232323232323232323232084b69c59f6973656c076b69736973656c01247579653a633237376134616465356330396531616662353234653333626231373437306501247579653a6332373761346164653563303965316166623532346533336262313734373065066e6f726d616c0001000000000000000000000000000000000000000000000000000000000000000001c277a4ade5c09e1afb524e33bb17470e08190688388b473a61f0933bbf8eb5b21e02944dc9d71447efb45b90e94698ecae2a1f05dcde5f46bc268c249bca5221f0f228ef62010b93f6243e136ba8f70b",
+   "020b863a9c4480fedfc076bd0ee962932b18b9de72f541636070b1472ed80ede544d15fff89650c4a001000063333333333333333333333333333333330842616bc4b163c4b10662616b696369010b726f6c3a6562657665796e010b726f6c3a6562657665796e066e6f726d616c0000000000000000000000000000000000000000000000000000000000000000000001ee5dcee7a71a87c7bd1c2dc3a5748e2ec8a82fe9b2269a5644e9a26c3476337142e7991e3ea1ebe76b895062865d13db0b72a78c04fab1e7f7fb12055c06c52c8d9ad98b731cffdc497df16cfb688200",
+   "020cf40da3cf43eb613bf02c2c1b73c37c0b74f94dfc652ef93f56fa42332b1c17a115ffe09a50c4a0010000a8343434343434343434343434343434340a4f6c61796c61723a4576076f6c61796c6172020b726f6c3a6562657665796e0c726f6c3a79657469736b696e030b726f6c3a6562657665796e0c726f6c3a79657469736b696e276465766963653a6366303737326132393835386636363262353261306534303861363837383465066e6f726d616c0101090909090909090909090909090909090909090909090909090909090909090901b6f91e50fdc5a36b9b251d03b722f59740d42f41ab65da2f203d6169bff60ac918d9aaf456c2c85d465f13b711bb0468196db6e81ae80da85494e3e922ec66c6cbac614d2fa34afa1b97d3e07c4a4b02",
+   "020d25a87afcc1f5bd9d15f259bc241ae4433098037e5ee4ddbf12522645f2cd890215ffc89e50c4a00100005c35353535353535353535353535353535044b6173610567656e656c010b726f6c3a6562657665796e010b726f6c3a6562657665796e046b6173610001000000000000000000000000000000000000000000000000000000000000000002ee5dcee7a71a87c7bd1c2dc3a5748e2e92a69fbd110add038c07e4be65fdcf9e493f14b709e418fa07ce6b18eb54401e1d8ef109a019418c2827df1ea3440f4bd3c712c0506dfc72ceb54b542a04b40db6f91e50fdc5a36b9b251d03b722f5974970e752680fc161f50974d37c5cf7d71d0568542ddaad4ce4a79a3a6f3676519253fbce69b3043e5cf2644ac6f7eb0878ed840e32482cc4901562098254d307",
+   "020e29143d3b7c1590d07958b90ed0bc95c4f8e5bb6999308a7c215e189d303a65330dffb0a250c4a00100008e00f4ac933a309227d7ac33099b84e7514d841795e47c562905ee8232fbb9849af22f22f51f71ff91d371f846a084d2d107d377b6c94a2db5fe6bf6a5e6ba856d2b047465737400000469736369056973636931111111111111111111111111111111110a636170733a6973636931070707070707070707070707070707070707070707070707070707070707070702cf0772a29858f662b52a0e408a68784e85a901507d7ddc18d6164bb015a2daf7f88d0a4641160e2e37cba0360f2dd7e01c4be5af57408b68b1d65f43cda70a983064f466922d7e941974756e137db801ee5dcee7a71a87c7bd1c2dc3a5748e2e7d392b22e09b2e0669ff292f627f40e8b4206938ac0fd85d4c41a48be3ef731e31a3867f2d6936b02fa315a298f09a3f2088a71feb84f5a0741abc41427d3c0f",
+   "020f126fac56d02c745b7d04bb3da985c9962480891c8ec6e8aa1c51cf2602585caf0dff98a650c4a00100008800eba430d18473361f205dc4b017c3241e3488fdc3f4ace996cdf8e6528fffae1bae360296a060a56339ea7c04faf5f94ef98a82389ffc87b5fd682659e631101704746573740000027563037563310000000000000000000000000000000008636170733a756331070707070707070707070707070707070707070707070707070707070707070702ecdffedd720bdd368a8df344583189900599bddd3147105f72a0ff724d3d7c7339866654c2c8671885b480a0b583d8fbf935ed8dacc345086ac70959deb434ef1940455f231481ebdb3f0c12bae1740bb6f91e50fdc5a36b9b251d03b722f597091d9110e8ee80ce3914decb6ac8042dadae3ed2f097b0c48996f341c8721bd9d31a01bb43c0a8f0b78561823debc0ccb2a600b2a70964096999eaaa6f16ba03",
+   "0210a38c4b49389a5fd2b11107e100ad6c04de1e12d5c2516add9b8197cc2eb691ba11ff80aa50c4a00100009c00e4c70d63a94f04321047977eae12e583eb4fe251c21fff183308b9c8e8c2d1d771c8554184f9a9be63cb5414d5617dfb1ca29f3eb53959dc76dbdbded5062830047465737400000842616bc4b163c4b1013333333333333333333333333333333300ff0034cf5ea10100000707070707070707070707070707070707070707070707070707070707070707ee5dcee7a71a87c7bd1c2dc3a5748e2e028bf881a939c56f0d58b9a7fb5c0161a6f52d6221fa0f9ca88b42a05cb950a23c50fb48a0beed1f0d24dbe76285ce6a05b0ca55b22931ee788c633dd05465c4a1a4d643ed703298dbdbf9e751fe461c00ee5dcee7a71a87c7bd1c2dc3a5748e2e9ce7bf186b2d592848d0c6e995a6c3904cc5b38f8eaf416e1c64d526571952003aa8c9c65c6f114eb9f643b20ce119dac9f337c428198a126132f935e990b608",
+   "021167e00e05fcd630a876d7813942278761dfcff23c5108bc46c68470855150453417ff68ae50c4a00100001809726f6c3a636f63756b010b68662e7461736b2e6f63720101ee5dcee7a71a87c7bd1c2dc3a5748e2e340c4cdbd0cf30dad39446910c1bb00c63fd17993369e6ba8c4377a7ff58774e56f5e9eec60bf6e061b33d9e3e81c098e26c996d717bbcf75c82de7cadea9402",
+   "02122555e18ccf8bb976d256574484b6614136fbf225f8da04357c12eccf346c285e13ff50b250c4a00100005841414141414141414141414141414141097665746572696e65720470617469c277a4ade5c09e1afb524e33bb17470eff00f05ce8a0010000050505050505050505050505050505050505050505050505050505050505050501c277a4ade5c09e1afb524e33bb17470e5e35e2d08299b717ab4ecbd7cc6dbe5d24f391446dc4cb6e305897fb2f496002d9100dd352f9874d29fdec352fcf791240d0ae6753e0bdc7f3777f21b1938a0b",
+   "02130eaa7e95b357a8fa99128a594c289a9a75fe60969ca1c2dd8743e79655ea6fba0eff38b650c4a001000036ecdffedd720bdd368a8df34458318990047465737400000000000000000000000000000000000000000000000000000000000000000001ecdffedd720bdd368a8df344583189909f11675f4922b6ba6294de43c6d8ce5825294509324efb78baae5763104708a609b2d4dfc5d57acb5493043e71992c5431dd1b6d5c993e6f44b133b6e5f6c30a",
+   "0214cb68448356f4ec02e4e1f7dd5337783e240447813118def5ab5ad35846a49bb012ff20ba50c4a0010000158bf881a939c56f0d58b9a7fb5c0161a6047465737401b6f91e50fdc5a36b9b251d03b722f597e1c46d41f42623ae479420a194c46fa760b5b566d67541017882ccedbfb1384955107a069ba38b06c820a90a2972c9b4fd9fcbe2e6cdd2481cdbd979a5410a02"
+  ],
+  "kimlikler": {
+   "ecem": "7a529486fcd357ff9c1fd1beb682f860",
+   "irem": "c277a4ade5c09e1afb524e33bb17470e",
+   "kerem": "ee5dcee7a71a87c7bd1c2dc3a5748e2e"
+  },
+  "dizinlenecekler": {
+   "ecem": [
+    "31313131313131313131313131313131"
+   ],
+   "irem": [
+    "31313131313131313131313131313131",
+    "32323232323232323232323232323232",
+    "34343434343434343434343434343434"
+   ],
+   "kerem": [
+    "31313131313131313131313131313131",
+    "33333333333333333333333333333333",
+    "34343434343434343434343434343434"
+   ]
+  },
+  "daraltan": {
+   "olay": "021552a23fd0cbe94282ffe64f670b4d54fb61a34a418f77264898095e01bb48e7f815ff08be50c4a00100007d313131313131313131313131313131310954c3bc6d2041696c650567656e656c020b726f6c3a6562657665796e0c726f6c3a79657469736b696e020b726f6c3a6562657665796e0c726f6c3a79657469736b696e066e6f726d616c0101000000000000000000000000000000000000000000000000000000000000000001ee5dcee7a71a87c7bd1c2dc3a5748e2e3ccf1e7396ea29e4e937189f3a9d550abb9c5f2b19f12843d922196d203dee5720dfb88caa4d91b8b96601ccb74a599e2d5ac35ddd458654228f07da023c7606",
+   "me": "7a529486fcd357ff9c1fd1beb682f860",
+   "silinen": [
+    {
+     "cid": "31313131313131313131313131313131",
+     "seq": 21
+    }
+   ]
+  }
+ },
+ "12": {
+  "k": 60,
+  "listeler": [
+   [
+    {
+     "id": "x",
+     "collectionId": "02020202020202020202020202020202",
+     "recordId": "0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a"
+    },
+    {
+     "id": "y",
+     "collectionId": "01010101010101010101010101010101",
+     "recordId": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b"
+    },
+    {
+     "id": "z",
+     "collectionId": "01010101010101010101010101010101",
+     "recordId": "0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a"
+    }
+   ],
+   [
+    {
+     "id": "z",
+     "collectionId": "01010101010101010101010101010101",
+     "recordId": "0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a"
+    },
+    {
+     "id": "w",
+     "collectionId": "01010101010101010101010101010101",
+     "recordId": "0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a"
+    },
+    {
+     "id": "x",
+     "collectionId": "02020202020202020202020202020202",
+     "recordId": "0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a"
+    }
+   ]
+  ],
+  "beklenen": [
+   "z",
+   "x",
+   "w",
+   "y"
+  ]
+ },
+ "14": {
+  "metinler": [
+   {
+    "metin": "Artık ölmek istiyorum",
+    "kriz": true
+   },
+   {
+    "metin": "Kombi bozuk",
+    "kriz": false
+   }
+  ],
+  "sablon": "Bu konuda yalnız değilsin. Şimdi güvendiğin bir yetişkinle konuş. Acil bir tehlike varsa 112'yi ara.",
+  "modelCagrilir": false,
+  "gecmiseYazilir": false
+ },
+ "16": [
+  {
+   "metin": "Kombi kapalı olabilir. Seni özledim! Vanayı aç.",
+   "beklenen": "Kombi kapalı olabilir. Vanayı aç."
+  }
+ ],
+ "rfc": "RFC-0013",
+ "not": "Numaralar §19 ile aynı. 1, 2, 13, 15 sonraki adımlarda eklenir (yeni dosyada).",
+ "hatalar": {
+  "dizinBozuk": "INDEX_CORRUPT"
+ }
+}

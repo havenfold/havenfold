@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# Dependabot: GitHub Actions weekly; npm only for security updates.
+# Every dependency is pinned to an exact version (CONTRIBUTING.md, scripts/license-check.js), so routine npm
+# version bumps are switched off: "open-pull-requests-limit: 0" stops version-update pull requests, while security
+# updates (turned on in the repository settings) still arrive. "increase-if-necessary" only moves the pinned
+# version when a fix needs it.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    versioning-strategy: increase-if-necessary
+  - package-ecosystem: npm
+    directory: /worklet
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    versioning-strategy: increase-if-necessary

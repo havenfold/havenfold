@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# hf-depolama-yaz — /autoinstall.yaml'a depolama bölümünü yazar (RFC-0007 §8.3). early-commands'ta hf-on-kontrol'den
+# sonra çalışır. Düzen: LVM; hedef disk seri numarasıyla (yoksa yoluyla) eşleşir; 4 GB takas.
+#
+# TPM varsa LUKS2 için 32 baytlık rastgele geçici parola üretilir (base32). Parola yalnız kurulum ortamının belleğinde
+# durur: /autoinstall.yaml ve /run/havenfold-kurulum/luks-gecici (0600, tmpfs). USB'ye hiç yazılmaz. İlk açılışta
+# havenfold-luks-yenile bu parolanın yuvasını siler (§8.5). TPM yoksa disk şifrelenmez (kurucu belge §9.2).
+set -euo pipefail
+
+USB=${HF_USB:-/cdrom}
+K=$USB/havenfold/kurulum
+NODE=${HF_NODE:-$K/node}
+RAM=${HF_RAM:-/run/havenfold-kurulum}
+AI=${HF_AUTOINSTALL:-/autoinstall.yaml}
+cli () { "$NODE" "$K/lib/cli.js" "$@"; }
+
+umask 077
+[ -f "$RAM/karar.json" ] || { echo "HATA: ön kontrol kararı yok (hf-on-kontrol çalışmadı)" >&2; exit 1; }
+
+EK=()
+if [ "$(cli bilgi --dosya "$RAM/karar.json" --alan tpm)" = "true" ]; then
+  head -c 32 /dev/urandom | base32 -w 0 | tr -d '=' > "$RAM/luks-gecici"
+  EK=(--parola-dosyasi "$RAM/luks-gecici")
+fi
+cli depolama --dosya "$AI" --karar "$RAM/karar.json" ${EK[@]+"${EK[@]}"} > "$RAM/autoinstall.yeni"
+cat "$RAM/autoinstall.yeni" > "$AI"
+rm -f "$RAM/autoinstall.yeni"
+echo "Depolama bölümü yazıldı ($( [ ${#EK[@]} -gt 0 ] && echo 'LUKS2 + LVM' || echo 'LVM, şifresiz' ))."

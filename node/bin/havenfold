@@ -1,0 +1,59 @@
+#!/usr/bin/env node
+// SPDX-License-Identifier: MPL-2.0
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+// was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// havenfold — düğüm yönetim komutu (RFC-0007 §7). Paketle gelen Node ile çalışır: /opt/havenfold/guncel/node
+const path = require('path')
+const { ana, YONETIM_SOKETI } = require('../command')
+const { baglan } = require('../ipc/socket')
+const { cerceveYaz, mesajCoz, CerceveOkuyucu } = require('../ipc/frame')
+
+const SOKET = (kapsam) => YONETIM_SOKETI[kapsam]
+
+// Tek istek ve akış: yönetim soketine çerçeve gönderir, gelen çerçeveleri çözer
+function akis (kapsam, type, mesaj) {
+  return {
+    async * [Symbol.asyncIterator] () {
+      const s = await baglan(SOKET(kapsam))
+      const okuyucu = new CerceveOkuyucu()
+      s.write(cerceveYaz(type, 1, mesaj))
+      try {
+        for await (const parca of s) for (const b of okuyucu.besle(parca)) yield mesajCoz(b)
+      } finally { s.destroy() }
+    }
+  }
+}
+// Tek istek: soket 5 saniye sessiz kalırsa kapanır (cevap vermeyen çekirdek ekranı ve komutu bekletmesin).
+// Tören akışı (akis) uzun sürer; ona zaman aşımı konmaz.
+const ISTEK_MS = 5_000
+async function istek (kapsam, type, mesaj) {
+  const s = await baglan(SOKET(kapsam))
+  s.setTimeout(ISTEK_MS, () => s.destroy(Object.assign(new Error('TIMEOUT'), { code: 'TIMEOUT' })))
+  const okuyucu = new CerceveOkuyucu()
+  s.write(cerceveYaz(type, 1, mesaj))
+  try {
+    for await (const parca of s) for (const b of okuyucu.besle(parca)) return mesajCoz(b)
+  } finally { s.destroy() }
+  throw new Error('NO_REPLY')
+}
+
+// Tören QR'ı PNG olarak da (ekransız kutu: başka makinede açıp telefonla okutmak için)
+function pngYaz (metin) {
+  const yol = path.join(require('os').homedir(), 'havenfold-katil.png')
+  require('fs').writeFileSync(yol, require('../qr-png').pngKodla(metin).png, { mode: 0o600 })
+  return yol
+}
+
+// Linux konsolunda (tty1) tören QR'ı çerçeve arabelleğine piksel olarak: konsol yazı tipi yarım blokları taşımıyor.
+// SSH'ta ve terminal emülatöründe null döner, komut yarım blokla çizer (node/qr-screen.js).
+let cizici
+function qrCiz (metin) {
+  if (cizici === undefined) cizici = require('../qr-screen').konsolCizici()
+  return cizici ? cizici(metin) : null
+}
+
+// Tanımsız dönüş başarı sayılmaz (Codex 12. tur: undefined çıkış kodu 0'dı)
+ana(process.argv.slice(2), { baglanti: { istek, akis }, pngYaz, qrCiz }).then((k) => { process.exitCode = Number.isInteger(k) ? k : 1 }, (err) => {
+  console.error('havenfold: ' + err.message)
+  process.exitCode = 1
+})

@@ -1,0 +1,28 @@
+{
+  "aciklama": "RFC-0036 §9 vektör 7–12: hf.uygulama kaydı ve kendi yazar sınıfı. Durumlar core/kayit/test/uygulama.js'te ana zincir (ledger-v21) üstünde çalıştırılır; beklenenler RFC'den elle yazıldı. Vektör 1–6 ve 5a (törende aile adı) D97'de toren-aile-adi.json'da.",
+  "rfc": "RFC-0036",
+  "tur": {
+    "tur": "hf.uygulama",
+    "olay": false,
+    "yazar": "kendi",
+    "koleksiyon": "Tüm Aile",
+    "alanlar": { "_subj": "uye:<yazarın kendi kimliği, hex16>", "app_id": "[a-z0-9-], 1–32 bayt (RFC-0036 §3.2 appId; kayıt alan adı kuralı RFC-0001 §4.1 nedeniyle app_id)" }
+  },
+  "durumlar": [
+    { "no": 7, "aciklama": "Hüsniye kendi kaydını yazar: kimliğin uygulaması", "yazar": "husniye", "appId": "yuva-acil", "beklenen": { "husniye": "yuva-acil" } },
+    { "no": 7, "aciklama": "Kerem Hüsniye'nin kaydına put eder: görünüme girmez, değer değişmez; işlem geçerli kümede kalır", "yazar": "kerem", "hedef": "husniye", "appId": "yuva-pati", "beklenen": { "husniye": "yuva-acil" } },
+    { "no": 7, "aciklama": "İrem _subj'i Hüsniye olan kayıt oluşturur: yok sayılır", "yazar": "irem", "subj": "husniye", "appId": "yuva-pati", "beklenen": { "husniye": "yuva-acil", "irem": null } },
+    { "no": 8, "aciklama": "Ek kimliğin kaydı APP_ATTACH.appId'den farklı: defter geçerli", "yazar": "keremDefter", "attach": "yuva-hat", "appId": "yuva-pati", "beklenen": { "keremDefter": "yuva-hat" } },
+    { "no": 9, "aciklama": "Ana kimlik kayıtsız, ek kimlik yuva-hat: Acil bilinmiyor", "kisi": "kerem", "urun": "yuva-acil", "beklenen": "bilinmiyor" },
+    { "no": 9, "aciklama": "Ana kimlik yuva-acil yazar: Acil var", "kisi": "kerem", "yazar": "kerem", "appId": "yuva-acil", "urun": "yuva-acil", "beklenen": "var" },
+    { "no": 9, "aciklama": "Bütün kimlikler biliniyor, hiçbiri Pati değil: Pati yok", "kisi": "kerem", "urun": "yuva-pati", "beklenen": "yok" },
+    { "no": 10, "aciklama": "ROTATE_DEVICE: eski kimliğin kaydı yeni kimliğe geçmez; yeni kimlik yazana kadar bilinmiyor", "eski": "u5", "yeni": "u6", "appId": "yuva-acil", "urun": "yuva-acil", "beklenen": "bilinmiyor" },
+    { "no": 11, "aciklama": "Cihaz ve kutu kendi sınıfına uymaz: görünüme girmez", "roller": ["cihaz", "kutu"], "beklenen": false },
+    { "no": 12, "aciklama": "Kataloğunda tür olmayan sürüm (yazar sınıfı uygulanmaz) kaydı hata vermeden eşitler", "beklenen": "gecerli" }
+  ],
+  "yazma": {
+    "aciklama": "§3.3 madde 1 ve 4: kimliğin kendisi yazar; kayıt yoksa ya da appId farklıysa bir kez. Misafir, kutu, cihaz yazmaz; düzey 2.0 ailede (Tüm Aile yok) yazılmaz. Anahtar yoksa yazım kuyrukta bekler.",
+    "sonuclar": ["yazildi", "var", "kuyrukta", null]
+  },
+  "hatalar": []
+}

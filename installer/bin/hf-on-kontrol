@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# hf-on-kontrol — kurulumdan önce ön kontrol (RFC-0007 §8.4). Subiquity'nin early-commands adımında, kurulum
+# ortamında (USB'den açılmış canlı sistem) kök olarak çalışır. Hiçbir diske yazmaz.
+#
+# Adımlar: işlemci (x86-64-v2), RAM, iç disk, pil görsel kontrolü, hedef disk seçimi, "SIL" onayı (120 sn), TPM 2.0
+# algılama ve mühürle–aç denemesi, diğer disklerin dokunulmadan kalacağı notu. Bir adım tutmazsa kurulum durur ve
+# bilgisayar 60 saniye sonra kapanır. Karar /run/havenfold-kurulum/karar.json'a (yalnız RAM) yazılır; ağ adı
+# /autoinstall.yaml'daki havenfold-XXXX yerine rastgele dört onaltılık haneyle yazılır.
+#
+# Sorular ayrı sanal konsolda (tty3) sorulur: tty1'i subiquity kullanır.
+set -euo pipefail
+
+USB=${HF_USB:-/cdrom}
+K=$USB/havenfold/kurulum
+NODE=${HF_NODE:-$K/node}
+RAM=${HF_RAM:-/run/havenfold-kurulum}
+AI=${HF_AUTOINSTALL:-/autoinstall.yaml}
+TTY=${HF_TTY:-/dev/tty3}
+SYS=${HF_SYS:-/sys}
+PROC=${HF_PROC:-/proc}
+cli () { "$NODE" "$K/lib/cli.js" "$@"; }
+mesaj () { cli bilgi --dosya "$RAM/mesaj.json" --alan "$1"; }
+
+umask 077
+mkdir -p "$RAM"
+"$NODE" -e "process.stdout.write(JSON.stringify(require('$K/lib/preflight').MESAJ))" > "$RAM/mesaj.json"
+
+if [ -z "${HF_TTY_YOK:-}" ] && [ -c "$TTY" ]; then
+  chvt "${TTY#/dev/tty}" 2>/dev/null || true
+  exec <"$TTY" >"$TTY" 2>&1
+  trap 'chvt 1 2>/dev/null || true' EXIT
+fi
+
+durdur () {
+  printf '\n%s\n%s\n' "$1" "$(mesaj kapanis)"
+  if [ -z "${HF_KAPATMA:-}" ]; then sleep 60; poweroff || true; fi
+  exit 1
+}
+
+printf '\nHavenfold kurulumu: ön kontrol\n\n'
+
+# 1–3, 5, 8: işlemci, RAM, diskler
+lsblk -J -b -o "$("$NODE" -e "process.stdout.write(require('$K/erase/discovery').SUTUNLAR.join(','))")" > "$RAM/lsblk.json"
+PIL=0
+for t in "$SYS"/class/power_supply/*/type; do
+  [ -e "$t" ] || continue
+  d=$(dirname "$t")
+  if [ "$(cat "$t")" = "Battery" ] && [ "$(cat "$d/scope" 2>/dev/null || echo System)" != "Device" ]; then PIL=1; fi
+done
+cli on-kontrol --cpuinfo "$PROC/cpuinfo" --meminfo "$PROC/meminfo" --lsblk "$RAM/lsblk.json" --pil "$PIL" \
+  --tpm "$SYS/class/tpm/tpm0/tpm_version_major" > "$RAM/karar.json"
+DURDUR=$(cli bilgi --dosya "$RAM/karar.json" --alan durdur)
+[ "$DURDUR" = "null" ] || durdur "$DURDUR"
+"$NODE" -e "for (const u of require('$RAM/karar.json').uyarilar) console.log('Uyarı: ' + u)"
+
+# 4: pil görsel kontrolü (kurucu belge §9.6)
+if [ "$PIL" = "1" ]; then
+  while true; do
+    printf '%s ' "$(mesaj pilSoru)"
+    read -r c || durdur "Onay verilmedi." # girdi bitti (EOF): soru sonsuza dek dönmesin (Codex 12. tur)
+    case "$(printf '%s' "$c" | tr '[:lower:]' '[:upper:]')" in
+      E) durdur "$(mesaj pilSismis)" ;;
+      H) break ;;
+    esac
+  done
+fi
+
+# 5–6: hedef disk ve onay
+printf '\nKurulacak disk: %s\n' "$(cli bilgi --dosya "$RAM/karar.json" --alan hedef.etiket)"
+printf '%s\n> ' "$(mesaj onay)"
+if ! read -r -t 120 c || [ "$c" != "SIL" ]; then durdur "Onay verilmedi."; fi
+
+# 7: TPM 2.0 ve mühürle–aç denemesi. tpm2-tools USB'deki paketlerden RAM'e açılır (kurulum ortamında yok). Kurulum
+# ortamında olmayan kitaplıkları (libtss2-*, gerekirse diğerleri) da USB'deki lib*.deb'lerden gelir; kitaplık arama
+# yolu açılan .so dosyalarının dizinleridir (usr/lib/x86_64-linux-gnu gibi). Araçlar tek ikilidir (tpm2 <araç>);
+# tpm2_* adları ona bağdır. Tutmayan adımın sebebi ekrana yazılır.
+# Araçlar çalıştırılabilen bir dizine açılır: kurulum ortamında /run noexec bağlıdır (sanal makinede görüldü).
+calisabilir_dizin () {
+  local d x
+  for d in /tmp /var/tmp "$RAM"; do
+    x=$(mktemp -d "$d/hf-tpm.XXXXXX" 2>/dev/null) || continue
+    if cp /bin/true "$x/dene" 2>/dev/null && "$x/dene" 2>/dev/null; then rm -f "$x/dene"; echo "$x"; return 0; fi
+    rm -rf "$x"
+  done
+  return 1
+}
+tpm_dene () {
+  local t deb
+  t=$(calisabilir_dizin) || { echo "TPM denemesi yapılamadı: araçları çalıştıracak dizin yok (noexec)"; return 1; }
+  mkdir -p "$t/kok"
+  for deb in "$USB"/havenfold/deb/tpm2-tools_*.deb "$USB"/havenfold/deb/lib*.deb; do
+    case "$(basename "$deb")" in libc6_*|libc6-*) continue ;; esac # C kitaplığı kurulum ortamınınki kalır
+    [ -e "$deb" ] && dpkg-deb -x "$deb" "$t/kok"
+  done
+  local b="$t/kok/usr/bin" tpm2
+  if [ -x "$b/tpm2" ]; then tpm2=("$b/tpm2"); elif [ -x "$b/tpm2_createprimary" ]; then tpm2=(); else
+    echo "TPM denemesi yapılamadı: USB'de tpm2-tools yok ya da açılamadı ($(ls "$b" 2>/dev/null | head -n 3 | tr '\n' ' '))"
+    rm -rf "$t"
+    return 1
+  fi
+  t2 () { if [ ${#tpm2[@]} -gt 0 ]; then "${tpm2[@]}" "$@"; else local a=$1; shift; "$b/tpm2_$a" "$@"; fi; }
+  local lib
+  lib=$(find "$t/kok" -name '*.so*' \( -type f -o -type l \) -printf '%h\n' | sort -u | tr '\n' ':')
+  # `if` bağlamında set -e işlemez: adımlar && ile bağlı, ilk tutmayanda durulur
+  (
+    export LD_LIBRARY_PATH="$lib" TPM2TOOLS_TCTI=device:/dev/tpmrm0
+    cd "$t" &&
+      t2 createprimary -Q -C o -c birincil.ctx &&
+      head -c 32 /dev/urandom > deneme &&
+      t2 create -Q -C birincil.ctx -i deneme -u muhur.pub -r muhur.priv &&
+      t2 load -Q -C birincil.ctx -u muhur.pub -r muhur.priv -c muhur.ctx &&
+      t2 unseal -Q -c muhur.ctx -o acilan &&
+      { cmp -s deneme acilan || { echo "açılan veri mühürlenenle aynı değil" >&2; false; }; }
+  ) 2>"$RAM/tpm.hata"
+  local s=$?
+  rm -rf "$t"
+  [ "$s" = 0 ] || printf 'TPM denemesi tutmadı: %s\n' "$(tail -n 3 "$RAM/tpm.hata" | tr '\n' ' ')"
+  return $s
+}
+TPM=0
+if [ "$(cli bilgi --dosya "$RAM/karar.json" --alan tpm)" != "true" ]; then
+  echo "TPM 2.0 bulunamadı ($SYS/class/tpm/tpm0/tpm_version_major)."
+elif [ ! -e /dev/tpmrm0 ]; then
+  echo "TPM 2.0 var ama /dev/tpmrm0 yok."
+elif tpm_dene; then
+  TPM=1
+  echo "TPM 2.0: mühürle–aç denemesi tamam."
+fi
+if [ "$TPM" = "0" ]; then
+  printf '\n%s\n%s\n> ' "$(mesaj tpmYok)" "$(mesaj tpmOnay)"
+  if ! read -r -t 120 c || [ "$c" != "TAMAM" ]; then durdur "Onay verilmedi."; fi
+fi
+"$NODE" -e "const f='$RAM/karar.json';const k=require(f);k.tpm=$([ "$TPM" = 1 ] && echo true || echo false);require('fs').writeFileSync(f,JSON.stringify(k))"
+
+# Ağ adı: havenfold-<4 onaltılık hane> (§10)
+HEX=$(od -An -N2 -tx1 /dev/urandom | tr -d ' \n')
+cli host-adi --dosya "$AI" --hex "$HEX" > "$RAM/autoinstall.yeni"
+cat "$RAM/autoinstall.yeni" > "$AI"
+rm -f "$RAM/autoinstall.yeni"
+
+printf '\nÖn kontrol tamam. Kurulum başlıyor (ağ adı havenfold-%s).\n' "$HEX"

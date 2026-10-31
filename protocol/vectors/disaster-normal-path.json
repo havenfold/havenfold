@@ -1,0 +1,9 @@
+{
+  "aciklama": "D104 (yuva-acil LA44 (1)–(2)): afet modunun çekirdek eksikleri. (a) Normal yol (RFC-0031 §8.4, RFC-0012 §8.4): çevrimdışı yazılan afet mesajları ağ gelince ürün zarfı olarak (AFET_MSG, kalıcı kuyruk) bir kez teslim; aynı mid iki kez gelirse bir kez işlenir. (b) Yükseltme (RFC-0012 §6.1, §6.5): Bluetooth oturumunda iki yönde bekleyen 20 mesaj ya da 16 KB aşılınca grup sahibi (bağı başlatmayan) AFET_LINK_UP gönderir, başlatan alır. (c) Afet hâli ve teslim edilmemiş mesajlar worklet'in şifreli durum dosyasında, yeniden açılışta korunur. Durumlar core/afet/test/yukseltme.js ve worklet/test/afet-normal-yol.js'te; beklenenler elle yazıldı.",
+  "esik": { "adet": 20, "bayt": 16384 },
+  "durumlar": [
+    { "no": "a", "aciklama": "İki afet mesajı çevrimdışı; bağlanınca normal yoldan bir kez", "gelen": 2 },
+    { "no": "b", "aciklama": "Kerem 11, Hüsniye 10 mesaj (toplam 21 > 20): grup sahibi Hüsniye teklif eder, Kerem alır; eşik altında yükseltme yok", "kerem": 11, "husniye": 10, "teklif": { "kind": 0, "name": "DIRECT-hf-afet", "pass": "parola123", "port": 47871 } },
+    { "no": "c", "aciklama": "Yeniden açılışta afet hâli ve giden kuyruk korunur" }
+  ]
+}

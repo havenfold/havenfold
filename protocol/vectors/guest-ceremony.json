@@ -1,0 +1,77 @@
+{
+  "aciklama": "D99: misafir (bakıcı) töreni ve misafir kipi uçtan uca (RFC-0019 §11.3, RFC-0030, RFC-0003 §5.5). Numaralar bu dosyada (komut-araliklari.json 440–449 sira; RFC-0003 §10'a işlenene kadar, İstek 177). Akış worklet/test/misafir.js'te (iki gerçek çekirdek, yerel testnet); beklenenler buradan.",
+  "rfc": [
+    "RFC-0019",
+    "RFC-0030",
+    "RFC-0003"
+  ],
+  "komutlar": [
+    {
+      "no": 440,
+      "ad": "CAREGIVER_LIST",
+      "sdk": "LedgerApi.caregivers",
+      "govde": "{}",
+      "sonuc": "[{ grantId, ad, bitis, koleksiyonlar, aktif, verenId }]"
+    },
+    {
+      "no": 441,
+      "ad": "CAREGIVER_REMOVE",
+      "sdk": "LedgerApi.removeCaregiver",
+      "govde": "{ grantId, neden? }",
+      "sonuc": "{ durum }"
+    }
+  ],
+  "davet": {
+    "komut": 3,
+    "govde": "{ tur: 'misafir', bitis? }",
+    "bitisVarsayilanMs": 86400000,
+    "bitisEnCokGun": 90,
+    "hata": "INVALID_DURATION"
+  },
+  "toren": [
+    "misafir QR okutur (kind 3)",
+    "iki tarafta aynı 5 resim",
+    "aile tarafı GRANT taslağı (bakiciHazirla) → JOIN_DRAFT",
+    "misafir imzalar → JOIN_SIG",
+    "aile tarafı uygular (bakiciOner) → GUEST_VIEW (0x9a)",
+    "misafir görünümü doğrular, misafir kipine geçer"
+  ],
+  "uzatma": "protokolde yok: defterde görülmüş kimliğe ikinci GRANT yazılamaz (RFC-0003 §5.5 tek kimlik); aynı bakıcıyla yeniden tören hiçbir şey yazmadan IDENTITY_ALREADY_EXISTS ile kapanır (İstek 177)",
+  "adimlar": [
+    {
+      "ad": "tören",
+      "beklenen": "misafir kipi; CAREGIVER_LIST'de tek aktif misafirlik"
+    },
+    {
+      "ad": "izin",
+      "beklenen": "CAREGIVER_WRITE_GRANT sonrası misafirin izinleri GUEST_VIEW ile güncellenir"
+    },
+    {
+      "ad": "bırakma",
+      "beklenen": "misafir izinli türde bırakır, ebeveynde kayıt görünür"
+    },
+    {
+      "ad": "okuma",
+      "beklenen": "misafir aile kaydını okuyamaz",
+      "hata": "NO_IDENTITY"
+    },
+    {
+      "ad": "uzatma",
+      "beklenen": "yeniden tören IDENTITY_ALREADY_EXISTS ile kapanır; misafirlik ve bitiş değişmez",
+      "hata": "IDENTITY_ALREADY_EXISTS"
+    },
+    {
+      "ad": "kaldırma",
+      "beklenen": "GUEST_REVOKED gelir, misafir bırakamaz",
+      "hata": "GUEST_ACCESS_ENDED"
+    }
+  ],
+  "hatalar": [
+    "PARENT_REQUIRED",
+    "NO_TARGET",
+    "INVALID_DURATION",
+    "NOT_GUEST",
+    "GUEST_ACCESS_ENDED",
+    "IDENTITY_ALREADY_EXISTS"
+  ]
+}

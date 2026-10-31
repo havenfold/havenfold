@@ -1,0 +1,28 @@
+{
+  "name": "@havenfold/services",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Havenfold service sharing: service cards, directory, QR card, package bodies and encryption, aliases, consent and revocation (RFC-0010)",
+  "license": "MPL-2.0",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "*.js"
+  ],
+  "scripts": {
+    "test": "brittle-node test/*.js"
+  },
+  "dependencies": {
+    "@havenfold/core": "0.0.0",
+    "@havenfold/records": "0.0.0",
+    "b4a": "1.9.0",
+    "compact-encoding": "3.5.2",
+    "sodium-native": "5.2.0"
+  },
+  "devDependencies": {
+    "brittle": "4.5.0"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}

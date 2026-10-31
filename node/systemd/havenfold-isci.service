@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# havenfold-isci.service — RFC-0007 §4.3. Bu dosya düğüm paketiyle gelir; kurulum aracı /etc/systemd/system altına bağlar.
+[Unit]
+Description=Havenfold işçi çekirdeği
+After=havenfold-denetci.service
+Requires=havenfold-denetci.service
+ConditionPathExists=/var/lib/havenfold/isci/kimlik
+
+[Service]
+Type=simple
+User=havenfold-isci
+Group=havenfold-isci
+# Bare desteği İstek 151'e kadar Node: çekirdek RFC-0007 §4.1'e göre Bare'de çalışacak; bugünkü işçi kodu Node modülleri
+# kullanır (var olan Ubuntu kipindeki havenfold-kutu-ubuntu.service gibi)
+ExecStart=/opt/havenfold/guncel/node /opt/havenfold/guncel/cekirdek/isci.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+DevicePolicy=closed
+# yalnız TPM; başka aygıt yok
+DeviceAllow=/dev/tpmrm0 rw
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictRealtime=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallFilter=@system-service
+SystemCallArchitectures=native
+UMask=0077
+# MemoryDenyWriteExecute kullanılmaz: V8'in JIT derleyicisi yazılabilir ve çalıştırılabilir bellek ister
+# AF_NETLINK: ağ arayüzlerinin okunması (getifaddrs; HyperDHT ağ değişimi), var olan Ubuntu kipindeki kutu birimi gibi
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+ReadWritePaths=/var/lib/havenfold/isci /run/havenfold/isci /run/havenfold/gorev
+# havenfold-cekirdek: denetçinin soket dizini. Yardımcı soketine giremez (/run/havenfold/yetki/ yalnız denetçi; RFC-0033 §9 l)
+SupplementaryGroups=havenfold-gorev tss havenfold-cekirdek
+
+[Install]
+WantedBy=multi-user.target

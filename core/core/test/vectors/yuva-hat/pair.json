@@ -1,0 +1,22 @@
+{
+ "aciklama": "docs/04 §5: pair = derive(X25519(a,B), \"pair\", familyId, lo, hi, anchorHash, ceremonyKey). Alt anahtarlar derive(pair, etiket, ...).",
+ "girdi": {
+  "aSecret": "0303030303030303030303030303030303030303030303030303030303030303",
+  "aPub": "5dfedd3b6bd47f6fa28ee15d969d5bb0ea53774d488bdaf9df1c6e0124b3ef22",
+  "bSecret": "0404040404040404040404040404040404040404040404040404040404040404",
+  "bPub": "ac01b2209e86354fb853237b5de0f4fab13c7fcbf433a61c019369617fecf10b",
+  "idA": "0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a",
+  "idB": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+  "familyId": "f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0",
+  "anchorHash": "e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0",
+  "ceremonyKey": "c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0"
+ },
+ "pair": "ed871a7cbf0b24e48c7a95a65c3217f6f28dadcc9d3c035013015bb24f5566d0",
+ "altAnahtarlar": {
+  "ratchetRoot": "f66095d0be8893120780bd14588a4c528b60ae2aa7fa60479e20fa5b809343fb",
+  "bellKey": "24fdee2e2f6dc682daccdba9a52c0bfdbb463bf9f14876d95df9afdd132baec8",
+  "relayKey": "7efc9dfd50f6977ea4416c98596444d552cb94dbc186ffbb25ea4b7e401fb2b7",
+  "listenSeedA_epoch1": "02cbe51b1ca736fe7d3540e70138b398e1dcc9f15350ac39f2e2a01780039707",
+  "mailboxIdB_day20379": "3e6e76da1dc0eb3a85242e2405b1745c623d7bb4626bcf58973fe61b90dc9372"
+ }
+}

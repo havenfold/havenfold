@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+// SPDX-License-Identifier: MPL-2.0
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+// was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// Test aracı: coreutils `base32 -w 0` taklidi (macOS'ta yok). RFC 4648 alfabesi, dolgulu, satır sonu yok.
+if (process.argv.slice(2).join(' ') !== '-w 0') { process.stderr.write('base32 taklidi: yalnız -w 0\n'); process.exit(2) }
+const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+const b = require('fs').readFileSync(0)
+let bit = 0, v = 0, o = ''
+for (const x of b) { v = (v << 8) | x; bit += 8; while (bit >= 5) { o += A[(v >>> (bit - 5)) & 31]; bit -= 5 } v &= (1 << bit) - 1 }
+if (bit) o += A[(v << (5 - bit)) & 31]
+while (o.length % 8) o += '='
+process.stdout.write(o)

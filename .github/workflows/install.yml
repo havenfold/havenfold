@@ -1,0 +1,301 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# kurulum: Havenfold Kurulum USB'si ISO'sunun derlenmesi ve sanal makinede denenmesi (RFC-0007 §8, §9, §13.2;
+# RFC-0033 §4). Elle çalışır; ağır iş yalnız burada (geliştirici makinelerinde ISO, QEMU, disk komutu yok).
+#
+#   iso      resmî Ubuntu Server 24.04 amd64 ISO'su (SHA256SUMS ile doğrulanır, önbellekte), düğüm paketi, çevrimdışı
+#            .deb'ler (installerDebs), silme ortamı (mmdebstrap) ve havenfold-usb-build.sh. Bildirim iş akışında üretilen
+#            GEÇİCİ test kök anahtarıyla imzalanır; anahtar imzadan hemen sonra silinir. Gerçek kök anahtar CI'da yoktur.
+#            Aynı kaynaktan derlenmiş ISO önbellekteyse yeniden derlenmez.
+#   kurulum  QEMU + KVM, OVMF (Güvenli Önyükleme açık, Microsoft anahtarları), swtpm TPM 2.0, boş 80 GB NVMe. Test ISO'su
+#            (installer/test/vm/test-iso.sh: varsayılan girdi "kur", sorular ttyS1'de) ile otomatik kurulum, sonra
+#            USB'siz iki açılış: ilk açılış (yönetici parolası ve rol CI sürücüsünden), LUKS2 + Clevis TPM bağı, kimlik,
+#            servisler (hf-test-denetim sonuçları seri konsola yazar).
+#   silme    iki sanal disk (NVMe LUKS2 + SATA, ESP'de test bileti), "sil" girdisi, QR'lar ekrandan okunur,
+#            verifyWipe ve silinen blokların denetimi.
+name: install
+
+on:
+  workflow_dispatch:
+    inputs:
+      silme:
+        description: 'Silme modunu da dene'
+        type: boolean
+        default: true
+      yeniden_derle:
+        description: 'Önbellekteki ISO''yu kullanma, yeniden derle'
+        type: boolean
+        default: false
+  # Haftalık deneme: Actions dakikası sınırlı olduğu için kapalı
+  # schedule:
+  #   - cron: '17 3 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kurulum-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SURUM: 0.0.1
+  HF_NODE_SURUM: 22.23.4
+  UBUNTU_TABAN: https://releases.ubuntu.com/24.04
+
+jobs:
+  iso:
+    name: ISO build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    outputs:
+      anahtar: ${{ steps.anahtar.outputs.anahtar }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Makine
+        run: |
+          nproc; free -h; df -h
+          ls -l /dev/kvm || echo "KVM YOK"
+      - name: Kabuk betikleri (bash -n, shellcheck uyarı düzeyi)
+        continue-on-error: true
+        run: |
+          mapfile -t b < <(git ls-files 'installer/build/*.sh' 'installer/bin/*' 'installer/target/*' 'installer/install/*' 'installer/test/vm/*.sh' 'installer/test/vm/target/*' | grep -vE '\.(service|js)$')
+          for f in "${b[@]}"; do bash -n "$f"; done
+          shellcheck --severity=warning --shell=bash "${b[@]}"
+      - name: Ubuntu ISO'sunun adı ve özeti (SHA256SUMS)
+        id: ubuntu
+        run: |
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/SHA256SUMS" "$UBUNTU_TABAN/SHA256SUMS"
+          SATIR=$(grep -E '^[0-9a-f]{64} [ *]ubuntu-24\.04(\.[0-9]+)?-live-server-amd64\.iso$' "$RUNNER_TEMP/SHA256SUMS" | sort -V -k2 | tail -n 1)
+          [ -n "$SATIR" ] || { cat "$RUNNER_TEMP/SHA256SUMS"; echo "HATA: SHA256SUMS'ta server ISO'su yok"; exit 1; }
+          SHA=${SATIR%% *}
+          AD=${SATIR##* }
+          AD=${AD#\*}
+          { echo "ad=$AD"; echo "sha=$SHA"; } >> "$GITHUB_OUTPUT"
+          echo "$AD $SHA"
+      - name: ISO önbellek anahtarı
+        id: anahtar
+        env:
+          KAYNAK: ${{ hashFiles('installer/bin/**', 'installer/build/**', 'installer/target/**', 'installer/install/**', 'installer/lib/**', 'installer/erase/**', 'installer/erase-mode/**', 'installer/test/vm/test-iso-build.sh', 'installer/test/vm/test-root.js', 'node/**', 'core/**', 'sdk/**', 'worklet/**', 'package.json', 'package-lock.json', '.github/workflows/install.yml') }}
+          USHA: ${{ steps.ubuntu.outputs.sha }}
+          YENIDEN: ${{ inputs.yeniden_derle && github.run_id || '' }}
+        # Node sürümü anahtarda: güvenlik sürümü değişince eski ISO denenmez. Yeniden derlemede anahtar koşuya özeldir:
+        # önbellek kaydı değiştirilemez, aynı anahtarla kaydedilen yeni ISO sessizce düşer ve sonraki işler eskisini açardı.
+        run: echo "anahtar=hf-iso-$SURUM-node$HF_NODE_SURUM-${USHA:0:16}-$KAYNAK${YENIDEN:+-$YENIDEN}" | tee -a "$GITHUB_OUTPUT"
+      - name: Havenfold ISO önbellekte mi
+        id: hf
+        if: ${{ !inputs.yeniden_derle }}
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/onbellek/hf
+          key: ${{ steps.anahtar.outputs.anahtar }}
+          lookup-only: true
+      - name: Yer aç
+        if: steps.hf.outputs.cache-hit != 'true'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/.ghcup
+          df -h /
+      - name: Ubuntu ISO önbelleği
+        id: ubuntu-onbellek
+        if: steps.hf.outputs.cache-hit != 'true'
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/onbellek/ubuntu
+          key: ubuntu-iso-${{ steps.ubuntu.outputs.sha }}
+      - name: Ubuntu ISO'sunu indir ve doğrula
+        if: steps.hf.outputs.cache-hit != 'true'
+        env:
+          AD: ${{ steps.ubuntu.outputs.ad }}
+          SHA: ${{ steps.ubuntu.outputs.sha }}
+        run: |
+          mkdir -p ~/onbellek/ubuntu
+          cd ~/onbellek/ubuntu
+          [ -f "$AD" ] || curl -fsSL --retry 3 -o "$AD" "$UBUNTU_TABAN/$AD"
+          echo "$SHA  $AD" | sha256sum -c -
+          ls -l
+      - name: Ubuntu ISO'sunu önbelleğe yaz
+        if: steps.hf.outputs.cache-hit != 'true' && steps.ubuntu-onbellek.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/onbellek/ubuntu
+          key: ubuntu-iso-${{ steps.ubuntu.outputs.sha }}
+      - name: Derleme araçları
+        if: steps.hf.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends xorriso mmdebstrap squashfs-tools
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        if: steps.hf.outputs.cache-hit != 'true'
+        with:
+          node-version: 22
+      - name: Üretim bağımlılıkları
+        if: steps.hf.outputs.cache-hit != 'true'
+        run: |
+          npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+          (cd worklet && npm ci --omit=dev --ignore-scripts --no-audit --no-fund)
+      - name: ISO derle (test kökü)
+        if: steps.hf.outputs.cache-hit != 'true'
+        env:
+          AD: ${{ steps.ubuntu.outputs.ad }}
+          SHA: ${{ steps.ubuntu.outputs.sha }}
+        run: |
+          bash installer/test/vm/test-iso-build.sh --ubuntu-iso ~/onbellek/ubuntu/"$AD" --ubuntu-sha256 "$SHA" \
+            --surum "$SURUM" --cikti ~/onbellek/hf
+          rm -rf ~/onbellek/ubuntu
+          df -h /
+      - name: Havenfold ISO'sunu önbelleğe yaz
+        if: steps.hf.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/onbellek/hf
+          key: ${{ steps.anahtar.outputs.anahtar }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: steps.hf.outputs.cache-hit != 'true'
+        with:
+          name: iso-ozet
+          path: ~/onbellek/hf/ozet/
+          retention-days: 14
+
+  install:
+    name: virtual install and first boot
+    needs: iso
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    env:
+      VM: /home/runner/hf-vm
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Yer aç (önbellekteki ISO ~6 GB, açılınca iki katı)
+        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/.ghcup
+      - name: KVM ve sanal makine araçları
+        run: |
+          [ -e /dev/kvm ] || { echo "HATA: KVM yok; TCG ile kurulum saatler sürer, deneme durduruldu."; exit 1; }
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends qemu-system-x86 qemu-utils ovmf swtpm swtpm-tools xorriso
+          # Ubuntu'nun swtpm AppArmor profili durum dizinini /var/lib/libvirt ile sınırlar; doğrudan çalıştırmada kaldırılır
+          if [ -f /etc/apparmor.d/usr.bin.swtpm ]; then sudo apparmor_parser -R /etc/apparmor.d/usr.bin.swtpm || true; fi
+          qemu-system-x86_64 --version | head -n 1; swtpm --version
+          mkdir -p "$VM"
+          df -h /
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+      - name: ISO (önbellekten)
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/onbellek/hf
+          key: ${{ needs.iso.outputs.anahtar }}
+          fail-on-cache-miss: true
+      - name: Test ISO'su ve sanal makine
+        run: |
+          bash installer/test/vm/test-iso.sh --iso ~/onbellek/hf/havenfold-kurulum-"$SURUM"-amd64.iso --kip kur --cikti "$VM/test-kur.iso"
+          rm -rf ~/onbellek/hf
+          cp /usr/share/OVMF/OVMF_VARS_4M.ms.fd "$VM/vars.fd"
+          qemu-img create -f qcow2 "$VM/disk.qcow2" 80G
+          P=$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | head -c 20)
+          echo "::add-mask::$P"
+          echo "HF_TEST_PAROLA=$P" >> "$GITHUB_ENV"
+      - name: Otomatik kurulum (USB'den)
+        id: kur
+        run: node installer/test/vm/driver.js --kip kur --is "$VM" --iso "$VM/test-kur.iso" --dakika 85
+      - name: Kurulum sonucu
+        if: always() && steps.kur.outcome != 'skipped'
+        run: |
+          sed 's/\x1b\[[0-9;?]*[a-zA-Z]//g' "$VM/seri1-kur.log" | tail -n 120 || true
+          grep -q 'hedefe-test-kur: tamam' "$VM/seri1-kur.log" || { echo "HATA: kurulum late-commands sonuna gelmedi"; exit 1; }
+      - name: İlk açılış ve ikinci açılış (diskten, TPM ile)
+        id: ilk
+        run: node installer/test/vm/driver.js --kip ilk --is "$VM" --dakika 40
+      - name: Denetim sonuçları
+        if: always() && steps.ilk.outcome != 'skipped'
+        run: |
+          sed 's/\x1b\[[0-9;?]*[a-zA-Z]//g; s/\r//g' "$VM/seri0-ilk.log" | grep -a 'HF-TEST' > "$VM/hf-test-sonuc.txt" || true
+          cat "$VM/hf-test-sonuc.txt"
+          { echo '### Sanal kurulum: hf-test-denetim'; echo '```'; grep -av 'HF-TEST-DOK' "$VM/hf-test-sonuc.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          grep -q 'HF-TEST-SONUC acilis=1 hata=0' "$VM/hf-test-sonuc.txt" || { echo "HATA: 1. açılış denetimi tutmadı"; exit 1; }
+          grep -q 'HF-TEST-SONUC acilis=2 hata=0' "$VM/hf-test-sonuc.txt" || { echo "HATA: 2. açılış (PCR 7 bağı) denetimi tutmadı"; exit 1; }
+      - name: Günlükleri topla
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/gunluk"
+          cd "$VM" && cp -- *.log *.png *.json *.txt *.cfg test-user-data "$RUNNER_TEMP/gunluk/" 2>/dev/null || true
+          ls -l "$RUNNER_TEMP/gunluk"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: kurulum-gunlukleri
+          path: ${{ runner.temp }}/gunluk/
+          retention-days: 14
+
+  erase:
+    name: erase mode
+    needs: iso
+    if: ${{ inputs.silme }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      VM: /home/runner/hf-sil
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Yer aç (önbellekteki ISO ~6 GB, açılınca iki katı)
+        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/.ghcup
+      - name: KVM ve araçlar
+        run: |
+          [ -e /dev/kvm ] || { echo "HATA: KVM yok; deneme durduruldu."; exit 1; }
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends qemu-system-x86 qemu-utils ovmf swtpm swtpm-tools xorriso zbar-tools \
+            tesseract-ocr tesseract-ocr-eng imagemagick gdisk dosfstools mtools cryptsetup-bin
+          if [ -f /etc/apparmor.d/usr.bin.swtpm ]; then sudo apparmor_parser -R /etc/apparmor.d/usr.bin.swtpm || true; fi
+          mkdir -p "$VM"
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: ISO (önbellekten)
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/onbellek/hf
+          key: ${{ needs.iso.outputs.anahtar }}
+          fail-on-cache-miss: true
+      - name: Test ISO'su ve diskler
+        run: |
+          bash installer/test/vm/test-iso.sh --iso ~/onbellek/hf/havenfold-kurulum-"$SURUM"-amd64.iso --kip sil --cikti "$VM/test-sil.iso"
+          rm -rf ~/onbellek/hf
+          cp /usr/share/OVMF/OVMF_VARS_4M.ms.fd "$VM/vars.fd"
+          bash installer/test/vm/erase-prepare.sh "$VM"
+      - name: Silme modu (USB'den)
+        id: sil
+        run: node installer/test/vm/driver.js --kip sil --is "$VM" --iso "$VM/test-sil.iso" --dakika 30
+      - name: Rapor (verifyWipe) ve diskler
+        if: always() && steps.sil.outcome != 'skipped'
+        run: |
+          set +e
+          node installer/test/vm/erase-test.js dogrula "$VM/qr-sil.json" "$VM/bilet.json" | tee "$VM/sil-sonuc.txt"
+          a=${PIPESTATUS[0]}
+          node installer/test/vm/erase-test.js ornek-denetle "$VM/ornek.json" | tee -a "$VM/sil-sonuc.txt"
+          b=${PIPESTATUS[0]}
+          { echo '### Silme modu'; echo '```'; cat "$VM/sil-sonuc.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          [ "$a" = 0 ] && [ "$b" = 0 ]
+      - name: Günlükleri topla
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/gunluk"
+          cd "$VM" && cp -- *.log *.png *.json *.txt *.cfg "$RUNNER_TEMP/gunluk/" 2>/dev/null || true
+          rm -f "$RUNNER_TEMP/gunluk/ornek.json"
+          ls -l "$RUNNER_TEMP/gunluk"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: silme-gunlukleri
+          path: ${{ runner.temp }}/gunluk/
+          retention-days: 14

@@ -1,0 +1,25 @@
+{
+  "aciklama": "RFC-0037 §16 vektör 1–15: SOS'ta kişi başına teslim (hf.sos.alindi, yazar sınıfı kendi). Durumlar core/olay/test/alindi.js'te (çekirdek ve SDK), 8 worklet/test/sos-alindi.js'te (bildiren uygulama) ana zincir (ledger-v21) üstünde çalıştırılır; beklenenler RFC'den elle yazıldı.",
+  "rfc": "RFC-0037",
+  "tur": { "tur": "hf.sos.alindi", "olay": false, "yazar": "kendi", "koleksiyon": "Tüm Aile", "keep": 7, "alanlar": { "_subj": "uye:<yazar>", "_t": "çözme anı (ms)", "_keep": 7, "sos": "bytes 16: hf.sos recordId" } },
+  "yetenek": { "tur": "hf.uygulama", "alan": "yetenek", "deger": "sos-alindi" },
+  "sureler": { "yazmaMs": 86400000, "gelecekMs": 300000, "keepGun": 7 },
+  "durumlar": [
+    { "no": 1, "aciklama": "Hüsniye Kerem'in SOS'unu çözer: tek alındı; ikinci çözme yazmaz", "yazilacak": 1, "ikinci": 0 },
+    { "no": 2, "aciklama": "Kerem'de: Hüsniye aldı (at = max(_t, sos._t)); İrem yetenek bildirdi, yazmadı: bekliyor; Ecem bildirmedi: bilinmiyor", "beklenen": { "husniye": "aldi", "irem": "bekliyor", "ecem": "bilinmiyor" } },
+    { "no": 3, "aciklama": "İrem _subj = uye:Hüsniye ile alındı yazar ya da Hüsniye'nin alındısına put eder: sayılmaz, görünüm değişmez" },
+    { "no": 4, "aciklama": "Cihaz kimliği kendi sınıfına uymaz", "roller": ["cihaz", "kutu"], "beklenen": false },
+    { "no": 5, "aciklama": "Sessiz SOS: kimse yazmaz; dışarıdan yazılan sayılmaz", "yazilacak": 0, "aldi": 0 },
+    { "no": 6, "aciklama": "Gönderenin kendi ek kimliği yazmaz; yazılmışsa sayılmaz", "yazilacak": 0 },
+    { "no": 7, "aciklama": "Aynı afet_mid'li ve aynı ortak_mid'li iki SOS kaydı: ikisine de alındı yazılır", "yazilacak": 2 },
+    { "no": 8, "aciklama": "Bildiren uygulama bu kimlik değil: yazmaz; yerel kanal yok (sosBildiren verilmedi): yazar" },
+    { "no": 9, "aciklama": "Kişinin iki kimliği iki alındı yazar: tek satır, en erken zaman", "satir": 1 },
+    { "no": 10, "aciklama": "24 saatten eski SOS ve kapalı vaka: yazmaz; sahipli vaka: yazar" },
+    { "no": 11, "aciklama": "Çok aile: alındı aile örneği başına, kayıtta ortak_mid yok", "alanlar": ["_keep", "_subj", "_t", "sos"] },
+    { "no": 12, "aciklama": "Afet: sosYaz({ afetMidler }), alıcının mid'ine ALINDI: kayıt alındısı yokken aldı (yol afet); sonra kayıt alındısı: tek satır, en erken zaman" },
+    { "no": 13, "aciklama": "_t > hlc + 5 dk: sayılmaz; _t < sos._t: sayılır, at = sos._t" },
+    { "no": 14, "aciklama": "Kataloğunda tür olmayan sürüm (yazar sınıfı uygulanmaz) alındıyı ve yeteneği hata vermeden eşitler" },
+    { "no": 15, "aciklama": "Temizlik: 7 gün sonra alındı temizlenir, SOS kalır; alıcı bekliyor ya da bilinmiyor" }
+  ],
+  "hatalar": ["NO_RECORD"]
+}

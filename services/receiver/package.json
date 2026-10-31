@@ -1,0 +1,12 @@
+{
+  "name": "@havenfold/service-receiver",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Reference receiver for Havenfold service packages and a package opening tool (RFC-0010 §13.1, §13.2)",
+  "license": "AGPL-3.0-only",
+  "main": "receiver.js",
+  "scripts": {
+    "test": "brittle-node test/*.js",
+    "start": "node server.js"
+  }
+}

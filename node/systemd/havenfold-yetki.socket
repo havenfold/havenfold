@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# havenfold-yetki.socket — RFC-0007 §4.3, §6.1: kök yardımcı soketle açılır. RFC-0033 §9 l: yetki dosya izni ve grup
+# üyeliğiyle verilir (SO_PEERCRED yok). Dizin /run/havenfold/yetki/ 0750 root:havenfold-denetci tmpfiles.conf'tan gelir
+# (systemd-tmpfiles-setup sysinit.target'tadır, soketlerden önce); havenfold-denetci grubunun tek üyesi denetçidir.
+# Çekirdekler, ekran ve yönetim grubu bağlanamaz; yardımcı soketten gelen isteği denetçi sayar (node/privilege-socket.js).
+[Unit]
+Description=Havenfold yetki yardımcısı soketi
+
+[Socket]
+ListenStream=/run/havenfold/yetki/yetki.sock
+SocketUser=root
+SocketGroup=havenfold-denetci
+SocketMode=0660
+Accept=no
+
+[Install]
+WantedBy=sockets.target

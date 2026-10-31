@@ -1,0 +1,58 @@
+{
+  "aciklama": "RFC-0003 §5.4 BEING (olay 16) için SDK yöntemi ve kanal komutu (D98). Numaralar bu dosyada (komut-araliklari.json 430–439 sira); RFC-0003 §10'a işlenene kadar (İstek 176). Durumlar sdk/test/varlik.js'te; beklenen sonuçlar buradan.",
+  "rfc": "RFC-0003",
+  "komutlar": [
+    {
+      "no": 430,
+      "ad": "BEING_ADD",
+      "sdk": "LedgerApi.addBeing",
+      "govde": "{ tur, ad, yerId?, varlikId? }",
+      "sonuc": "{ durum, oneriId?, waitingFor?, varlikId }"
+    },
+    {
+      "no": 431,
+      "ad": "BEING_REMOVE",
+      "sdk": "LedgerApi.removeBeing",
+      "govde": "{ varlikId }",
+      "sonuc": "{ durum, oneriId?, waitingFor?, varlikId }"
+    }
+  ],
+  "sinirlar": {
+    "aktifVarlik": 32,
+    "turBayt": 32,
+    "adBayt": 64,
+    "duzey": "2.1"
+  },
+  "yazarlar": [
+    {
+      "rol": "ebeveyn",
+      "sonuc": "uygulandi"
+    },
+    {
+      "rol": "yetiskin",
+      "sonuc": "oneri",
+      "not": "bir ebeveyn LEDGER_SIGN (14) ile tamamlar"
+    },
+    {
+      "rol": "cocuk",
+      "hata": "PARENT_REQUIRED"
+    },
+    {
+      "rol": "kutu",
+      "hata": "PARENT_REQUIRED"
+    },
+    {
+      "rol": "misafir",
+      "hata": "NO_MEMBER"
+    }
+  ],
+  "hatalar": [
+    "PARENT_REQUIRED",
+    "NO_MEMBER",
+    "NO_TARGET",
+    "INVALID_BODY",
+    "BEING_LIMIT",
+    "NO_PLACE",
+    "LEVEL_TOO_LOW"
+  ]
+}

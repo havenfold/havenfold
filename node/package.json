@@ -1,0 +1,59 @@
+{
+  "name": "havenfold-node",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Havenfold node software: supervisor, havenfold command, local IPC, health, release manifests and updates, privilege helper, systemd units (RFC-0007)",
+  "license": "MPL-2.0",
+  "main": "index.js",
+  "bin": {
+    "havenfold": "bin/havenfold"
+  },
+  "files": [
+    "index.js",
+    "*.js",
+    "ipc/*.js",
+    "*.json",
+    "disaster/*.js",
+    "edge/*.js",
+    "bin/*",
+    "systemd/*",
+    "deploy/*",
+    "bundle/**",
+    "scripts/pack.sh"
+  ],
+  "scripts": {
+    "test": "brittle-node test/*.js"
+  },
+  "dependencies": {
+    "@havenfold/core": "0.0.0",
+    "@havenfold/tasks": "0.0.0",
+    "@havenfold/export": "0.0.0",
+    "@havenfold/vault": "0.0.0",
+    "@havenfold/sdk": "0.0.0",
+    "@havenfold/transport": "0.0.0",
+    "@havenfold/edge": "0.0.0",
+    "b4a": "1.9.0",
+    "bare-fs": "4.8.4",
+    "bare-path": "3.1.2",
+    "compact-encoding": "3.5.2",
+    "dbus-next": "0.10.2",
+    "sodium-native": "5.2.0",
+    "streamx": "2.28.1"
+  },
+  "devDependencies": {
+    "brittle": "4.5.0"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "imports": {
+    "#fs": {
+      "bare": "bare-fs",
+      "default": "./fs-node.js"
+    },
+    "#path": {
+      "bare": "bare-path",
+      "default": "./path-node.js"
+    }
+  }
+}

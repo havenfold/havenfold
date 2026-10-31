@@ -1,0 +1,8 @@
+{
+  "name": "crypto",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Bare only: provides the node:crypto.randomBytes that shamir-secret-sharing's 'node' csprng module asks for, using sodium. On Node the node: prefix picks the built-in module and this package is not used.",
+  "license": "MPL-2.0",
+  "main": "index.js"
+}

@@ -1,0 +1,60 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# Havenfold denetimi: her PR'da ve main'e her girişte scripts/check.sh (Node ve Bare testleri, vektörler, lisans,
+# kapsam, bulanık test) amd64'te; depo herkese açıkken arm64'te de (GitHub'ın arm64 makineleri kapalı depoda ücretli).
+name: check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  # Elle başlatma: depo açıldıktan sonra arm64'ün ilk koşusu için (görünürlüğü değiştirmek iş akışını koşturmaz)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kontrol-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: check (${{ matrix.makine }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # matrix iş düzeyindeki if'te okunamaz; makine listesi depo görünürlüğüne göre kurulur
+        makine: ${{ fromJSON(github.event.repository.private && '["ubuntu-24.04"]' || '["ubuntu-24.04","ubuntu-24.04-arm"]') }}
+    runs-on: ${{ matrix.makine }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            worklet/package-lock.json
+      - run: npm ci
+      - run: npm ci
+        working-directory: worklet
+      - run: bash scripts/check.sh
+
+  shell-scripts:
+    name: shell scripts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: bash -n ve shellcheck (yalnız hata düzeyi)
+        run: |
+          mapfile -t betikler < <(git ls-files '*.sh')
+          for b in "${betikler[@]}"; do bash -n "$b"; done
+          shellcheck --severity=error "${betikler[@]}"

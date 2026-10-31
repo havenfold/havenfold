@@ -1,0 +1,39 @@
+{
+  "name": "@havenfold/sdk",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Havenfold SDK: the interface products use for records, tasks, the ledger, people and events, with shared fields, helpers and TypeScript types (RFC-0015)",
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "*.js"
+  ],
+  "scripts": {
+    "test": "brittle-node test/*.js"
+  },
+  "dependencies": {
+    "@havenfold/disaster": "0.0.0",
+    "@havenfold/core": "0.0.0",
+    "@havenfold/tasks": "0.0.0",
+    "@havenfold/services": "0.0.0",
+    "@havenfold/export": "0.0.0",
+    "@havenfold/vault": "0.0.0",
+    "@havenfold/records": "0.0.0",
+    "@havenfold/events": "0.0.0",
+    "@havenfold/edge": "0.0.0",
+    "@havenfold/ai": "0.0.0",
+    "b4a": "1.9.0",
+    "compact-encoding": "3.5.2",
+    "sodium-native": "5.2.0"
+  },
+  "devDependencies": {
+    "brittle": "4.5.0",
+    "streamx": "2.28.1"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}

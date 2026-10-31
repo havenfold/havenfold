@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# hf-test-denetim — YALNIZ TEST ISO'SU: sanal makinede kurulan sistemin ilk açılışlarını denetler ve sonuçları seri
+# konsola (ttyS0) "HF-TEST acilis=N <ad>=TAMAM|HATA|BILGI" satırlarıyla yazar. CI bu satırları okur.
+#
+# 1. açılış: TPM ile parolasız açılış (PCR'sız Clevis bağı), havenfold-luks-yenile (PCR 7'ye geçiş, kurtarma yuvası,
+#    geçici yuvanın silinmesi), ilk açılışta `havenfold ilk-ayar --rol isci` kimliği, işçi ve denetçi servisleri,
+#    kurulum günlüklerinde geçici parola. Sonra yeniden başlatır.
+# 2. açılış: PCR 7 bağıyla parolasız açılış, kimliğin değişmediği. Sonra kapatır.
+# Sır yazdırılmaz: kimlik işareti sır taşımaz; parola ve kurtarma anahtarı yalnız dosyadan cryptsetup'a gider.
+set -uo pipefail
+
+S=/var/lib/hf-test
+K=/usr/lib/havenfold/kurulum
+NODE=$K/node
+N=$(( $(cat "$S/acilis" 2>/dev/null || echo 0) + 1 ))
+echo "$N" > "$S/acilis"
+HATA=0
+PCR7_BAG=0
+sonuc () { # ad durum [ayrıntı]
+  echo "HF-TEST acilis=$N $1=$2${3:+ | $3}"
+  case "$2" in TAMAM|BILGI) ;; *) HATA=$((HATA + 1)) ;; esac
+}
+dok () { sed "s/^/HF-TEST-DOK acilis=$N $1: /"; }
+echo "HF-TEST-BASLADI acilis=$N $(date -u +%FT%TZ)"
+
+# İlk açılış (tty yerine ttyS1'de, CI sürücüsü yanıtlar) kimliği yazıp işçiyi başlatana kadar en çok 15 dk
+for _ in $(seq 1 180); do
+  [ -f /var/lib/havenfold/isci/kimlik ] && systemctl -q is-active havenfold-isci.service && break
+  sleep 5
+done
+sleep 20
+
+# Disk şifreleme
+AYGIT=$(awk '!/^#/ && NF >= 2 { print $2; exit }' /etc/crypttab 2>/dev/null)
+case "$AYGIT" in UUID=*) AYGIT=/dev/disk/by-uuid/${AYGIT#UUID=} ;; esac
+if [ -n "$AYGIT" ] && lsblk -no TYPE | grep -qx crypt; then
+  sonuc luks-parolasiz-acilis TAMAM "kök LUKS2 üstünde, parola sorulmadan açıldı ($AYGIT)"
+else
+  sonuc luks-parolasiz-acilis HATA "crypttab'da aygıt yok ya da kök şifreli değil"
+fi
+lsblk -o NAME,TYPE,SIZE,FSTYPE,MOUNTPOINTS 2>&1 | dok lsblk
+
+R=$(systemctl show -p Result --value havenfold-luks-yenile.service 2>/dev/null)
+[ "$R" = success ] && sonuc luks-yenile TAMAM || sonuc luks-yenile HATA "Result=$R"
+journalctl -b --no-pager -o cat -u havenfold-luks-yenile.service 2>&1 | tail -n 15 | dok luks-yenile
+
+if [ -n "$AYGIT" ]; then
+  L=$(clevis luks list -d "$AYGIT" 2>&1)
+  printf '%s\n' "$L" | dok clevis
+  if printf '%s\n' "$L" | grep -q 'tpm2.*"pcr_ids":"7"'; then sonuc clevis-pcr7 TAMAM; PCR7_BAG=1; else sonuc clevis-pcr7 HATA "PCR 7 bağı yok"; fi
+  if printf '%s\n' "$L" | grep 'tpm2' | grep -vq 'pcr_ids'; then sonuc clevis-pcrsiz-bag-silindi HATA "PCR'sız bağ duruyor"; else sonuc clevis-pcrsiz-bag-silindi TAMAM; fi
+  cryptsetup luksDump "$AYGIT" 2>&1 | sed -n '/^Keyslots:/,/^Digests:/p' | grep -E '^[[:space:]]+[0-9]+: |^[[:space:]]+[0-9]+: [a-z]|Keyslot:' | dok luks-yuvalar
+  cryptsetup luksDump "$AYGIT" 2>&1 | sed -n '/^Tokens:/,/^Digests:/p' | dok luks-jetonlar
+  if cryptsetup luksDump "$AYGIT" 2>/dev/null | grep -q 'havenfold-kurtarma'; then sonuc kurtarma-jetonu TAMAM; else sonuc kurtarma-jetonu HATA; fi
+  if [ -s "$S/gecici" ]; then
+    if cryptsetup open --test-passphrase --key-file "$S/gecici" "$AYGIT" 2>/dev/null; then
+      sonuc gecici-yuva-silindi HATA "geçici parola hâlâ açıyor"
+    else
+      sonuc gecici-yuva-silindi TAMAM
+    fi
+  else
+    sonuc gecici-yuva-silindi HATA "geçici parolanın test kopyası yok"
+  fi
+  KF=/var/lib/havenfold/yetki/luks-kurtarma
+  if [ -f "$KF" ]; then
+    IZIN=$(stat -c '%a %U %s' "$KF")
+    "$NODE" "$K/lib/cli.js" kurtarma-kodla < "$KF" > /run/hf-test-kurtarma
+    if cryptsetup open --test-passphrase --key-file /run/hf-test-kurtarma "$AYGIT" 2>/dev/null; then
+      sonuc kurtarma-anahtari-acar TAMAM "dosya $IZIN"
+    else
+      sonuc kurtarma-anahtari-acar HATA "dosya $IZIN; kodlanmış anahtar diski açmadı"
+    fi
+    shred -u /run/hf-test-kurtarma 2>/dev/null || rm -f /run/hf-test-kurtarma
+  else
+    sonuc kurtarma-anahtari-acar HATA "$KF yok"
+  fi
+fi
+
+# Kurulum günlüklerinde geçici parola (BENIOKU "denenecekler" 3)
+if [ -s "$S/gecici" ]; then
+  B=$(grep -rlaF -f "$S/gecici" /var/log /etc /root /var/lib/cloud /var/lib/havenfold /home 2>/dev/null | grep -v "^$S" || true)
+  if [ -z "$B" ]; then sonuc gunlukte-parola-yok TAMAM; else sonuc gunlukte-parola-yok HATA "$(echo "$B" | tr '\n' ' ')"; fi
+fi
+ls -la /var/log/installer 2>&1 | dok installer-gunlukleri
+
+# Düğüm kimliği (§9 adım 7; RFC-0033 §9 k)
+KIM=/var/lib/havenfold/isci/kimlik
+if [ -f "$KIM" ]; then
+  ICERIK=$(cat "$KIM")
+  UYE=$("$NODE" -e 'const k=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));process.stdout.write(String(k.memberId))' "$KIM" 2>/dev/null)
+  TPM=$("$NODE" -e 'const k=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));process.stdout.write(String(k.tpm))' "$KIM" 2>/dev/null)
+  sonuc kimlik TAMAM "$ICERIK"
+  [ "$TPM" = muhur-ok ] && sonuc kimlik-tpm-muhru TAMAM || sonuc kimlik-tpm-muhru HATA "tpm=$TPM"
+  if [ "$N" = 1 ]; then echo "$UYE" > "$S/uye"; elif [ "$(cat "$S/uye" 2>/dev/null)" = "$UYE" ]; then sonuc kimlik-degismedi TAMAM; else sonuc kimlik-degismedi HATA "önce $(cat "$S/uye" 2>/dev/null), şimdi $UYE"; fi
+  ls -la /var/lib/havenfold/isci 2>&1 | dok isci-dizini
+else
+  sonuc kimlik HATA "$KIM yok"
+fi
+[ -s /var/lib/havenfold/denetci/host.id ] && sonuc host-id TAMAM || sonuc host-id HATA
+journalctl -b --no-pager -o cat -u havenfold-ilk-acilis.service 2>&1 | tail -n 25 | dok ilk-acilis
+
+# Servisler
+for b in havenfold-denetci.service havenfold-isci.service havenfold-yetki.socket havenfold-nft.service; do
+  D=$(systemctl is-active "$b" 2>/dev/null)
+  Y=$(systemctl show -p NRestarts --value "$b" 2>/dev/null)
+  [ "$D" = active ] && sonuc "servis:$b" TAMAM "yeniden başlama ${Y:-0}" || sonuc "servis:$b" HATA "$D, yeniden başlama ${Y:-0}"
+done
+for b in havenfold-denetci.service havenfold-isci.service; do
+  journalctl -b --no-pager -o cat -u "$b" 2>&1 | tail -n 12 | dok "$b"
+done
+nft list table inet havenfold >/dev/null 2>&1 && sonuc nft-tablosu TAMAM || sonuc nft-tablosu HATA
+sonuc basarisiz-birimler BILGI "$(systemctl --failed --no-legend --plain 2>/dev/null | awk '{print $1}' | tr '\n' ' ')"
+
+# Bilgi
+SB=$(od -An -tu1 /sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c 2>/dev/null | awk '{print $NF}')
+sonuc guvenli-onyukleme BILGI "SecureBoot=${SB:-?}"
+sonuc pcr7 BILGI "$(tpm2_pcrread sha256:7 2>/dev/null | awk '/7 *:/ {print $NF}')"
+sonuc sistem BILGI "$(hostname) $(uname -r) $(. /etc/os-release; echo "$PRETTY_NAME")"
+sonuc havenfold-surum BILGI "$(readlink /opt/havenfold/guncel)"
+
+echo "HF-TEST-SONUC acilis=$N hata=$HATA"
+sleep 3
+# İkinci açılış PCR 7 bağını sınar; bağ yoksa disk parola bekler, boşuna beklenmesin
+if [ "$N" -lt 2 ] && [ "$PCR7_BAG" = 1 ]; then systemctl reboot; else systemctl poweroff; fi

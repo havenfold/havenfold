@@ -1,0 +1,496 @@
+{
+ "9": {
+  "aciklama": "HFRT1 bileti, HFK1 anahtar QR'ı, 3 diskli WIPE_SET'in 384 ve 128 baytlık parçaları; parçalar herhangi bir sırayla birleşir; başka oturumdan gelen parça imzayı bozar.",
+  "bilet": "484652543101a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a102b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4",
+  "biletAlanlari": {
+   "v": 1,
+   "hostId": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+   "ids": [
+    "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2",
+    "c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3"
+   ],
+   "retireNonce": "d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4"
+  },
+  "anahtarQr": "HFK1:C90MJKMJKMJKMJKMJKMJKMJK/FKQQMQQMQQMQQMQQMQQMQQMQQMUXOUXOUXOUXOUXOUXOUXOUXOY+QY+QY+QY+QY+QY+QY+QY+Q0$M.KQ%1DHER0LCNB6A2877R-AW*ILBXJG.9* ELG0P3KMJR8H0Z96LF661",
+  "raporPub": "b487d1586728d81a629d317c3facd6d5ff0ba96e9c234ea3753902e59ed4d900",
+  "raporlar": [
+   "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2085046324142434445114c454e4f564f2032304b483030324a5458105341485445204e564d652035313247420d4e564d45305345524931323334136e766d652d73616e6974697a652d626c6f636b0d686176656e666f6c642d73696c05312e322e331873737461743d307830313031207370726f673d3635353335ff002da9159a010000ffc054b2159a010000026f6bb487d1586728d81a629d317c3facd6d5ff0ba96e9c234ea3753902e59ed4d9007591720ec2b2b5cbca4a277f2c09b3370358514afc0607397854ce0ea20e086a6c0baad8f001ed0b9937ddb10804a6cdf02e30053849a3f80db6f1430f037c00",
+   "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2085046324142434445114c454e4f564f2032304b483030324a54580d534148544520484444203154420b4844445345524935363738106f76657277726974652d7665726966790d686176656e666f6c642d73696c05312e322e33316f76657277726974653a2074616d206f6b756d612065c59f6c65c59f74693b20485041206b616c64c4b172c4b16c64c4b1ffc054b2159a010000ff807cbb159a010000026f6bb487d1586728d81a629d317c3facd6d5ff0ba96e9c234ea3753902e59ed4d90044ee3e8fd97844216e8b6b2d19f111a68d1f5178ca7a4273e7a803d25cd965a8e7995f3226762b23c0d166200763b52c6b1e70645cbfcf10ad3cd04a328ab80c",
+   "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2085046324142434445114c454e4f564f2032304b483030324a54580f5341485445205353442032353647420b535344534552493930313210636c6561722d756e76657269666965640d686176656e666f6c642d73696c05312e322e33176f76657277726974653b206469736b20646f6e6d75c59fff807cbb159a010000ff40a4c4159a0100000d646f6772756c616e616d616469b487d1586728d81a629d317c3facd6d5ff0ba96e9c234ea3753902e59ed4d9001c3fc7bb77fe75b1dfbfe8de2eafd0d56526ed88a5aad0e2037bbe0595a1f4dba848352ec3e33415892f3ab316b1dfee9a044f590cc7b1af0b740f2addcebe02"
+  ],
+  "parcalar384": [
+   "HFW1:1/3:VM0100QQMQQMQQMQQMQQMQQMQQMQQMD21F*8BB8UM8-W8+S9M+90-A734X46U59846%H9:5BSNAL69BX8T+9DZ9A34*96H09VU1/+ARX8WNA5IA*96DL6OK2W/EQZCHQE5/DBWEDLF8X5*VDQPCCV1KEC1$CX.CSVDPX5XEDOT0 $5$$5443 QEIEC4X7X8F$96L96WQE0LEE2DH%6TW68$6010+GL5LJ000.EW$VA+W2V50200%3E0$M.KQ%1DHER0LCNB6A2877R-AW*ILBXJG.9* ELG0P3KMJR$%E%IERRO9:M PPV:4NP5OTM1J0KCAX%V4-0O9FA2Q-LK*21TTD-QLGFUN/TSGJ81SR01-3LGGU836957 WK0X1NMUI+1JUFU:VT90QQMQQMQQMQQMQQMQQMQQM MMU6A+F6/G8HS8I82CY8F1A60ANF6CN96464G6$TA U1HB8ITAT34GS8634FTA8J1GS8WNA5IAWW66:6M32O/E8LE*KE7WESX55$CREDTDF 8DO/E2/D*3E+TCPQENTDZ96LF6AL644E5$CN4F-ED*ZCS44BEC",
+   "HFW1:2/3:N44EQDB$DD44B:OTVDB:OBWEGL7H69MA8*PDSVD/%O+MEFJMBXCRMM6EO4NM5LJ000NDWQYF+W2V50200%3E0$M.KQ%1DHER0LCNB6A2877R-AW*ILBXJG.9* ELG0P3KMJR6W8++77MRQR8*/DWODQC3IA2$$HLDA*QP1I8*CTXL09XBE%COCTP1C %4IK5-GO:+C1.0U+MHODH9ESWB/7QN+L.EQNH61CNH:VT90QQMQQMQQMQQMQQMQQMQQM MMU6A+F6/G8HS8I82CY8F1A60ANF6CN96464G6$TA8.1HB8ITA+34VNA734WW6H09JJ1VNAWNA5IAFA7*96A32TVDGECRX5I/D5$CREDQED8TC 8DO/E2/D*3E+TCPQENTDZ96LF6TK644E5$CN4F-ED+ZCC44+EDJODGVC9/D:*E9AK.AGDTN5LJ0004CWF$K+W2V50D00GVCM3D0%ECECBEC2ECFGDT7H-7BG754F3B*J$VFB%LI2RFL1B:D%K4+TKE97C1T*+QS00$28LVNQ7W+LMXBO/3S8AM:/QK-4GCHXQLYPS/SFYV0FLKRYR",
+   "HFW1:3/3:Z591-5OWSNW2U/5 SM+LMH7UNO0QBB1BP 5MBUE%I566Q20"
+  ],
+  "parcalar128": [
+   "HFW1:1/7:VM0100QQMQQMQQMQQMQQMQQMQQMQQMD21F*8BB8UM8-W8+S9M+90-A734X46U59846%H9:5BSNAL69BX8T+9DZ9A34*96H09VU1/+ARX8WNA5IA*96DL6OK2W/EQZCHQE5/DBWEDLF8X5*VDQPCCV1KEC1$CX.CSVDPX5XEDOT0 $5$$5443 QEIEC4X7X8F",
+   "HFW1:2/7:$96L96WQE0LEE2DH%6TW68$6010+GL5LJ000.EW$VA+W2V50200%3E0$M.KQ%1DHER0LCNB6A2877R-AW*ILBXJG.9* ELG0P3KMJR$%E%IERRO9:M PPV:4NP5OTM1J0KCAX%V4-0O9FA2Q-LK*21TTD-QLGFUN/TSGJ81SR01-3LGGU836957 WK0X1NMU",
+   "HFW1:3/7:I+1JUFU:VT90QQMQQMQQMQQMQQMQQMQQM MMU6A+F6/G8HS8I82CY8F1A60ANF6CN96464G6$TA U1HB8ITAT34GS8634FTA8J1GS8WNA5IAWW66:6M32O/E8LE*KE7WESX55$CREDTDF 8DO/E2/D*3E+TCPQENTDZ96LF6AL644E5$CN4F-ED*ZCS44BEC",
+   "HFW1:4/7:N44EQDB$DD44B:OTVDB:OBWEGL7H69MA8*PDSVD/%O+MEFJMBXCRMM6EO4NM5LJ000NDWQYF+W2V50200%3E0$M.KQ%1DHER0LCNB6A2877R-AW*ILBXJG.9* ELG0P3KMJR6W8++77MRQR8*/DWODQC3IA2$$HLDA*QP1I8*CTXL09XBE%COCTP1C %4IK5",
+   "HFW1:5/7:-GO:+C1.0U+MHODH9ESWB/7QN+L.EQNH61CNH:VT90QQMQQMQQMQQMQQMQQMQQM MMU6A+F6/G8HS8I82CY8F1A60ANF6CN96464G6$TA8.1HB8ITA+34VNA734WW6H09JJ1VNAWNA5IAFA7*96A32TVDGECRX5I/D5$CREDQED8TC 8DO/E2/D*3E+TCPQE",
+   "HFW1:6/7:NTDZ96LF6TK644E5$CN4F-ED+ZCC44+EDJODGVC9/D:*E9AK.AGDTN5LJ0004CWF$K+W2V50D00GVCM3D0%ECECBEC2ECFGDT7H-7BG754F3B*J$VFB%LI2RFL1B:D%K4+TKE97C1T*+QS00$28LVNQ7W+LMXBO/3S8AM:/QK-4GCHXQLYPS/SFYV0FLKRYR",
+   "HFW1:7/7:Z591-5OWSNW2U/5 SM+LMH7UNO0QBB1BP 5MBUE%I566Q20"
+  ],
+  "baskaOturum": {
+   "anahtarQr": "HFK1:C90MJKMJKMJKMJKMJKMJKMJK/FKQQMQQMQQMQQMQQMQQMQQMQQMUXOUXOUXOUXOUXOUXOUXOUXOY+QY+QY+QY+QY+QY+QY+QY+QGZ3AUR1IU9-2XYRY-3QELOX3XQ2JIJ2NQGLDTVTS LVOSPFH8H0Z96LF661",
+   "degisenParca": 3,
+   "parcalar": [
+    "HFW1:1/7:VM0100QQMQQMQQMQQMQQMQQMQQMQQMD21F*8BB8UM8-W8+S9M+90-A734X46U59846%H9:5BSNAL69BX8T+9DZ9A34*96H09VU1/+ARX8WNA5IA*96DL6OK2W/EQZCHQE5/DBWEDLF8X5*VDQPCCV1KEC1$CX.CSVDPX5XEDOT0 $5$$5443 QEIEC4X7X8F",
+    "HFW1:2/7:$96L96WQE0LEE2DH%6TW68$6010+GL5LJ000.EW$VA+W2V50200%3E0$M.KQ%1DHER0LCNB6A2877R-AW*ILBXJG.9* ELG0P3KMJR$%E%IERRO9:M PPV:4NP5OTM1J0KCAX%V4-0O9FA2Q-LK*21TTD-QLGFUN/TSGJ81SR01-3LGGU836957 WK0X1NMU",
+    "HFW1:3/7:IS602FU:VT90QQMQQMQQMQQMQQMQQMQQM MMU6A+F6/G8HS8I82CY8F1A60ANF6CN96464G6$TA U1HB8ITAT34GS8634FTA8J1GS8WNA5IAWW66:6M32O/E8LE*KE7WESX55$CREDTDF 8DO/E2/D*3E+TCPQENTDZ96LF6AL644E5$CN4F-ED*ZCS44BEC",
+    "HFW1:4/7:N44EQDB$DD44B:OTVDB:OBWEGL7H69MA8*PDSVD/%O+MEFJMBXCRMM6EO4NM5LJ000NDWQYF+W2V50200%3E0$M.KQ%1DHER0LCNB6A2877R-AW*ILBXJG.9* ELG0P3KMJR6W8++77MRQR8*/DWODQC3IA2$$HLDA*QP1I8*CTXL09XBE%COCTP1C %4IK5",
+    "HFW1:5/7:-GO:+C1.0U+MHODH9ESWB/7QN+L.EQNH61CNH:VT90QQMQQMQQMQQMQQMQQMQQM MMU6A+F6/G8HS8I82CY8F1A60ANF6CN96464G6$TA8.1HB8ITA+34VNA734WW6H09JJ1VNAWNA5IAFA7*96A32TVDGECRX5I/D5$CREDQED8TC 8DO/E2/D*3E+TCPQE",
+    "HFW1:6/7:NTDZ96LF6TK644E5$CN4F-ED+ZCC44+EDJODGVC9/D:*E9AK.AGDTN5LJ0004CWF$K+W2V50D00GVCM3D0%ECECBEC2ECFGDT7H-7BG754F3B*J$VFB%LI2RFL1B:D%K4+TKE97C1T*+QS00$28LVNQ7W+LMXBO/3S8AM:/QK-4GCHXQLYPS/SFYV0FLKRYR",
+    "HFW1:7/7:Z591-5OWSNW2U/5 SM+LMH7UNO0QBB1BP 5MBUE%I566Q20"
+   ],
+   "beklenen": "INVALID_SIGNATURE"
+  }
+ },
+ "10": {
+  "aciklama": "wipeReportHash: tek disk hash('hf/wipe-report-id/', rapor); birden çok disk hash('hf/wipe-report-set/', küçükten büyüğe dizilmiş kimlikler).",
+  "tekDisk": {
+   "rapor": "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2085046324142434445114c454e4f564f2032304b483030324a5458105341485445204e564d652035313247420d4e564d45305345524931323334136e766d652d73616e6974697a652d626c6f636b0d686176656e666f6c642d73696c05312e322e331873737461743d307830313031207370726f673d3635353335ff002da9159a010000ffc054b2159a010000026f6bb487d1586728d81a629d317c3facd6d5ff0ba96e9c234ea3753902e59ed4d9007591720ec2b2b5cbca4a277f2c09b3370358514afc0607397854ce0ea20e086a6c0baad8f001ed0b9937ddb10804a6cdf02e30053849a3f80db6f1430f037c00",
+   "ozet": "11f733d32db78ecd43da73ceb1bc616f022b7e35021655cbf9180b518d1c7a5c"
+  },
+  "ucDisk": {
+   "raporlar": [
+    "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2085046324142434445114c454e4f564f2032304b483030324a5458105341485445204e564d652035313247420d4e564d45305345524931323334136e766d652d73616e6974697a652d626c6f636b0d686176656e666f6c642d73696c05312e322e331873737461743d307830313031207370726f673d3635353335ff002da9159a010000ffc054b2159a010000026f6bb487d1586728d81a629d317c3facd6d5ff0ba96e9c234ea3753902e59ed4d9007591720ec2b2b5cbca4a277f2c09b3370358514afc0607397854ce0ea20e086a6c0baad8f001ed0b9937ddb10804a6cdf02e30053849a3f80db6f1430f037c00",
+    "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2085046324142434445114c454e4f564f2032304b483030324a54580d534148544520484444203154420b4844445345524935363738106f76657277726974652d7665726966790d686176656e666f6c642d73696c05312e322e33316f76657277726974653a2074616d206f6b756d612065c59f6c65c59f74693b20485041206b616c64c4b172c4b16c64c4b1ffc054b2159a010000ff807cbb159a010000026f6bb487d1586728d81a629d317c3facd6d5ff0ba96e9c234ea3753902e59ed4d90044ee3e8fd97844216e8b6b2d19f111a68d1f5178ca7a4273e7a803d25cd965a8e7995f3226762b23c0d166200763b52c6b1e70645cbfcf10ad3cd04a328ab80c",
+    "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2085046324142434445114c454e4f564f2032304b483030324a54580f5341485445205353442032353647420b535344534552493930313210636c6561722d756e76657269666965640d686176656e666f6c642d73696c05312e322e33176f76657277726974653b206469736b20646f6e6d75c59fff807cbb159a010000ff40a4c4159a0100000d646f6772756c616e616d616469b487d1586728d81a629d317c3facd6d5ff0ba96e9c234ea3753902e59ed4d9001c3fc7bb77fe75b1dfbfe8de2eafd0d56526ed88a5aad0e2037bbe0595a1f4dba848352ec3e33415892f3ab316b1dfee9a044f590cc7b1af0b740f2addcebe02"
+   ],
+   "siraliKimlikler": [
+    "11f733d32db78ecd43da73ceb1bc616f022b7e35021655cbf9180b518d1c7a5c",
+    "6a28eb2695522f438564981eec77195e4f792cf80155d61c9d79d85a6317aaa4",
+    "77fecb54420e1eae71c9337ca580ccdd533fb0821d1ed601256a0b16bb52cfa8"
+   ],
+   "ozet": "d7d284c4205f8cf563c674bd6cd165f89543ef650cef989479ec497136289611",
+   "tersSiraOzeti": "d7d284c4205f8cf563c674bd6cd165f89543ef650cef989479ec497136289611"
+  }
+ },
+ "11": {
+  "aciklama": "Yöntem seçimi (RFC-0007 §13.4): disk yetenekleri ve ölçüm → method ve result. gerek: 'uyku' önce rtcwake -m mem -s 5 ister. beklenenIlk: komutlar başarılı olursa beklenen sonuç.",
+  "durumlar": [
+   {
+    "aciklama": "NVMe, blok ve şifreleme silme: blok silme önce",
+    "disk": {
+     "veriYolu": "nvme",
+     "donen": false,
+     "nvme": {
+      "sanitize": {
+       "blok": true,
+       "kripto": true,
+       "uzerineYaz": false
+      },
+      "format": {
+       "var": true,
+       "kriptoSilme": false
+      }
+     }
+    },
+    "olcum": {
+     "sanitizeLog": {
+      "durum": "basarili",
+      "driveStatus": "sstat=0x0101 sprog=65535"
+     },
+     "ornek": {
+      "hata": false
+     }
+    },
+    "method": "nvme-sanitize-block",
+    "result": "ok",
+    "beklenenIlk": "ok"
+   },
+   {
+    "aciklama": "NVMe yalnız şifreleme silme",
+    "disk": {
+     "veriYolu": "nvme",
+     "donen": false,
+     "nvme": {
+      "sanitize": {
+       "blok": false,
+       "kripto": true,
+       "uzerineYaz": false
+      },
+      "format": {
+       "var": true,
+       "kriptoSilme": false
+      }
+     }
+    },
+    "olcum": {
+     "sanitizeLog": {
+      "durum": "basarili",
+      "driveStatus": "sstat=0x0101 sprog=65535"
+     },
+     "ornek": {
+      "hata": false
+     }
+    },
+    "method": "nvme-sanitize-crypto",
+    "result": "ok",
+    "beklenenIlk": "ok"
+   },
+   {
+    "aciklama": "NVMe sanitize başarılı ama örnek bloklar değişmemiş",
+    "disk": {
+     "veriYolu": "nvme",
+     "donen": false,
+     "nvme": {
+      "sanitize": {
+       "blok": true,
+       "kripto": false,
+       "uzerineYaz": false
+      },
+      "format": {
+       "var": true,
+       "kriptoSilme": false
+      }
+     }
+    },
+    "olcum": {
+     "sanitizeLog": {
+      "durum": "basarili",
+      "driveStatus": "sstat=0x0101 sprog=65535"
+     },
+     "ornek": {
+      "hata": true
+     }
+    },
+    "method": "nvme-sanitize-block",
+    "result": "hata",
+    "beklenenIlk": "ok"
+   },
+   {
+    "aciklama": "NVMe sanitize yok, Format NVM SES=2",
+    "disk": {
+     "veriYolu": "nvme",
+     "donen": false,
+     "nvme": {
+      "sanitize": {
+       "blok": false,
+       "kripto": false,
+       "uzerineYaz": false
+      },
+      "format": {
+       "var": true,
+       "kriptoSilme": true
+      }
+     }
+    },
+    "olcum": {
+     "ornek": {
+      "hata": false
+     }
+    },
+    "method": "clear-unverified",
+    "result": "dogrulanamadi",
+    "driveStatus": "format-ses=2",
+    "beklenenIlk": "dogrulanamadi"
+   },
+   {
+    "aciklama": "NVMe hiçbiri: tam üzerine yazma",
+    "disk": {
+     "veriYolu": "nvme",
+     "donen": false,
+     "nvme": {
+      "sanitize": {
+       "blok": false,
+       "kripto": false,
+       "uzerineYaz": false
+      },
+      "format": {
+       "var": false,
+       "kriptoSilme": false
+      }
+     }
+    },
+    "olcum": {
+     "dogrulama": {
+      "tamam": true
+     },
+     "ornek": {
+      "hata": false
+     }
+    },
+    "method": "clear-unverified",
+    "result": "dogrulanamadi",
+    "beklenenIlk": "dogrulanamadi"
+   },
+   {
+    "aciklama": "SATA SSD, ATA Sanitize blok silme",
+    "disk": {
+     "veriYolu": "sata",
+     "donen": false,
+     "ata": {
+      "guvenlik": {
+       "destek": true,
+       "etkin": false,
+       "kilitli": false,
+       "donmus": false,
+       "gelismis": true,
+       "sayacBitti": false
+      },
+      "sanitize": {
+       "destek": true,
+       "blok": true,
+       "kripto": true,
+       "uzerineYaz": false
+      }
+     }
+    },
+    "olcum": {
+     "ataSanitize": {
+      "durum": "basarili",
+      "driveStatus": "State: SD0 Sanitize Idle Last Sanitize Operation Completed Without Error"
+     },
+     "ornek": {
+      "hata": false
+     }
+    },
+    "method": "ata-sanitize",
+    "result": "ok",
+    "beklenenIlk": "ok"
+   },
+   {
+    "aciklama": "SATA SSD, yalnız Security Erase",
+    "disk": {
+     "veriYolu": "sata",
+     "donen": false,
+     "ata": {
+      "guvenlik": {
+       "destek": true,
+       "etkin": false,
+       "kilitli": false,
+       "donmus": false,
+       "gelismis": true,
+       "sayacBitti": false
+      },
+      "sanitize": {
+       "destek": false,
+       "blok": false,
+       "kripto": false,
+       "uzerineYaz": false
+      }
+     }
+    },
+    "olcum": {
+     "guvenlikSonra": {
+      "destek": true,
+      "etkin": false,
+      "kilitli": false,
+      "donmus": false,
+      "gelismis": true
+     },
+     "ornek": {
+      "hata": false
+     }
+    },
+    "method": "ata-secure-erase",
+    "result": "ok",
+    "beklenenIlk": "ok"
+   },
+   {
+    "aciklama": "donmuş SATA SSD, uyku–uyanmadan önce",
+    "disk": {
+     "veriYolu": "sata",
+     "donen": false,
+     "ata": {
+      "guvenlik": {
+       "destek": true,
+       "etkin": false,
+       "kilitli": false,
+       "donmus": true,
+       "gelismis": true,
+       "sayacBitti": false
+      },
+      "sanitize": {
+       "destek": true,
+       "blok": true,
+       "kripto": false,
+       "uzerineYaz": false
+      }
+     }
+    },
+    "gerek": "uyku"
+   },
+   {
+    "aciklama": "donmuş SATA SSD, uyku–uyanmadan sonra da donmuş",
+    "disk": {
+     "veriYolu": "sata",
+     "donen": false,
+     "ata": {
+      "guvenlik": {
+       "destek": true,
+       "etkin": false,
+       "kilitli": false,
+       "donmus": true,
+       "gelismis": true,
+       "sayacBitti": false
+      },
+      "sanitize": {
+       "destek": true,
+       "blok": true,
+       "kripto": false,
+       "uzerineYaz": false
+      }
+     }
+    },
+    "uykuDenendi": true,
+    "olcum": {
+     "dogrulama": {
+      "tamam": true
+     },
+     "ornek": {
+      "hata": false
+     }
+    },
+    "method": "clear-unverified",
+    "result": "dogrulanamadi",
+    "beklenenIlk": "dogrulanamadi"
+   },
+   {
+    "aciklama": "HPA'lı HDD, HPA kaldırıldı",
+    "disk": {
+     "veriYolu": "sata",
+     "donen": true,
+     "hpa": {
+      "gorunen": 1536,
+      "yerel": 2048,
+      "hpa": true
+     },
+     "dco": {
+      "var": true,
+      "kisitli": false,
+      "gercek": 2048
+     }
+    },
+    "olcum": {
+     "hpaKaldirildi": true,
+     "dogrulama": {
+      "tamam": true
+     },
+     "reallocated": 0
+    },
+    "method": "overwrite-verify",
+    "result": "ok",
+    "beklenenIlk": "ok"
+   },
+   {
+    "aciklama": "HPA'lı HDD, HPA kaldırılamadı",
+    "disk": {
+     "veriYolu": "sata",
+     "donen": true,
+     "hpa": {
+      "gorunen": 1536,
+      "yerel": 2048,
+      "hpa": true
+     }
+    },
+    "olcum": {
+     "hpaKaldirildi": false,
+     "dogrulama": {
+      "tamam": true
+     },
+     "reallocated": 0
+    },
+    "method": "overwrite-verify",
+    "result": "dogrulanamadi",
+    "beklenenIlk": "ok"
+   },
+   {
+    "aciklama": "HDD, DCO gizli alanı",
+    "disk": {
+     "veriYolu": "sata",
+     "donen": true,
+     "dco": {
+      "var": true,
+      "kisitli": true,
+      "gercek": 4096
+     }
+    },
+    "olcum": {
+     "dogrulama": {
+      "tamam": true
+     },
+     "reallocated": 0
+    },
+    "method": "overwrite-verify",
+    "result": "dogrulanamadi",
+    "beklenenIlk": "dogrulanamadi"
+   },
+   {
+    "aciklama": "HDD, yeniden atanmış sektör var",
+    "disk": {
+     "veriYolu": "sata",
+     "donen": true
+    },
+    "olcum": {
+     "dogrulama": {
+      "tamam": true
+     },
+     "reallocated": 8
+    },
+    "method": "overwrite-verify",
+    "result": "dogrulanamadi",
+    "beklenenIlk": "ok"
+   },
+   {
+    "aciklama": "eMMC: tam üzerine yazma + mmc sanitize",
+    "disk": {
+     "veriYolu": "mmc",
+     "donen": false
+    },
+    "olcum": {
+     "dogrulama": {
+      "tamam": true
+     }
+    },
+    "method": "clear-unverified",
+    "result": "dogrulanamadi",
+    "beklenenIlk": "dogrulanamadi"
+   },
+   {
+    "aciklama": "USB bellek",
+    "disk": {
+     "veriYolu": "usb",
+     "donen": false
+    },
+    "olcum": {
+     "dogrulama": {
+      "tamam": true
+     }
+    },
+    "method": "clear-unverified",
+    "result": "dogrulanamadi",
+    "beklenenIlk": "dogrulanamadi"
+   },
+   {
+    "aciklama": "komut hata verdi",
+    "disk": {
+     "veriYolu": "nvme",
+     "donen": false,
+     "nvme": {
+      "sanitize": {
+       "blok": true,
+       "kripto": false,
+       "uzerineYaz": false
+      },
+      "format": {
+       "var": false,
+       "kriptoSilme": false
+      }
+     }
+    },
+    "olcum": {
+     "hata": true
+    },
+    "method": "nvme-sanitize-block",
+    "result": "hata",
+    "beklenenIlk": "ok"
+   }
+  ]
+ },
+ "rfc": "RFC-0007 §16 madde 9–11 (silme ortamı). Madde 1–8 ve 12 dugum.json'dadır.",
+ "not": "Rapor anahtarları test tohumundandır (hash(\"yuva/v2/test/silme-vektor/…\")). Doğrulayıcı core/core/protocol/emeklilik.js verifyWipe. Üretici: installer/test/yardimci/silme-vektor.js."
+}

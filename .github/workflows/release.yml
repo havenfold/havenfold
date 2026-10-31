@@ -1,0 +1,293 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# Sürüm: v* etiketiyle ya da elle. Düğüm paketleri (linux amd64 ve arm64; resmî Node 22 ve Bare ikilileriyle), görev
+# imajı (hf.task.ocr: oci-archive, ociDigest, kaynak arşivi, düğümün yolundan deneme), birleşik İMZASIZ sürüm bildirimi
+# ve SHA256SUMS (RFC-0007 §12.1; RFC-0033 §3, §9 g, h). İmza adımı yok: kök anahtar CI'da yoktur, bildirimi ve
+# SHA256SUMS'u Kerem çevrimdışı imzalar (docs/surum.md). Etikette dosyalar taslak GitHub Release'e yüklenir; elle
+# çalıştırmada yalnız küçük çıktılar (bildirim, SHA256SUMS, satırlar) iş akışı çıktısıdır, "taslak" seçilirse release.
+# arm64 imajı depo herkese açıkken (GitHub'ın arm64 makineleri kapalı depoda ücretli); arm64 paketi amd64 makinede
+# hazırlanır (çalışma zamanları resmî ikililer, node_modules mimariden bağımsız).
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      etiket:
+        description: 'Sürüm etiketi (ör. v0.1.0-alfa). Boşsa v0.0.0-deneme.'
+        required: false
+        default: ''
+      taslak:
+        description: 'Dosyaları taslak GitHub Release''e yükle'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: surum-${{ github.ref }}-${{ inputs.etiket }}
+  cancel-in-progress: false
+
+env:
+  HF_NODE_SURUM: 22.23.4
+
+jobs:
+  bilgi:
+    name: release info
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write # yalnız taslak release oluşturmak için
+    outputs:
+      etiket: ${{ steps.b.outputs.etiket }}
+      surum: ${{ steps.b.outputs.surum }}
+      kanal: ${{ steps.b.outputs.kanal }}
+      yayin: ${{ steps.b.outputs.yayin }}
+      taslak: ${{ steps.b.outputs.taslak }}
+      url_taban: ${{ steps.b.outputs.url_taban }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - id: b
+        name: Etiketten sürüm ve kanal
+        env:
+          ETIKET_GIRDI: ${{ github.ref_type == 'tag' && github.ref_name || inputs.etiket }}
+          TASLAK_GIRDI: ${{ github.ref_type == 'tag' || inputs.taslak }}
+        run: |
+          ETIKET=${ETIKET_GIRDI:-v0.0.0-deneme}
+          # vMAJOR.MINOR.PATCH[-ek]: ek varsa (alfa, beta, rc) kanal deneme, yoksa kararlı (RFC-0007 §12.3)
+          [[ "$ETIKET" =~ ^v((0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*))(-[0-9A-Za-z.]+)?$ ]] || { echo "HATA: etiket vX.Y.Z[-ek] olmalı: $ETIKET"; exit 1; }
+          SURUM=${BASH_REMATCH[1]}
+          KANAL=kararli
+          [ -n "${BASH_REMATCH[5]}" ] && KANAL=deneme
+          # Yayın zamanı kaydın zamanı: aynı kayıttan aynı bildirim
+          YAYIN=$(( $(git log -1 --format=%ct) * 1000 ))
+          {
+            echo "etiket=$ETIKET"; echo "surum=$SURUM"; echo "kanal=$KANAL"; echo "yayin=$YAYIN"
+            echo "taslak=$TASLAK_GIRDI"; echo "url_taban=https://github.com/$GITHUB_REPOSITORY/releases/download/$ETIKET"
+          } | tee -a "$GITHUB_OUTPUT"
+      - name: Taslak release
+        if: steps.b.outputs.taslak == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ETIKET: ${{ steps.b.outputs.etiket }}
+          KANAL: ${{ steps.b.outputs.kanal }}
+        run: |
+          # Var olan release'e yalnız taslak ve imzasızsa yeniden yüklenir: yayımlanmış ya da imzalanmış release'in dosyaları
+          # --clobber ile ezilirse imzalı bildirim ve SHA256SUMS.sig yeni baytlarla uyuşmaz (Codex 12. tur)
+          if DURUM=$(gh release view "$ETIKET" --repo "$GITHUB_REPOSITORY" --json isDraft,assets \
+              --jq 'if .isDraft and ([.assets[].name] | any(. == "SHA256SUMS.sig" or . == "havenfold-node.bildirim") | not) then "taslak" else "kilitli" end' 2>/dev/null); then
+            [ "$DURUM" = taslak ] || { echo "HATA: $ETIKET yayımlanmış ya da imzalanmış; dosyaları yeniden yüklenmez"; exit 1; }
+            echo "taslak release zaten var"; exit 0
+          fi
+          EK=()
+          [ "$KANAL" = deneme ] && EK=(--prerelease)
+          gh release create "$ETIKET" --repo "$GITHUB_REPOSITORY" --draft --target "$GITHUB_SHA" "${EK[@]}" \
+            --title "Havenfold $ETIKET" \
+            --notes "Taslak. Sürüm bildirimi ve SHA256SUMS İMZASIZDIR; Kerem çevrimdışı imzalayıp havenfold-node.bildirim ve SHA256SUMS.sig'i ekleyince yayımlanır (docs/surum.md)."
+
+  derle:
+    name: packages and image (amd64)
+    needs: bilgi
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: write # yalnız release'e yükleme adımı jetonu alır
+    env:
+      SURUM: ${{ needs.bilgi.outputs.surum }}
+      KANAL: ${{ needs.bilgi.outputs.kanal }}
+      YAYIN: ${{ needs.bilgi.outputs.yayin }}
+      URL_TABAN: ${{ needs.bilgi.outputs.url_taban }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+      - name: Üretim bağımlılıkları (geliştirme bağımlılıkları ve kurulum betikleri yok)
+        run: |
+          npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+          (cd worklet && npm ci --omit=dev --ignore-scripts --no-audit --no-fund)
+      - name: Düğüm paketleri (amd64, arm64)
+        run: |
+          C="$RUNNER_TEMP/cikti"
+          for A in amd64 arm64; do
+            bash node/scripts/runtime.sh "$A" "$RUNNER_TEMP/cz/$A"
+            node node/scripts/release-build.js paket --surum "$SURUM" --kanal "$KANAL" --arch "$A" \
+              --node "$RUNNER_TEMP/cz/$A/node" --bare "$RUNNER_TEMP/cz/$A/bare" \
+              --yayin-zamani "$YAYIN" --url-taban "$URL_TABAN" --cikti "$C/$A"
+          done
+          ls -l "$C"/*/
+      - name: amd64 paketini kurulumun açıcısıyla aç ve çalıştır
+        run: |
+          K="$RUNNER_TEMP/kok"
+          node -e '
+            const fs = require("fs")
+            const { paketAc } = require("./installer/lib/package")
+            const zip = fs.readFileSync(process.argv[1])
+            console.log(paketAc({ kok: process.argv[2], surum: process.argv[3], zipBaytlari: zip, bildirim: Buffer.alloc(0), bildirimOzeti: "0".repeat(64) }))
+          ' "$RUNNER_TEMP/cikti/amd64/havenfold-node-$SURUM-amd64.zip" "$K" "$SURUM"
+          D="$K/opt/havenfold/surumler/$SURUM"
+          chmod 0755 "$D/yetki/node" # kurulum yardımcının kopyasında yapar (installer/target/common.sh)
+          "$D/node" --version
+          "$D/bare" --version
+          "$D/yetki/node" --version
+          (cd "$D" && ./node -e '
+            for (const m of ["./lib/node/release", "./lib/node/privilege-helper", "./lib/node/podman", "./lib/node/supervisor-main", "./lib/node/worker", "./lib/node/box"]) require(m)
+            require("./lib/node_modules/sodium-native"); console.log("modüller paketteki node_modules ile yüklendi")')
+          (cd "$D/yetki" && ./node -e 'require("./lib/node/privilege-helper"); console.log("yardımcının kopyası kendi lib/ inden yüklendi")')
+          "$D/bin/havenfold" yardim | tee "$RUNNER_TEMP/kullanim.txt" || true
+          grep -q '^Kullanım: havenfold' "$RUNNER_TEMP/kullanim.txt"
+          rm -rf "$K"
+      - name: Görev imajı (podman build, oci-archive, ociDigest)
+        run: bash images/image-build.sh images/task-ocr "$RUNNER_TEMP/imaj"
+      - name: Kaynak arşivi (GPL/AGPL paketlerin tam kaynağı, aynı anlık görüntüden)
+        run: |
+          . "$RUNNER_TEMP/imaj/imaj.env"
+          bash images/source-archive.sh "$REF" "$RUNNER_TEMP/kaynak"
+          AD="$TUR-$SURUM-kaynak"
+          mv "$RUNNER_TEMP/kaynak/$AD.tar" "$RUNNER_TEMP/imaj/$TUR-$SURUM-$ARCH-kaynak.tar"
+          rm -rf "${RUNNER_TEMP:?}/kaynak"
+          ls -l "$RUNNER_TEMP/imaj"
+      - name: İmaj satırı
+        run: |
+          . "$RUNNER_TEMP/imaj/imaj.env"
+          node node/scripts/release-build.js imaj-satiri --imaj-bildirimi images/task-ocr/imaj-bildirimi.json \
+            --arch "$ARCH" --oci-digest "$OCI_DIGEST" --arsiv "$ARSIV" --kaynak "$RUNNER_TEMP/imaj/$TUR-$SURUM-$ARCH-kaynak.tar" \
+            --url-taban "$URL_TABAN" --cikti "$RUNNER_TEMP/cikti/imaj-$ARCH.json"
+          cat "$RUNNER_TEMP/cikti/imaj-$ARCH.json"
+      - name: İmajı düğümün yolundan dene
+        run: |
+          . "$RUNNER_TEMP/imaj/imaj.env"
+          podman rmi --force "$REF" >/dev/null
+          SOKET="$RUNNER_TEMP/podman.sock"
+          podman system service --time=0 "unix://$SOKET" &
+          for _ in $(seq 50); do [ -S "$SOKET" ] && break; sleep 0.2; done
+          node node/scripts/image-try.js --url "unix://$SOKET" --arsiv "$ARSIV" --satir "$RUNNER_TEMP/cikti/imaj-$ARCH.json"
+      - name: Küçük çıktılar
+        run: |
+          mkdir -p "$RUNNER_TEMP/ozet"
+          for A in amd64 arm64; do
+            cp "$RUNNER_TEMP/cikti/$A/havenfold-node.bildirim.imzasiz" "$RUNNER_TEMP/ozet/bildirim-$A.imzasiz"
+            cp "$RUNNER_TEMP/cikti/$A/SHA256SUMS" "$RUNNER_TEMP/ozet/SHA256SUMS-$A"
+          done
+          cp "$RUNNER_TEMP"/cikti/imaj-*.json "$RUNNER_TEMP/ozet/"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ozet-derle
+          path: ${{ runner.temp }}/ozet/
+          retention-days: 7
+      - name: Release'e yükle
+        if: needs.bilgi.outputs.taslak == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ETIKET: ${{ needs.bilgi.outputs.etiket }}
+        run: |
+          . "$RUNNER_TEMP/imaj/imaj.env"
+          gh release upload "$ETIKET" --repo "$GITHUB_REPOSITORY" --clobber \
+            "$RUNNER_TEMP"/cikti/amd64/*.zip "$RUNNER_TEMP"/cikti/arm64/*.zip \
+            "$ARSIV" "$RUNNER_TEMP/imaj/$TUR-$SURUM-$ARCH-kaynak.tar"
+
+  imaj-arm64:
+    name: image (arm64)
+    needs: bilgi
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    permissions:
+      contents: write # yalnız release'e yükleme adımı jetonu alır
+    env:
+      URL_TABAN: ${{ needs.bilgi.outputs.url_taban }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Görev imajı, kaynak arşivi, satır
+        run: |
+          bash images/image-build.sh images/task-ocr "$RUNNER_TEMP/imaj"
+          . "$RUNNER_TEMP/imaj/imaj.env"
+          bash images/source-archive.sh "$REF" "$RUNNER_TEMP/kaynak"
+          mv "$RUNNER_TEMP/kaynak/$TUR-$SURUM-kaynak.tar" "$RUNNER_TEMP/imaj/$TUR-$SURUM-$ARCH-kaynak.tar"
+          rm -rf "${RUNNER_TEMP:?}/kaynak"
+          mkdir -p "$RUNNER_TEMP/ozet"
+          node node/scripts/release-build.js imaj-satiri --imaj-bildirimi images/task-ocr/imaj-bildirimi.json \
+            --arch "$ARCH" --oci-digest "$OCI_DIGEST" --arsiv "$ARSIV" --kaynak "$RUNNER_TEMP/imaj/$TUR-$SURUM-$ARCH-kaynak.tar" \
+            --url-taban "$URL_TABAN" --cikti "$RUNNER_TEMP/ozet/imaj-$ARCH.json"
+      - name: İmajı düğümün yolundan dene
+        run: |
+          . "$RUNNER_TEMP/imaj/imaj.env"
+          podman rmi --force "$REF" >/dev/null
+          SOKET="$RUNNER_TEMP/podman.sock"
+          podman system service --time=0 "unix://$SOKET" &
+          for _ in $(seq 50); do [ -S "$SOKET" ] && break; sleep 0.2; done
+          node node/scripts/image-try.js --url "unix://$SOKET" --arsiv "$ARSIV" --satir "$RUNNER_TEMP/ozet/imaj-$ARCH.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ozet-imaj-arm64
+          path: ${{ runner.temp }}/ozet/
+          retention-days: 7
+      - name: Release'e yükle
+        if: needs.bilgi.outputs.taslak == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ETIKET: ${{ needs.bilgi.outputs.etiket }}
+        run: |
+          . "$RUNNER_TEMP/imaj/imaj.env"
+          gh release upload "$ETIKET" --repo "$GITHUB_REPOSITORY" --clobber "$ARSIV" "$RUNNER_TEMP/imaj/$TUR-$SURUM-$ARCH-kaynak.tar"
+
+  birlestir:
+    name: merged unsigned manifest
+    needs: [bilgi, derle, imaj-arm64]
+    # arm64 imajı yalnız kapalı depoda atlanır; açık depoda zaman aşımı (cancelled) arm64'süz bildirim üretmesin
+    if: ${{ !cancelled() && needs.derle.result == 'success' && (needs.imaj-arm64.result == 'success' || (needs.imaj-arm64.result == 'skipped' && github.event.repository.private)) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write # yalnız release'e yükleme adımı jetonu alır
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: ozet-*
+          path: ${{ runner.temp }}/ozet
+          merge-multiple: true
+      - name: Birleştir
+        run: |
+          O="$RUNNER_TEMP/ozet"
+          IMAJ=()
+          for f in "$O"/imaj-*.json; do IMAJ+=(--imaj "$f"); done
+          node node/scripts/release-build.js birlestir \
+            --bildirim "$O/bildirim-amd64.imzasiz" --bildirim "$O/bildirim-arm64.imzasiz" \
+            --sums "$O/SHA256SUMS-amd64" --sums "$O/SHA256SUMS-arm64" "${IMAJ[@]}" --cikti "$RUNNER_TEMP/surum"
+          cat "$RUNNER_TEMP/surum/havenfold-node.bildirim.json"
+          echo "--- SHA256SUMS (imzasız)"
+          cat "$RUNNER_TEMP/surum/SHA256SUMS"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: surum-imzasiz
+          path: ${{ runner.temp }}/surum/
+          retention-days: 30
+      - name: Release'e yükle
+        if: needs.bilgi.outputs.taslak == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ETIKET: ${{ needs.bilgi.outputs.etiket }}
+        run: |
+          S="$RUNNER_TEMP/surum"
+          gh release upload "$ETIKET" --repo "$GITHUB_REPOSITORY" --clobber \
+            "$S/havenfold-node.bildirim.imzasiz" "$S/havenfold-node.bildirim.json" "$S/SHA256SUMS#SHA256SUMS (imzasız)"

@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# havenfold-deneme.service — RFC-0026 d: sağlık penceresinin denetimi. Kökün dizinindeki deneme kaydına bakar; pencere
+# doldu ve sağlık gelmediyse önceki sürüme döner. Yeni sürümün kodu bu kararda yer almaz (yardımcının sabit yolu).
+[Unit]
+Description=Havenfold güncelleme denemesi denetimi
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/havenfold/yetki/node /usr/lib/havenfold/yetki/ana.js deneme-denetle
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictRealtime=yes
+CapabilityBoundingSet=CAP_DAC_READ_SEARCH
+AmbientCapabilities=
+SystemCallFilter=@system-service
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_UNIX
+UMask=0022
+ReadWritePaths=/opt/havenfold /var/lib/havenfold/yetki

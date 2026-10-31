@@ -1,0 +1,9 @@
+#!/bin/sh
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# havenfold — paketteki komut (RFC-0007 §5, §7): /usr/local/bin/havenfold → /opt/havenfold/guncel/bin/havenfold.
+# Paketle gelen Node ile lib/node/bin/havenfold'u çalıştırır; sistemin Node'u kullanılmaz (RFC-0007 §4.1).
+set -eu
+KOK=$(dirname "$(dirname "$(readlink -f "$0")")")
+exec "$KOK/node" "$KOK/lib/node/bin/havenfold" "$@"

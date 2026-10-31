@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# /etc/havenfold/dugum.toml — RFC-0007 §5: rol, kanal, pil eşikleri, bakım penceresi. Sır içermez.
+rol = "isci"            # isci | kutu | birlesik
+kanal = "kararli"       # kararli | deneme (değişiklik ebeveyn onayıyla, §12.3)
+afet = "kapali"         # acik | kapali — kutuda afet modu (RFC-0012): güç izleme ve BlueZ ile Bluetooth LE (D91)
+
+[pil]
+baslangic = 60
+bitis = 80
+
+[bakim]
+# Yerel saatle 03:00 + 20 × (sıra mod 6) dakika (§12.7); sıra defterden hesaplanır
+saat = "03:00"

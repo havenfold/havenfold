@@ -1,0 +1,17 @@
+{
+  "aciklama": "D106: İstek 181 kararı (Mac, Kerem yetkisiyle, 25 Ekim 2026) — uzaktan katılımın taşıması, çok onay, etkinleştirme ve iptal. Numaralar bu dosyada (komut-araliklari.json 450–459 sira). Durumlar core/tasiyici/test/uzaktan-karar.js'te; beklenenler karardan elle yazıldı.",
+  "rfc": ["RFC-0003", "RFC-0028"],
+  "sureler": { "uzaktanKodMs": 600000, "yuzYuzeQrSn": 180, "onayBeklemeMs": 600000, "bekleme": 86400000, "davetEdenOncelikMs": 3600000 },
+  "yetenek": { "ad": "UZAKTAN_IPTAL", "bit": 65536 },
+  "komutlar": [
+    { "no": 450, "ad": "REMOTE_MEMBER_ACTIVATE", "sdk": "LedgerApi.activateMember", "govde": "{ memberId }", "sonuc": "YazimSonucu", "hatalar": ["NOT_WAITING", "WAITING_IN_PROGRESS", "INVITE_ER_PENDING"] },
+    { "no": 451, "ad": "MEMBER_REVOKE", "sdk": "LedgerApi.revokeMember", "govde": "{ memberId, neden? }", "sonuc": "YazimSonucu", "hatalar": ["NO_TARGET", "UPDATE_PENDING"] }
+  ],
+  "durumlar": [
+    { "no": "a", "aciklama": "Uzaktan kodun ömrü 10 dakika (QR yenilenmez); sınırdan sonra katılım QR_EXPIRY_EXPIRED; yüz yüze QR 180 sn kalır", "hata": "QR_EXPIRY_EXPIRED" },
+    { "no": "b", "aciklama": "İki ebeveynli aile: öbür ebeveynin LEDGER_SIGN'ı 10 dakika içinde gelince üye bekleyen; gelmezse QUORUM_TIMEOUT, defterde iz yok", "hata": "QUORUM_TIMEOUT" },
+    { "no": "c", "aciklama": "Beklemede ikinci ebeveyn REVOKE ile iptal eder (tek imza); üye düşer, kişi sayılmaz, yeni gelende yerel aile silinir (wipe)" },
+    { "no": "d", "aciklama": "İki telefon aynı anda ACTIVATE_MEMBER yazar: çatal çözümünden sonra iki defterde tek etkin üye, aynı uzunluk" }
+  ],
+  "hatalar": ["QUORUM_TIMEOUT", "INVITE_ER_PENDING", "UPDATE_PENDING", "QR_EXPIRY_EXPIRED"]
+}

@@ -1,0 +1,32 @@
+{
+ "aciklama": "Tören MAC'i (RFC-0028 §5; caps kapsamı RFC-0021 §2 madde 81, RFC-0003 §2.2). mac = derive(sec, \"hf/toren/mac\", el sıkışma özeti, taraf) ; caps doluysa sona u64be(caps) eklenir, caps = 0 iken eklenmez (eski istemcinin biçimi). derive: anahtarlı BLAKE2b-256, etiket telde \"yuva/v2/\" önekli. taraf: \"c\" tarayan, \"s\" gösteren.",
+ "sec": "000102030405060708090a0b0c0d0e0f",
+ "handshakeHash": "a0a1a2a3a4a5a6a7a8a9aaabacadaeafa0a1a2a3a4a5a6a7a8a9aaabacadaeaf",
+ "durumlar": [
+  {
+   "taraf": "c",
+   "caps": 0,
+   "mac": "b9ec844fa842a3ab188378db4dea5a66b73cd9edb726286303869ee04f066e82"
+  },
+  {
+   "taraf": "s",
+   "caps": 0,
+   "mac": "e332ed2d6855d5f97f92ec633170c8ea4158e9496486dc485f13f97dc5b68304"
+  },
+  {
+   "taraf": "c",
+   "caps": 24800,
+   "mac": "685a0d99b570b80cd9e471a6fecb82d0c5f32993773a41c55a9f28fe24413b16"
+  },
+  {
+   "taraf": "s",
+   "caps": 24800,
+   "mac": "4b422cdf1f7c4861a897ab0a2fc7808bcaf48d06ca1375f4a17ace119348c14e"
+  },
+  {
+   "taraf": "c",
+   "caps": 32,
+   "mac": "ca412ce23f088a03422f6d9e9be8eef20aa1afaf4a1b9c5f60900fb2b25e37e4"
+  }
+ ]
+}

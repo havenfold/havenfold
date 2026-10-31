@@ -1,0 +1,778 @@
+{
+ "aciklama": "Havenfold çekirdek olay türleri (RFC-0006 §6). onem: §11.2 (0 bilgi, 1 duyuru, 2 dikkat, 3 acil); onem_kutu: özne kutuysa. koleksiyon ve anahtar açıklamadır; _key türetimi §4.5.",
+ "turler": [
+  {
+   "tur": "hf.device.added",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "device"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 365,
+   "ozel": false,
+   "ozet": "hf.device.added.ozet",
+   "onem": 1,
+   "koleksiyon": "Ebeveynler",
+   "anahtar": [
+    "DEVICE_ATTACH eventHash"
+   ]
+  },
+  {
+   "tur": "hf.device.removed",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "device"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 365,
+   "ozel": false,
+   "ozet": "hf.device.removed.ozet",
+   "onem": 1,
+   "koleksiyon": "Ebeveynler",
+   "anahtar": [
+    "DEVICE_DETACH eventHash"
+   ]
+  },
+  {
+   "tur": "hf.device.offline",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "device",
+    "uye"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 30,
+   "ozel": false,
+   "ozet": "hf.device.offline.ozet",
+   "onem": 0,
+   "koleksiyon": "Ebeveynler",
+   "anahtar": [
+    "özne kimliği",
+    "son NODE_CAPS.seq"
+   ],
+   "onem_kutu": 1
+  },
+  {
+   "tur": "hf.device.online",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "device",
+    "uye"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 30,
+   "ozel": false,
+   "ozet": "hf.device.online.ozet",
+   "onem": 0,
+   "koleksiyon": "Ebeveynler",
+   "anahtar": [
+    "özne kimliği",
+    "yeni NODE_CAPS.seq"
+   ]
+  },
+  {
+   "tur": "hf.device.silent",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "device"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 90,
+   "ozel": false,
+   "ozet": "hf.device.silent.ozet",
+   "onem": 1,
+   "koleksiyon": "Ebeveynler",
+   "anahtar": [
+    "özne kimliği",
+    "son NODE_CAPS.seq"
+   ]
+  },
+  {
+   "tur": "hf.device.overheat",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "device",
+    "uye"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 30,
+   "ozel": false,
+   "ozet": "hf.device.overheat.ozet",
+   "onem": 2,
+   "koleksiyon": "Ebeveynler",
+   "anahtar": [
+    "özne kimliği",
+    "NODE_CAPS.seq"
+   ]
+  },
+  {
+   "tur": "hf.device.battery",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "device",
+    "uye"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 90,
+   "ozel": false,
+   "ozet": "hf.device.battery.ozet",
+   "onem": 2,
+   "koleksiyon": "Ebeveynler",
+   "anahtar": [
+    "özne kimliği",
+    "cycles"
+   ]
+  },
+  {
+   "tur": "hf.device.on-battery",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "device",
+    "uye"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 30,
+   "ozel": false,
+   "ozet": "hf.device.on-battery.ozet",
+   "onem": 1,
+   "koleksiyon": "Ebeveynler",
+   "anahtar": [
+    "özne kimliği",
+    "NODE_CAPS.seq"
+   ]
+  },
+  {
+   "tur": "hf.device.disk-low",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "device",
+    "uye"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 30,
+   "ozel": false,
+   "ozet": "hf.device.disk-low.ozet",
+   "onem": 1,
+   "koleksiyon": "Ebeveynler",
+   "anahtar": [
+    "özne kimliği",
+    "gün numarası"
+   ]
+  },
+  {
+   "tur": "hf.device.battery-check",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "topluluk"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 365,
+   "ozel": false,
+   "ozet": "hf.device.battery-check.ozet",
+   "onem": 1,
+   "koleksiyon": "Ebeveynler",
+   "anahtar": [
+    "yıl"
+   ]
+  },
+  {
+   "tur": "hf.task.done",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "uye"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 30,
+   "ozel": false,
+   "ozet": "hf.task.done.ozet",
+   "onem": 0,
+   "koleksiyon": "İsteyenin Kişisel'i",
+   "anahtar": [
+    "taskId"
+   ]
+  },
+  {
+   "tur": "hf.task.failed",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "uye"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 30,
+   "ozel": false,
+   "ozet": "hf.task.failed.ozet",
+   "onem": 1,
+   "koleksiyon": "İsteyenin Kişisel'i",
+   "anahtar": [
+    "taskId"
+   ]
+  },
+  {
+   "tur": "hf.task.standing-ending",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "device"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 30,
+   "ozel": false,
+   "ozet": "hf.task.standing-ending.ozet",
+   "onem": 2,
+   "koleksiyon": "Görevin koleksiyonu",
+   "anahtar": [
+    "taskId"
+   ]
+  },
+  {
+   "tur": "hf.backup.verified",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "uye"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 30,
+   "ozel": false,
+   "ozet": "hf.backup.verified.ozet",
+   "onem": 0,
+   "koleksiyon": "Sahibin Kişisel'i",
+   "anahtar": [
+    "BACKUP_INDEX.seq"
+   ]
+  },
+  {
+   "tur": "hf.backup.stale",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "uye"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 30,
+   "ozel": false,
+   "ozet": "hf.backup.stale.ozet",
+   "onem": 1,
+   "koleksiyon": "Sahibin Kişisel'i",
+   "anahtar": [
+    "gün numarası"
+   ]
+  },
+  {
+   "tur": "hf.backup.failed",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "uye"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 30,
+   "ozel": false,
+   "ozet": "hf.backup.failed.ozet",
+   "onem": 1,
+   "koleksiyon": "Sahibin Kişisel'i",
+   "anahtar": [
+    "gün numarası"
+   ]
+  },
+  {
+   "tur": "hf.wipe.done",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "device"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 0,
+   "ozel": false,
+   "ozet": "hf.wipe.done.ozet",
+   "onem": 1,
+   "koleksiyon": "Ebeveynler",
+   "anahtar": [
+    "wipeReportHash"
+   ]
+  },
+  {
+   "tur": "hf.kasa.rotated",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "uye",
+    "topluluk"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 365,
+   "ozel": false,
+   "ozet": "hf.kasa.rotated.ozet",
+   "onem": 0,
+   "koleksiyon": "Sahibin Kişisel'i / Ebeveynler",
+   "anahtar": [
+    "secretId",
+    "version"
+   ]
+  },
+  {
+   "tur": "hf.kasa.paper-needed",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "uye",
+    "topluluk"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 7,
+   "ozel": false,
+   "ozet": "hf.kasa.paper-needed.ozet",
+   "onem": 1,
+   "koleksiyon": "Sahibin Kişisel'i / Ebeveynler",
+   "anahtar": [
+    "secretId",
+    "version",
+    "gün numarası"
+   ]
+  },
+  {
+   "tur": "hf.kayit.kutu-dolu",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "uye"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 30,
+   "ozel": false,
+   "ozet": "hf.kayit.kutu-dolu.ozet",
+   "onem": 2,
+   "koleksiyon": "Ebeveynler",
+   "anahtar": [
+    "kutu kimliği",
+    "collectionId",
+    "gün numarası"
+   ]
+  },
+  {
+   "tur": "hf.grant.expired",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "grant"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 90,
+   "ozel": false,
+   "ozet": "hf.grant.expired.ozet",
+   "onem": 1,
+   "koleksiyon": "Ebeveynler",
+   "anahtar": [
+    "GRANT eventHash"
+   ]
+  },
+  {
+   "tur": "hf.sos",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "uye",
+    "grant"
+   ],
+   "alanlar": [
+    {
+     "ad": "yol",
+     "deger": "string",
+     "zorunlu": false
+    },
+    {
+     "ad": "konum",
+     "deger": "list",
+     "zorunlu": false
+    },
+    {
+     "ad": "metin",
+     "deger": "string",
+     "zorunlu": false
+    },
+    {
+     "ad": "pil",
+     "deger": "int",
+     "zorunlu": false
+    },
+    {
+     "ad": "afet_mid",
+     "deger": "bytes",
+     "zorunlu": false
+    },
+    {
+     "ad": "sessiz",
+     "deger": "bool",
+     "zorunlu": false
+    },
+    {
+     "ad": "ortak_mid",
+     "deger": "bytes",
+     "zorunlu": false
+    },
+    {
+     "ad": "afet_midler",
+     "deger": "list",
+     "zorunlu": false
+    }
+   ],
+   "kapsam": "topluluk",
+   "keep": 365,
+   "ozel": false,
+   "ozet": "hf.sos.ozet",
+   "onem": 3,
+   "koleksiyon": "Tüm Aile",
+   "anahtar": []
+  },
+  {
+   "tur": "hf.aile-izni",
+   "v": 1,
+   "olay": true,
+   "yazar": "uye",
+   "ozne": [
+    "uye"
+   ],
+   "alanlar": [
+    {
+     "ad": "gecerli",
+     "deger": "int",
+     "zorunlu": true
+    }
+   ],
+   "kapsam": "topluluk",
+   "keep": 7,
+   "ozel": false,
+   "ozet": "hf.aile-izni.ozet",
+   "koleksiyon": "Tüm Aile"
+  },
+  {
+   "tur": "hf.rutin",
+   "v": 1,
+   "olay": false,
+   "yazar": "uye",
+   "ozne": [
+    "uye",
+    "varlik",
+    "yer",
+    "device",
+    "grant",
+    "kayit",
+    "topluluk"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 0,
+   "ozel": false,
+   "ozet": "hf.rutin.ozet"
+  },
+  {
+   "tur": "hf.kural",
+   "v": 1,
+   "olay": false,
+   "yazar": "uye",
+   "ozne": [
+    "uye",
+    "varlik",
+    "yer",
+    "device",
+    "grant",
+    "kayit",
+    "topluluk"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 0,
+   "ozel": false,
+   "ozet": "hf.kural.ozet"
+  },
+  {
+   "tur": "hf.vaka",
+   "v": 1,
+   "olay": false,
+   "yazar": "ikisi",
+   "ozne": [
+    "uye",
+    "varlik",
+    "yer",
+    "device",
+    "grant",
+    "kayit",
+    "topluluk"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 365,
+   "ozel": false,
+   "ozet": "hf.vaka.ozet"
+  },
+  {
+   "tur": "hf.vaka.basamak",
+   "v": 1,
+   "olay": false,
+   "yazar": "ikisi",
+   "ozne": [
+    "uye",
+    "varlik",
+    "yer",
+    "device",
+    "grant",
+    "kayit",
+    "topluluk"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 365,
+   "ozel": false,
+   "ozet": "hf.vaka.basamak.ozet"
+  },
+  {
+   "tur": "hf.vaka.sahip",
+   "v": 1,
+   "olay": false,
+   "yazar": "uye",
+   "ozne": [
+    "uye",
+    "varlik",
+    "yer",
+    "device",
+    "grant",
+    "kayit",
+    "topluluk"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 365,
+   "ozel": false,
+   "ozet": "hf.vaka.sahip.ozet"
+  },
+  {
+   "tur": "hf.vaka.kapat",
+   "v": 1,
+   "olay": false,
+   "yazar": "uye",
+   "ozne": [
+    "uye",
+    "varlik",
+    "yer",
+    "device",
+    "grant",
+    "kayit",
+    "topluluk"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 365,
+   "ozel": false,
+   "ozet": "hf.vaka.kapat.ozet"
+  },
+  {
+   "tur": "hf.kart",
+   "v": 1,
+   "olay": false,
+   "yazar": "uye",
+   "ozne": [
+    "uye",
+    "varlik",
+    "yer",
+    "device",
+    "grant",
+    "kayit",
+    "topluluk"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 0,
+   "ozel": false,
+   "ozet": "hf.kart.ozet"
+  },
+  {
+   "tur": "hf.kart.not",
+   "v": 1,
+   "olay": false,
+   "yazar": "uye",
+   "ozne": [
+    "uye",
+    "varlik",
+    "yer",
+    "device",
+    "grant",
+    "kayit",
+    "topluluk"
+   ],
+   "alanlar": [
+    {
+     "ad": "metin",
+     "deger": "string",
+     "zorunlu": true
+    }
+   ],
+   "kapsam": "topluluk",
+   "keep": 365,
+   "ozel": false,
+   "ozet": "hf.kart.not.ozet"
+  },
+  {
+   "tur": "hf.olay.duzelt",
+   "v": 1,
+   "olay": false,
+   "yazar": "uye",
+   "ozne": [
+    "uye",
+    "varlik",
+    "yer",
+    "device",
+    "grant",
+    "kayit",
+    "topluluk"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 0,
+   "ozel": false,
+   "ozet": "hf.olay.duzelt.ozet"
+  },
+  {
+   "tur": "hf.saklama",
+   "v": 1,
+   "olay": false,
+   "yazar": "uye",
+   "ozne": [
+    "uye",
+    "varlik",
+    "yer",
+    "device",
+    "grant",
+    "kayit",
+    "topluluk"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 0,
+   "ozel": false,
+   "ozet": "hf.saklama.ozet"
+  },
+  {
+   "tur": "hf.wipe.report",
+   "v": 1,
+   "olay": false,
+   "yazar": "uye",
+   "ozne": [
+    "uye",
+    "varlik",
+    "yer",
+    "device",
+    "grant",
+    "kayit",
+    "topluluk"
+   ],
+   "alanlar": [],
+   "kapsam": "topluluk",
+   "keep": 0,
+   "ozel": false,
+   "ozet": "hf.wipe.report.ozet"
+  },
+  {
+   "tur": "hf.uygulama",
+   "v": 1,
+   "olay": false,
+   "yazar": "kendi",
+   "ozne": [
+    "uye"
+   ],
+   "alanlar": [
+    {
+     "ad": "app_id",
+     "deger": "string",
+     "zorunlu": true
+    },
+    {
+     "ad": "yetenek",
+     "deger": "list",
+     "zorunlu": false
+    }
+   ],
+   "kapsam": "topluluk",
+   "keep": 0,
+   "ozel": false,
+   "ozet": "hf.uygulama.ozet",
+   "koleksiyon": "Tüm Aile"
+  },
+  {
+   "tur": "hf.sos.alindi",
+   "v": 1,
+   "olay": false,
+   "yazar": "kendi",
+   "ozne": [
+    "uye"
+   ],
+   "alanlar": [
+    {
+     "ad": "sos",
+     "deger": "bytes",
+     "zorunlu": true
+    }
+   ],
+   "kapsam": "topluluk",
+   "keep": 7,
+   "ozel": false,
+   "ozet": "hf.sos.alindi.ozet",
+   "koleksiyon": "Tüm Aile"
+  }
+ ]
+}

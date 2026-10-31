@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: Apache-2.0
+# hf.task.ocr — PDF ya da görüntüden metin veya aranabilir PDF (RFC-0002 §5, §11.1, §12; sözleşme CONTRACT.md)
+#
+# Araçlar ayrı süreç olarak çalışır ve telefona girmez (kurucu §17.1). Ghostscript AGPL-3.0'dır: imajla aynı yerden,
+# aynı sürüm etiketiyle tam kaynak arşivi yayımlanır (images/source-archive.sh; RFC-0007 §12.1 sourceArchive).
+#
+# Sabitleme: taban imaj sürüm etiketiyle; paket sürümleri Ubuntu arşiv anlık görüntüsüyle (snapshot.ubuntu.com).
+# Aynı UBUNTU_SNAPSHOT aynı paket sürümlerini verir; kaynak arşivi de aynı anlık görüntüden indirilir. Derleme hattı
+# tabanı ayrıca @sha256: özetiyle sabitler (TABAN argümanı).
+#
+# Çalışma (node/podman.js): kök salt okunur, ağ yok, /in salt okunur, /out yazılır, /work tmpfs; süreç konteynerin
+# kökü değil havenfold-task kimliğiyle (--userns=keep-id). Bu yüzden imajda kullanıcı açılmaz ve hiçbir dosya
+# çalışma anında yazılmaz.
+ARG TABAN=docker.io/library/ubuntu:24.04
+FROM ${TABAN}
+
+ARG UBUNTU_SNAPSHOT=20261015T000000Z
+ARG HF_SURUM=1.0.0
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Anlık görüntü sunucusu yalnız HTTPS'tir ve taban imajda kök sertifikalar yoktur: ilk adımda ca-certificates tabanın
+# kendi arşiv adresinden (apt imzasıyla) kurulur. Bu tek paketin sürümü anlık görüntüye değil derleme gününe bağlıdır;
+# kurulu sürüm kaynak arşivinin paket listesinde yazılıdır. Kalan her paket anlık görüntüden.
+# --no-install-recommends: unpaper (GPL-2), pngquant (GPL-3), jbig2enc gibi isteğe bağlı araçlar gelmez
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates \
+ && apt-get -o APT::Snapshot="${UBUNTU_SNAPSHOT}" update \
+ && apt-get -o APT::Snapshot="${UBUNTU_SNAPSHOT}" install -y --no-install-recommends \
+      ocrmypdf \
+      tesseract-ocr \
+      tesseract-ocr-tur \
+      tesseract-ocr-eng \
+      ghostscript \
+      qpdf \
+      python3 \
+ && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*.deb
+
+COPY --chmod=0755 hf-gorev /usr/local/bin/hf-gorev
+COPY CONTRACT.md LICENSES.md LICENSE /usr/share/doc/havenfold-task-ocr/
+
+# Lisans etiketi bu dizindeki dosyaların; imajdaki araçların lisansları LICENSES.md'de
+LABEL org.opencontainers.image.title="hf.task.ocr" \
+      org.opencontainers.image.version="${HF_SURUM}" \
+      org.opencontainers.image.licenses="Apache-2.0" \
+      org.havenfold.task.type="hf.task.ocr" \
+      org.havenfold.task.version="${HF_SURUM}" \
+      org.havenfold.ubuntu-snapshot="${UBUNTU_SNAPSHOT}"
+
+WORKDIR /work
+ENTRYPOINT ["/usr/local/bin/hf-gorev"]

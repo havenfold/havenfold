@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# havenfold-ilk-acilis.service — RFC-0007 §4.3, §9: ilk açılış tty1'de (ağ, saat, yönetici parolası, durum özeti, rol,
+# kimlikler, tören). Bitince kendini devre dışı bırakır ve durum ekranına geçer. Kurulum aracının sabit yolundan çalışır.
+[Unit]
+Description=Havenfold ilk açılış
+After=cloud-init.service systemd-user-sessions.service havenfold-luks-yenile.service havenfold-denetci.service
+Wants=havenfold-denetci.service
+Before=havenfold-ekran.service getty@tty1.service
+Conflicts=getty@tty1.service
+ConditionPathExists=!/var/lib/havenfold/ilk-acilis.tamam
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/havenfold/kurulum/target/hf-ilk-acilis
+StandardInput=tty
+StandardOutput=tty
+StandardError=journal+console
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+TimeoutStartSec=infinity
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target

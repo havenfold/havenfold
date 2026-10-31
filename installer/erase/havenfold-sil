@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+// SPDX-License-Identifier: MPL-2.0
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+// was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// havenfold-sil — silme ortamının aracı (RFC-0007 §13.2). Silme kök dosya sisteminde havenfold-sil.service ile tty1'de
+// açılır. Yalnız silme ortamında çalışır (shell.js ortamDenetle); başka makinede hiçbir şey yapmadan çıkar.
+// Çıkış: 0 kapat, 10 Havenfold'u yeniden kur (birim yeniden başlatır ve Kurulum USB'si menüsüne döner), 3 iptal, 1 hata.
+const fs = require('fs')
+const path = require('path')
+const { SilmeOturumu } = require('./session')
+const { sistem } = require('./shell')
+
+function surum () {
+  try { return fs.readFileSync(path.join(__dirname, 'VERSION'), 'utf8').trim() } catch { return '0.0.0' }
+}
+
+async function ana () {
+  let s
+  try { s = sistem() } catch (err) {
+    console.error('havenfold-sil: ' + err.message + ' (yalnız Kurulum USB\'sinin silme modunda çalışır)')
+    return 1
+  }
+  const r = await new SilmeOturumu({ sistem: s, toolVersion: surum() }).calis()
+  return r.secim === 'yeniden-kur' ? 10 : r.secim === 'iptal' ? 3 : 0
+}
+
+ana().then((k) => { process.exitCode = k }, (err) => { console.error('havenfold-sil: ' + err.message); process.exitCode = 1 })

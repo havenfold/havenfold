@@ -1,0 +1,34 @@
+{
+  "name": "@havenfold/transport",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Havenfold phone and box transport over HyperDHT: pair rendezvous, sessions with HELLO, ceremony (RFC-0028); off by default on phones",
+  "license": "MPL-2.0",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "*.js",
+    "bootstrap.json"
+  ],
+  "scripts": {
+    "test": "brittle-node test/*.js"
+  },
+  "dependencies": {
+    "@havenfold/core": "0.0.0",
+    "b4a": "1.9.0",
+    "compact-encoding": "3.5.2",
+    "hyperdht": "6.34.1",
+    "sodium-native": "5.2.0"
+  },
+  "devDependencies": {
+    "brittle": "4.5.0"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./ceremony": "./ceremony.js",
+    "./package.json": "./package.json"
+  }
+}

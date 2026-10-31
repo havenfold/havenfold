@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: MPL-2.0
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+// was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// Yuva Hat'tan kopyalanan donmuş vektörler (test/vectors/yuva-hat/, SHA256SUMS) hata kodlarını Yuva Hat'taki
+// Türkçe adlarıyla taşır. Vektörler değişmez; karşılaştırmada kodlar bu tabloyla çevrilir.
+module.exports = {
+  BEKLEMIYOR: 'NOT_WAITING',
+  BEKLEYEN_DEGISIM: 'PENDING_CHANGE',
+  BEKLEYEN_UYE: 'PENDING_MEMBER',
+  BILINMEYEN_IMZACI: 'UNKNOWN_SIGNER',
+  BILINMEYEN_OLAY: 'UNKNOWN_EVENT',
+  CIFT_IMZA: 'DUPLICATE_SIGNATURE',
+  EBEVEYN_IMZASI_YOK: 'NO_PARENT_SIGNATURE',
+  EBEVEYN_ONAYI_YOK: 'NO_PARENT_APPROVAL',
+  EBEVEYN_SINIRI: 'PARENT_LIMIT',
+  GENESIS_HATASI: 'GENESIS_ERROR',
+  HEDEF_KENDINI_OYLAYAMAZ: 'TARGET_CANNOT_SELF_VOTE',
+  IMZA_GECERSIZ: 'INVALID_SIGNATURE',
+  IMZA_YOK: 'NO_SIGNATURE',
+  KUTU_OY_VEREMEZ: 'BOX_CANNOT_VOTE',
+  KUTU_SINIRI: 'BOX_LIMIT',
+  POLITIKA_GECERSIZ: 'INVALID_POLICY',
+  PREKEY_ESKI: 'PREKEY_STALE',
+  PREKEY_IMZA: 'PREKEY_SIGNATURE',
+  PREKEY_IMZACI: 'PREKEY_SIGNER',
+  SIRA_HATASI: 'ORDER_ERROR',
+  UYE_ZATEN_VAR: 'MEMBER_EXISTS',
+  UZAKTAN_BEKLEME: 'REMOTE_WAITING',
+  YENI_UYE_ONAYI_YOK: 'NO_NEW_MEMBER_APPROVAL',
+  YETER_SAYI_YOK: 'NO_QUORUM',
+  YETISKIN_ONAYI_YOK: 'NO_ADULT_APPROVAL',
+  ZINCIR_KOPUK: 'CHAIN_BROKEN'
+}

@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# havenfold-ag-kapali.service — silme ortamında ağ kapalı (RFC-0007 §13.2): bütün arayüzler (lo dışında) indirilir,
+# nftables her şeyi düşürür. Ağ yapılandırma dosyası yoktur; networkd ve resolved çekirdek satırında maskelidir.
+[Unit]
+Description=Havenfold silme ortamı: ağ kapalı
+DefaultDependencies=no
+After=systemd-udevd.service
+Before=network-pre.target havenfold-sil.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/nft -f /etc/havenfold/ag-kapali.nft
+ExecStart=/bin/sh -c 'for i in /sys/class/net/*; do n=$(basename "$i"); [ "$n" = lo ] || ip link set dev "$n" down; done'
+
+[Install]
+WantedBy=sysinit.target

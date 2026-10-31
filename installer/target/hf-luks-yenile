@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# hf-luks-yenile — disk şifrelemesinin TPM bağı ve kurtarma anahtarı (RFC-0007 §8.5). havenfold-luks-yenile.service
+# her açılışta çalıştırır. Karar lib/luks.js plan'ındadır; bu betik yalnız cryptsetup ve clevis komutlarını çalıştırır.
+#
+#   ilk           : kurtarma anahtarı (32 rastgele bayt) → /var/lib/havenfold/yetki/luks-kurtarma (0600, kök) ve yeni
+#                   yuva (LUKS2 jetonuyla işaretli); PCR 7'ye bağlı yeni Clevis bağı; PCR'sız bağ ve geçici parolanın
+#                   yuvası silinir. Anahtar törenden sonra ebeveyn telefonuna geçer (NODE_RECOVERY) ve dosya silinir.
+#   temizle       : yarım kalmış ilk açılışın artıkları silinir
+#   yeniden-bagla : PCR 7 değişmiş; tty1'de kurtarma anahtarı istenir, bağ yeni değerle kurulur
+set -euo pipefail
+
+KURULUM=${HF_KURULUM:-/usr/lib/havenfold/kurulum}
+YETKI=${HF_YETKI:-/var/lib/havenfold/yetki}
+cli () { "$KURULUM/node" "$KURULUM/lib/cli.js" "$@"; }
+
+umask 077
+R=$(mktemp -d /run/havenfold-luks.XXXXXX)
+trap 'find "$R" -type f -exec shred -u {} + 2>/dev/null; rm -rf "$R"' EXIT
+
+AYGIT=$(awk '!/^#/ && NF >= 2 { print $2; exit }' /etc/crypttab 2>/dev/null || true)
+[ -n "$AYGIT" ] || exit 0 # şifreli disk yok (TPM'siz kurulum ya da var olan Ubuntu)
+case "$AYGIT" in UUID=*) AYGIT=/dev/disk/by-uuid/${AYGIT#UUID=} ;; esac
+
+durum_oku () {
+  cryptsetup luksDump --dump-json-metadata "$AYGIT" > "$R/dump.json"
+  clevis luks list -d "$AYGIT" > "$R/clevis.txt" 2>/dev/null || : > "$R/clevis.txt"
+}
+deger () { "$KURULUM/node" -e "const p=JSON.parse(process.argv[1]);const v=p[process.argv[2]];process.stdout.write(Array.isArray(v)?v.join(' '):String(v??''))" "$PLAN" "$1"; }
+
+durum_oku
+# PCR 7 bağlı yuva TPM'den açılabiliyor mu
+PCR7=""
+for y in $(awk -F: '/tpm2/ && /"pcr_ids":"[^"]*7/ { print $1 }' "$R/clevis.txt"); do
+  if clevis luks pass -d "$AYGIT" -s "$y" > /dev/null 2>&1; then PCR7=evet; else PCR7=${PCR7:-hayir}; fi
+done
+PLAN=$(cli luks-plan --dump "$R/dump.json" --clevis "$R/clevis.txt" ${PCR7:+--pcr7 "$PCR7"})
+# Denetçinin sağlık bildirimi için (NODE_HEALTH platform.disk): kök olmayan denetçi LUKS başlığını okuyamaz. TPM'den
+# açılabilen bağ varsa luks-tpm, yoksa luks (TPM bağsız; denetçi sifresiz sayar ve uyarır)
+install -d -m 0755 /etc/havenfold
+if [ "$PCR7" = evet ] || { [ -z "$PCR7" ] && grep -q tpm2 "$R/clevis.txt"; }; then echo luks-tpm; else echo luks; fi > /etc/havenfold/disk-sifreleme.yeni
+chmod 0644 /etc/havenfold/disk-sifreleme.yeni
+mv /etc/havenfold/disk-sifreleme.yeni /etc/havenfold/disk-sifreleme
+DURUM=$(deger durum)
+echo "havenfold-luks-yenile: $DURUM"
+
+yuva_sil () {
+  local adim
+  for adim in $(deger adimlar); do
+    case "$adim" in
+      clevis-coz:*) clevis luks unbind -f -d "$AYGIT" -s "${adim#clevis-coz:}" ;;
+      yuva-sil:*) cryptsetup luksKillSlot -q "$AYGIT" "${adim#yuva-sil:}" ;;
+    esac
+  done
+}
+
+case "$DURUM" in
+  ilk)
+    # Var olan bir anahtar: PCR'sız Clevis yuvasının parolası (TPM'den)
+    clevis luks pass -d "$AYGIT" -s "$(deger kaynakYuva)" > "$R/kaynak"
+    ANAHTAR="$R/kaynak"
+    if [ -n "$(deger kurtarma)" ]; then
+      echo "Kurtarma yuvası zaten var."
+    else
+      install -d -m 0700 "$YETKI"
+      head -c 32 /dev/urandom > "$YETKI/luks-kurtarma.yeni"
+      chmod 0600 "$YETKI/luks-kurtarma.yeni"
+      cli kurtarma-kodla < "$YETKI/luks-kurtarma.yeni" > "$R/kurtarma"
+      ONCE=$(cli luks-yuvalar --dump "$R/dump.json")
+      cryptsetup luksAddKey -q --key-file "$R/kaynak" "$AYGIT" "$R/kurtarma"
+      durum_oku
+      SONRA=$(cli luks-yuvalar --dump "$R/dump.json")
+      YENI=$(comm -13 <(tr ' ' '\n' <<< "$ONCE" | sort) <(tr ' ' '\n' <<< "$SONRA" | sort) | head -1)
+      [ -n "$YENI" ] || { echo "HATA: kurtarma yuvası bulunamadı" >&2; exit 1; }
+      cli kurtarma-jetonu --yuva "$YENI" > "$R/jeton.json"
+      cryptsetup token import "$AYGIT" --json-file "$R/jeton.json"
+      mv "$YETKI/luks-kurtarma.yeni" "$YETKI/luks-kurtarma"
+      ANAHTAR="$R/kurtarma"
+      echo "Kurtarma anahtarı eklendi (yuva $YENI); törenden sonra ebeveyn telefonuna geçecek."
+    fi
+    clevis luks bind -y -d "$AYGIT" -k "$ANAHTAR" tpm2 '{"pcr_bank":"sha256","pcr_ids":"7"}'
+    yuva_sil
+    echo "TPM bağı PCR 7'ye taşındı; geçici parolanın yuvası silindi."
+    ;;
+  temizle)
+    yuva_sil
+    ;;
+  yeniden-bagla)
+    printf '\nGüvenli önyükleme durumu değişti. Ebeveyn telefonunda "Ev Makinesi → bu cihaz → Kurtarma anahtarı"nı açın\n'
+    printf 've anahtarı yazın (boşluk ve büyük-küçük harf önemsiz).\n'
+    for _ in 1 2 3; do
+      printf 'Kurtarma anahtarı: '
+      IFS= read -rs kod || kod=""
+      printf '\n'
+      # Ekrandaki öbek boşlukları, büyük harf, O/0 ve I/L/1 karışıklığı düzeltilir (Codex 12. tur)
+      printf '%s' "$kod" | cli kurtarma-duzelt > "$R/kurtarma"
+      if cryptsetup open --test-passphrase --key-file "$R/kurtarma" "$AYGIT"; then
+        clevis luks bind -y -d "$AYGIT" -k "$R/kurtarma" tpm2 '{"pcr_bank":"sha256","pcr_ids":"7"}'
+        for adim in $(deger adimlar); do
+          case "$adim" in clevis-coz:*) clevis luks unbind -f -d "$AYGIT" -s "${adim#clevis-coz:}" ;; esac
+        done
+        echo "TPM bağı yeni PCR 7 değeriyle kuruldu."
+        exit 0
+      fi
+      echo "Anahtar tutmadı."
+    done
+    echo "Üç deneme tutmadı; bir sonraki açılışta yeniden sorulacak." >&2
+    exit 1
+    ;;
+  *) exit 0 ;;
+esac

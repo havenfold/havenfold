@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# havenfold-luks-yenile.service — RFC-0007 §4.3, §8.5: her açılışta TPM bağını denetler. İlk açılışta bağı PCR 7'ye
+# taşır, kurtarma anahtarını ekler, geçici parolanın yuvasını siler. PCR 7 değişmişse (Güvenli Önyükleme ayarı ya da
+# anahtar veritabanı) kurtarma anahtarını tty1'de ister ve bağı yeni değerle kurar. Kök; kurulum aracının sabit yolundan.
+[Unit]
+Description=Havenfold disk şifrelemesi TPM bağı
+After=cryptsetup.target local-fs.target
+Before=havenfold-ilk-acilis.service havenfold-denetci.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/havenfold/kurulum/target/hf-luks-yenile
+StandardInput=tty-force
+StandardOutput=journal+console
+TTYPath=/dev/tty1
+TimeoutStartSec=infinity
+NoNewPrivileges=yes
+ProtectHome=yes
+PrivateTmp=yes
+PrivateNetwork=yes
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

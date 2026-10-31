@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# hata-gunlugu — YALNIZ TEST ISO'SU: autoinstall error-commands. Kurulum günlüklerinin sonunu yazar (calistir ile
+# ttyS1'e). Geçici LUKS parolasını içeren satırlar atlanır.
+P=/run/havenfold-kurulum/luks-gecici
+suz () { if [ -s "$P" ]; then grep -avF -f "$P"; else cat; fi; }
+for f in /var/log/installer/subiquity-server-debug.log /var/log/installer/curtin-install.log /var/log/curtin/install.log; do
+  [ -f "$f" ] || continue
+  echo "===== $f (son 150 satır)"
+  tail -n 150 "$f" | suz
+done
+/cdrom/hf-test/autoinstall-goster
+echo "===== /var/log/installer"
+ls -la /var/log/installer 2>/dev/null
+echo "===== journalctl (son 80)"
+journalctl -b --no-pager -n 80 2>/dev/null | suz

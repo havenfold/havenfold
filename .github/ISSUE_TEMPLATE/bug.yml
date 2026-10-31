@@ -1,0 +1,63 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+name: Bug report
+description: Something does not work the way the code, an RFC or the documentation says it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Security problems do not go here.** Report them privately as described in SECURITY.md.
+        You can write in English or Turkish.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      description: If an RFC or a document says how it should behave, link the section.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How can we reproduce it?
+      description: Commands, a failing test, or the smallest steps you can find.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - core (core/*)
+        - phone package (worklet)
+        - node software (node)
+        - installer or erase mode (installer)
+        - task images (images)
+        - SDK (sdk)
+        - demo or scripts
+        - documentation
+        - other or not sure
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Commit or version
+      placeholder: "git rev-parse --short HEAD"
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "OS, Node.js version, Bare version if relevant"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Output or logs
+      render: text

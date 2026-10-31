@@ -1,0 +1,55 @@
+{
+  "name": "@havenfold/worklet",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Havenfold core package for phones: persistent state in a Bare worklet, RFC-0024 frames over Bare Kit IPC, starter",
+  "license": "MPL-2.0",
+  "main": "index.js",
+  "imports": {
+    "#fs": {
+      "bare": "bare-fs",
+      "default": "./fs-node.js"
+    },
+    "#mode": {
+      "ios": "./mode-phone.js",
+      "android": "./mode-phone.js",
+      "default": "./mode-dev.js"
+    }
+  },
+  "scripts": {
+    "test": "brittle-node test/*.js",
+    "test:bare": "brittle-bare test/*.js",
+    "check": "bash scripts/check.sh",
+    "pack": "bash scripts/pack.sh"
+  },
+  "dependencies": {
+    "@havenfold/disaster": "file:../core/disaster",
+    "@havenfold/core": "file:../core/core",
+    "@havenfold/tasks": "file:../core/tasks",
+    "@havenfold/services": "file:../core/services",
+    "@havenfold/export": "file:../core/export",
+    "@havenfold/vault": "file:../core/vault",
+    "@havenfold/records": "file:../core/records",
+    "@havenfold/events": "file:../core/events",
+    "@havenfold/sdk": "file:../sdk",
+    "@havenfold/transport": "file:../core/transport",
+    "@havenfold/edge": "file:../core/edge",
+    "@havenfold/ai": "file:../core/ai",
+    "bare-fs": "4.8.4",
+    "hyperdht": "6.34.1"
+  },
+  "devDependencies": {
+    "bare": "1.33.4",
+    "bare-pack": "2.2.5",
+    "bare-pipe": "4.4.0",
+    "bare-subprocess": "6.2.2",
+    "brittle": "4.5.0",
+    "bare-runtime": "1.33.4"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "overrides": {
+    "bare-runtime": "1.33.4"
+  }
+}

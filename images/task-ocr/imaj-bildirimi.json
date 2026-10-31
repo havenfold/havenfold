@@ -1,0 +1,8 @@
+{
+  "type": "hf.task.ocr",
+  "version": "1.0.0",
+  "ramMB": 1024,
+  "policy": { "ekip": true, "kisiOlcer": false, "yuz": false, "plaka": false },
+  "sourceArchive": true,
+  "caps": { "standing": false, "splittable": true }
+}

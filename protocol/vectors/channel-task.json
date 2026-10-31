@@ -1,0 +1,617 @@
+{
+ "aciklama": "RFC-0002 §14 ve Ek: RFC-0033 §9 s (onaylı, 24 Ekim 2026): görev kanal komutları 250–255 ve 'gorev' olayı (RFC-0024 §2 çerçevesi). Gövde SDK yönteminin adlandırılmış bağımsız değişkenleridir; sonuç yöntemin döndürdüğüdür. params bayt ({ $b }) ya da JSON nesnesi (UTF-8 JSON olarak gider, RFC-0033 §9 q); opts'tan yalnız collectionId, ramMB, minutes, deadline, diskMB, telefondaYapilabilir (kanalda bölme yok). 254 TASK_CONSENT kanal.json'dadır, burada da tablonun parçasıdır. 256–259 boş. Akış: görev vektörlerinin ailesi (core/gorev/test/yardimci/gorev.js; ledger-v21.json ana zincirinin devamı), isteyen Kerem, işçi isci1 (yalnız bildirimi), zaman SIMDI = TS0 + 1 saat, iş tutamacı ve taskId sayaçlı (0xa1, 0xa2 …; gerçekte rastgele). Her adım: uygulamanın isteği ve cevabı ya da işçiden gelen zarf; TaskApi'nin işçiye gönderdiği zarflar (giden: tür, bayt) ve uygulamaya giden olay çerçeveleri. Sunucu worklet/gorev-kanal.js, üretici sdk/test/yardimci/kanal-gorev.js.",
+ "komutlar": [
+  {
+   "no": 250,
+   "ad": "TASK_REQUEST",
+   "govde": [
+    "type",
+    "version",
+    "inputs",
+    "params",
+    "opts"
+   ],
+   "sonuc": [
+    "id",
+    "yer",
+    "taskIds"
+   ],
+   "sonucAdaySiz": [
+    "yer",
+    "hata"
+   ],
+   "sdk": "TaskApi.run"
+  },
+  {
+   "no": 251,
+   "ad": "TASK_CANCEL",
+   "govde": [
+    "id"
+   ],
+   "sonuc": null,
+   "sdk": "TaskApi.cancel"
+  },
+  {
+   "no": 252,
+   "ad": "MACHINE",
+   "govde": [],
+   "sonuc": [
+    "cekirdek",
+    "bellekMB",
+    "bosDiskGB",
+    "acikCihaz",
+    "enBuyukTekIsMB",
+    "calisan"
+   ],
+   "sdk": "TaskApi.machine"
+  },
+  {
+   "no": 253,
+   "ad": "DEVICES",
+   "govde": [],
+   "sonuc": [
+    "deviceId",
+    "class",
+    "name",
+    "status",
+    "cores",
+    "ramTotalMB",
+    "maxTaskRamMB",
+    "battery",
+    "tasks",
+    "running",
+    "consent",
+    "consentAsked"
+   ],
+   "sdk": "TaskApi.devices"
+  },
+  {
+   "no": 254,
+   "ad": "TASK_CONSENT",
+   "govde": [
+    "deviceId",
+    "allow"
+   ],
+   "sonuc": null,
+   "sdk": "TaskApi.consent"
+  },
+  {
+   "no": 255,
+   "ad": "STANDING_START",
+   "govde": [
+    "type",
+    "version",
+    "deviceId",
+    "params",
+    "opts"
+   ],
+   "sonuc": [
+    "id",
+    "taskId"
+   ],
+   "sdk": "TaskApi.startStanding"
+  }
+ ],
+ "bos": [
+  256,
+  257,
+  258,
+  259
+ ],
+ "olay": {
+  "ad": "gorev",
+  "veri": {
+   "progress": [
+    "id",
+    "tur",
+    "pct",
+    "note"
+   ],
+   "result": [
+    "id",
+    "tur",
+    "status",
+    "outputs?",
+    "inline?",
+    "log?",
+    "taskId?",
+    "code?"
+   ],
+   "hata": [
+    "id",
+    "tur",
+    "hata"
+   ]
+  }
+ },
+ "hatalar": {
+  "aileYok": "NO_IDENTITY",
+  "govde": "INVALID_BODY",
+  "bilinmeyenIs": "NO_TASK",
+  "olayHata": "kod değilse INTERNAL_ERROR"
+ },
+ "ailesiz": {
+  "250": "NO_IDENTITY",
+  "251": "NO_IDENTITY",
+  "252": "NO_IDENTITY",
+  "253": "NO_IDENTITY",
+  "254": "NO_IDENTITY",
+  "255": "NO_IDENTITY"
+ },
+ "akis": [
+  {
+   "istek": {
+    "id": 1,
+    "komut": 252,
+    "govde": {}
+   },
+   "cevap": {
+    "id": 1,
+    "sonuc": {
+     "cekirdek": 4,
+     "bellekMB": 8192,
+     "bosDiskGB": 200,
+     "acikCihaz": 1,
+     "enBuyukTekIsMB": 7168,
+     "calisan": []
+    }
+   },
+   "giden": [],
+   "olaylar": []
+  },
+  {
+   "istek": {
+    "id": 2,
+    "komut": 253,
+    "govde": {}
+   },
+   "cevap": {
+    "id": 2,
+    "sonuc": [
+     {
+      "deviceId": "cf0772a29858f662b52a0e408a68784e",
+      "class": "isci",
+      "name": "isci1",
+      "status": "hazir",
+      "cores": 4,
+      "ramTotalMB": 8192,
+      "maxTaskRamMB": 7168,
+      "battery": {
+       "percent": 80,
+       "healthPct": 71,
+       "cycles": 412,
+       "tempC": 31,
+       "onAC": true
+      },
+      "tasks": [
+       "hf.task.ocr",
+       "hf.task.backup",
+       "hf.task.transcribe",
+       "hf.task.vision"
+      ],
+      "running": [],
+      "consent": false,
+      "consentAsked": false
+     }
+    ]
+   },
+   "giden": [],
+   "olaylar": []
+  },
+  {
+   "istek": {
+    "id": 3,
+    "komut": 250,
+    "govde": {
+     "type": "hf.task.ocr",
+     "version": "1.1.0",
+     "inputs": [
+      {
+       "blobId": {
+        "$b": "YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE="
+       },
+       "fileKey": {
+        "$b": "YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmI="
+       },
+       "size": 1048576,
+       "mime": "application/pdf"
+      }
+     ],
+     "params": {
+      "langs": [
+       "tur"
+      ],
+      "output": "text"
+     },
+     "opts": {
+      "collectionId": "31313131313131313131313131313131",
+      "ramMB": 2048,
+      "minutes": 30,
+      "diskMB": 1024,
+      "deadline": 1790007200000
+     }
+    }
+   },
+   "cevap": {
+    "id": 3,
+    "sonuc": {
+     "yer": null,
+     "hata": "NO_ELIGIBLE_DEVICE"
+    }
+   },
+   "giden": [],
+   "olaylar": []
+  },
+  {
+   "istek": {
+    "id": 4,
+    "komut": 254,
+    "govde": {
+     "deviceId": "cf0772a29858f662b52a0e408a68784e",
+     "allow": true
+    }
+   },
+   "cevap": {
+    "id": 4,
+    "sonuc": null
+   },
+   "giden": [],
+   "olaylar": []
+  },
+  {
+   "istek": {
+    "id": 5,
+    "komut": 250,
+    "govde": {
+     "type": "hf.task.ocr",
+     "version": "1.1.0",
+     "inputs": [
+      {
+       "blobId": {
+        "$b": "YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE="
+       },
+       "fileKey": {
+        "$b": "YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmI="
+       },
+       "size": 1048576,
+       "mime": "application/pdf"
+      }
+     ],
+     "params": {
+      "langs": [
+       "tur"
+      ],
+      "output": "text"
+     },
+     "opts": {
+      "collectionId": "31313131313131313131313131313131",
+      "ramMB": 2048,
+      "minutes": 30,
+      "diskMB": 1024,
+      "deadline": 1790007200000
+     }
+    }
+   },
+   "cevap": {
+    "id": 5,
+    "sonuc": {
+     "id": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+     "yer": "isci",
+     "taskIds": [
+      "a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2"
+     ]
+    }
+   },
+   "giden": [
+    {
+     "kime": "cf0772a29858f662b52a0e408a68784e",
+     "tur": 144,
+     "bayt": "a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a200000000000000000000000000000000cf0772a29858f662b52a0e408a68784e0b68662e7461736b2e6f637205312e312e30ee5dcee7a71a87c7bd1c2dc3a5748e2e0161616161616161616161616161616161616161616161616161616161616161616262626262626262626262626262626262626262626262626262626262626262fe000010000f6170706c69636174696f6e2f706466217b226c616e6773223a5b22747572225d2c226f7574707574223a2274657874227d313131313131313131313131313131311eff0049bec4a0010000fd00081efd000400003700b5c948e4d76b5f726d71b2498f06e0258f350b919169027bca77fefcf77633b5ffceae39eef74ee56ccb3ee8b6881df7e3a6880b1185d9f0e3031a218509"
+    }
+   ],
+   "olaylar": []
+  },
+  {
+   "gelen": {
+    "ad": "TASK_ACCEPT",
+    "kimden": "cf0772a29858f662b52a0e408a68784e",
+    "tur": 145,
+    "bayt": "a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a25a"
+   },
+   "giden": [],
+   "olaylar": []
+  },
+  {
+   "gelen": {
+    "ad": "TASK_PROGRESS",
+    "kimden": "cf0772a29858f662b52a0e408a68784e",
+    "tur": 147,
+    "bayt": "a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a23e087361796661203137"
+   },
+   "giden": [],
+   "olaylar": [
+    {
+     "olay": "task",
+     "veri": {
+      "id": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+      "tur": "progress",
+      "pct": 62,
+      "note": "sayfa 17"
+     }
+    }
+   ]
+  },
+  {
+   "gelen": {
+    "ad": "TASK_RESULT",
+    "kimden": "cf0772a29858f662b52a0e408a68784e",
+    "tur": 148,
+    "bayt": "a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2026f6b001a4b6972612073c3b67a6c65c59f6d6573692c20736179666120310d6f63726d797064662031362e30"
+   },
+   "giden": [],
+   "olaylar": [
+    {
+     "olay": "task",
+     "veri": {
+      "id": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+      "tur": "result",
+      "taskId": {
+       "$b": "oqKioqKioqKioqKioqKiog=="
+      },
+      "status": "ok",
+      "outputs": [],
+      "inline": {
+       "$b": "S2lyYSBzw7Z6bGXFn21lc2ksIHNheWZhIDE="
+      },
+      "log": "ocrmypdf 16.0"
+     }
+    }
+   ]
+  },
+  {
+   "istek": {
+    "id": 6,
+    "komut": 250,
+    "govde": {
+     "type": "hf.task.ocr",
+     "version": "1.1.0",
+     "inputs": [
+      {
+       "blobId": {
+        "$b": "YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE="
+       },
+       "fileKey": {
+        "$b": "YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmI="
+       },
+       "size": 1048576,
+       "mime": "application/pdf"
+      }
+     ],
+     "params": {
+      "langs": [
+       "tur"
+      ],
+      "output": "text"
+     },
+     "opts": {
+      "collectionId": "31313131313131313131313131313131",
+      "ramMB": 2048,
+      "minutes": 30,
+      "diskMB": 1024,
+      "deadline": 1790007200000
+     }
+    }
+   },
+   "cevap": {
+    "id": 6,
+    "sonuc": {
+     "id": "a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3",
+     "yer": "isci",
+     "taskIds": [
+      "a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4"
+     ]
+    }
+   },
+   "giden": [
+    {
+     "kime": "cf0772a29858f662b52a0e408a68784e",
+     "tur": 144,
+     "bayt": "a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a400000000000000000000000000000000cf0772a29858f662b52a0e408a68784e0b68662e7461736b2e6f637205312e312e30ee5dcee7a71a87c7bd1c2dc3a5748e2e0161616161616161616161616161616161616161616161616161616161616161616262626262626262626262626262626262626262626262626262626262626262fe000010000f6170706c69636174696f6e2f706466217b226c616e6773223a5b22747572225d2c226f7574707574223a2274657874227d313131313131313131313131313131311eff0049bec4a0010000fd00081efd00040000ab1e44613dbe0579dc20636e3f7b15ebe202463e61584a693d1d9ea4f0314e0061181f9ce513faf8d7ba0f9d017a7eef5fb1f6ca498fe869476791225dec7a0b"
+    }
+   ],
+   "olaylar": []
+  },
+  {
+   "istek": {
+    "id": 7,
+    "komut": 251,
+    "govde": {
+     "id": "a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3"
+    }
+   },
+   "cevap": {
+    "id": 7,
+    "sonuc": null
+   },
+   "giden": [
+    {
+     "kime": "cf0772a29858f662b52a0e408a68784e",
+     "tur": 149,
+     "bayt": "a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4a4ee5dcee7a71a87c7bd1c2dc3a5748e2e89e865056ecc1ecf2455ef1ee8d6abe14aeb39cffccb1e7462305cf3bde783545334e7dbf04886b1c6acc475c91fb94a572e262d2d421aabc2df7c2832dea103"
+    }
+   ],
+   "olaylar": [
+    {
+     "olay": "task",
+     "veri": {
+      "id": "a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3",
+      "tur": "result",
+      "status": "iptal"
+     }
+    }
+   ]
+  },
+  {
+   "istek": {
+    "id": 8,
+    "komut": 251,
+    "govde": {
+     "id": "a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3"
+    }
+   },
+   "cevap": {
+    "id": 8,
+    "sonuc": null
+   },
+   "giden": [],
+   "olaylar": []
+  },
+  {
+   "istek": {
+    "id": 9,
+    "komut": 251,
+    "govde": {
+     "id": "00000000000000000000000000000000"
+    }
+   },
+   "cevap": {
+    "id": 9,
+    "hata": "NO_TASK"
+   },
+   "giden": [],
+   "olaylar": []
+  },
+  {
+   "istek": {
+    "id": 10,
+    "komut": 250,
+    "govde": {
+     "type": "hf.task.ocr",
+     "version": "1.1.0",
+     "inputs": [
+      {
+       "blobId": {
+        "$b": "YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWE="
+       },
+       "fileKey": {
+        "$b": "YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmI="
+       },
+       "size": 1048576,
+       "mime": "application/pdf"
+      }
+     ],
+     "params": {
+      "langs": [
+       "tur"
+      ],
+      "output": "text"
+     },
+     "opts": {
+      "collectionId": "kasa",
+      "ramMB": 2048,
+      "minutes": 30,
+      "diskMB": 1024,
+      "deadline": 1790007200000
+     }
+    }
+   },
+   "cevap": {
+    "id": 10,
+    "hata": "INVALID_BODY"
+   },
+   "giden": [],
+   "olaylar": []
+  },
+  {
+   "istek": {
+    "id": 11,
+    "komut": 250,
+    "govde": {
+     "type": "hf.task.ocr",
+     "version": "1.1.0",
+     "inputs": [
+      {
+       "blobId": {
+        "$b": "AA=="
+       },
+       "fileKey": {
+        "$b": "YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmI="
+       },
+       "size": 1048576,
+       "mime": "application/pdf"
+      }
+     ],
+     "params": {
+      "langs": [
+       "tur"
+      ],
+      "output": "text"
+     },
+     "opts": {
+      "collectionId": "31313131313131313131313131313131",
+      "ramMB": 2048,
+      "minutes": 30,
+      "diskMB": 1024,
+      "deadline": 1790007200000
+     }
+    }
+   },
+   "cevap": {
+    "id": 11,
+    "hata": "INVALID_BODY"
+   },
+   "giden": [],
+   "olaylar": []
+  },
+  {
+   "istek": {
+    "id": 12,
+    "komut": 255,
+    "govde": {
+     "type": "hf.task.vision",
+     "version": "1.0.0",
+     "deviceId": "cf0772a29858f662b52a0e408a68784e",
+     "params": {
+      "kaynak": "kapi"
+     },
+     "opts": {
+      "collectionId": "34343434343434343434343434343434",
+      "ramMB": 512,
+      "deadline": 1790090000000
+     }
+    }
+   },
+   "cevap": {
+    "id": 12,
+    "sonuc": {
+     "id": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5",
+     "taskId": "a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6"
+    }
+   },
+   "giden": [
+    {
+     "kime": "cf0772a29858f662b52a0e408a68784e",
+     "tur": 144,
+     "bayt": "a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a600000000000000000000000000000000cf0772a29858f662b52a0e408a68784e0e68662e7461736b2e766973696f6e05312e302e30ee5dcee7a71a87c7bd1c2dc3a5748e2e00117b226b61796e616b223a226b617069227d343434343434343434343434343434341eff80b6adc9a0010000fd000200000100f966802c7b2629b4e49e01aceecd50e5c39cf11bcd2625130c11fc8defca514da68fd152005b4b8033655ae49bc10a7c66746a7e09a612ba5fd966ba76e6cf07"
+    }
+   ],
+   "olaylar": []
+  },
+  {
+   "istek": {
+    "id": 13,
+    "komut": 254,
+    "govde": {
+     "deviceId": "cf0772a29858f662b52a0e408a68784e",
+     "allow": "evet"
+    }
+   },
+   "cevap": {
+    "id": 13,
+    "hata": "INVALID_BODY"
+   },
+   "giden": [],
+   "olaylar": []
+  }
+ ]
+}

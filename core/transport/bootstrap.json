@@ -1,0 +1,9 @@
+{
+ "aciklama": "RFC-0028 §7 e (D74): önyükleme düğümleri sürümle gelir, uzaktan değiştirilmez. genel: HyperDHT 6.34.1'in genel düğümleri (DHT.BOOTSTRAP ile aynı; test denetler). eserx: EserX'in yedek düğümleri (adresler Kerem'den gelecek; şimdilik boş). Biçim: \"ip@ad:port\" ya da \"ad:port\".",
+ "genel": [
+  "88.99.3.86@node1.hyperdht.org:49737",
+  "142.93.90.113@node2.hyperdht.org:49737",
+  "138.68.147.8@node3.hyperdht.org:49737"
+ ],
+ "eserx": []
+}

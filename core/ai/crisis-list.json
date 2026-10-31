@@ -1,0 +1,219 @@
+{
+ "surum": 3,
+ "aciklama": "RFC-0013 §12 kriz tespitinin kural listesi. Tek sahibi çekirdektir; ürünler bu dosyanın kopyasını kullanır. Kalıplar düzenli ifadedir ve katlanmış metne uygulanır: N(metin), sonra ç→c ğ→g ı→i ö→o ş→s ü→u â→a î→i û→u, üç ve daha çok yinelenen harf bire iner. Bir küme, kalıplarından biri eşleşir ve 'haric' kalıplarından hiçbiri metinde geçmezse tetiklenir. Model yalnız tespit ekler.",
+ "kumeler": [
+  {
+   "ad": "olme-istegi",
+   "kaliplar": [
+    "\\bol(mek|esim|meyi|em|mem)\\b",
+    "\\bolmek ?ist",
+    "\\bol(sem|seydim|ucem|ecem|ecegim|ucegim|cem)\\b",
+    "\\bolunur\\b",
+    "\\byasa(mak|mayi|mayi bile)? ?istemiyo",
+    "\\byasamanin (bi|bir) (anlami|degeri) yok",
+    "\\byasamaktan (yoruldum|biktim|sikildim)",
+    "\\bnefes almak (bile )?istemiyo",
+    "\\bdogmasa(ydim|ydim keske)",
+    "\\b(yok|kaybol) ?olmak ist",
+    "\\bkaybolmak ist",
+    "\\bkendimi birakmak ist",
+    "\\bher seyi bitir(ecegim|icem|ecem|mek ist)",
+    "\\b(her seye|hayatima|bu hayata) son ver",
+    "\\bhayattan kurtul",
+    "\\bbensiz (daha )?(mutlu|iyi|rahat)",
+    "\\bveda mektub",
+    "\\bson kez konusuyoruz\\b",
+    "\\b(canima|kendime|kendimi) kiy",
+    "\\b(bi|bir|hic) daha uyanmasam",
+    "\\bkeske (hic )?uyanmasam",
+    "\\bdunyada (olmak|kalmak|yasamak) istemiyo",
+    "\\byasamaya devam ede(mem|miyorum|meyecegim)",
+    "\\bolmek en iyisi",
+    "\\bsonsuza (kadar|dek) (uyu|uyumak|kaybol|yok ol)",
+    "\\b(uyumak|uyuyup|kaybolmak|yok olmak)[a-z ]{0,25}sonsuza (kadar|dek)",
+    "\\bcanimi al(mak|ica|aca|sin|in)",
+    "\\b(yarini|yarin sabahi|sabahi|yeni gunu) gormek istemiyo",
+    "\\byasamanin\\b[a-z ]{0,20}\\b(anlami|degeri)\\b[a-z ]{0,10}\\b(yok|kalmadi)",
+    "\\bol(sem|ursem|dugumde|sem bile)\\b[a-z ]{0,30}\\b(kimse|fark|ozlemez|uzulmez|rahatlar|kurtulur|mutlu)",
+    "\\b(kimse|hic kimse)\\b[a-z ]{0,30}\\bol(sem|ursem)\\b",
+    "\\bkendimi yok et",
+    "\\b(bogulmak|olmek|kaybolmak|yok olmak|yasamamak) ist",
+    "\\b(hayatimi|kendimi) (sonlandir|bitir)",
+    "\\bolmemi ist",
+    "\\byoklugum[a-z]* (fark etmez|kimseyi uzmez|daha iyi)",
+    "\\b(yarin|artik) (burada )?olmayacag",
+    "\\bolumu dusun",
+    "\\bipi hazirladim\\b",
+    "\\bolum (tek|son) (care|cikis|yol)",
+    "\\b(bir daha )?kimse (beni )?(bir daha )?gormeyecek",
+    "\\bher sey bitsin ist",
+    "\\b(yemek|yemeyi|icmeyi)[a-z ]{0,25}olene kadar"
+   ],
+   "haric": [
+    "\\b(gulmekten|acliktan|sicaktan|soguktan|heyecandan|uykusuzluktan|sikintidan|meraktan|utanctan|stresten|sinirden|mutluluktan|sevincten|yorgunluktan|uykudan) ol",
+    "\\bol\\w*\\b.{0,25}\\b(gulmekten|acliktan|sicaktan|soguktan|heyecandan|uykusuzluktan|sikintidan|meraktan|utanctan|stresten|sinirden|mutluluktan|sevincten|yorgunluktan|uykudan)",
+    "\\bolmeden once\\b",
+    "\\bkaybolmak ist\\w*\\b.{0,30}\\b(kamp|tatil|orman|daga|koye|gezi|seyahat|kitap|oyun)\\w*",
+    "\\b(ucurtma|atlama ipi|camasir)"
+   ]
+  },
+  {
+   "ad": "intihar",
+   "kaliplar": [
+    "\\bint[ia]h?a?r"
+   ],
+   "haric": [
+    "\\b(belgesel|roman|film|dizi|karakter|kitap|ormani|haber|odev|sosyoloji|edebiyat|sair|siir|oran|tiyatro|konulu|farkindalik|kampanya)"
+   ]
+  },
+  {
+   "ad": "kendini-oldurme",
+   "kaliplar": [
+    "\\bkendi(mi|ni)( [a-z]+){0,2} (oldur|atic|atac|atarim|atmay|atmak|atlay|atlic|as(may|mak|ic|acag|arim)|vurur|birak(acag|icam|irim)|vuracag|vuricam)",
+    "\\b(balkon|kopru|cati|pencere|bina|kat)[a-z]* ([a-z]+ )?atla(may|mak|ic|yac|dim)",
+    "\\bkendini oldur"
+   ],
+   "haric": [
+    "N:\\bkendi(mi|ni) aş"
+   ]
+  },
+  {
+   "ad": "ilac-zehir",
+   "kaliplar": [
+    "\\bilac[a-z]* (hepsini|kutusunu|tumunu|tamamini) (ic|yut)",
+    "\\bhap[a-z]* (yut|biriktir|sayisi)",
+    "\\b(bir|bi) kutu hap\\b",
+    "\\bkendimi zehirle",
+    "\\bzehir (icicem|icecegim|ictim|icmek ist)",
+    "\\b(butun|tum|hepsini|bir kutu|kutu kutu) (ilac|hap)[a-z]* (yut|ic)",
+    "\\b(ilac|hap)[a-z]* (yut(acag|icam|tum|arim|tu)|icip olmek|ile olmek)"
+   ]
+  },
+  {
+   "ad": "kendine-zarar",
+   "kaliplar": [
+    "\\bkendi(mi|me)( [a-z]+){0,2} (kes|yak|yaral|zarar|cezalandir|kanat|yumruk|vur|tokat|yap(mak|maktan))",
+    "\\bkanatiyorum kendimi",
+    "\\b(kol|kollar|bilek|bacak|bacaklar)(imi|umu|larimi|lerimi|igimi|gimi)? kes",
+    "\\byine kestim",
+    "\\bkesik iz",
+    "\\bcanim acisin",
+    "\\bkafami duvara vur(up|uyorum|dum)",
+    "\\b(kendime|kendimi|koluma|bilegime|bacagima|kollarima|bacaklarima)( [a-z]+){0,2} (zarar|cizik|kes|yak|igne|jilet|bicak)",
+    "\\bjilet[a-z]*( [a-z]+){0,2} (kes|cizd|cizi|kanat)",
+    "\\bjilet sakl",
+    "\\b(kol|bilek|bileg|bacak|bacag)[a-z]* kes(m|t|iyo|ic|ece)",
+    "\\b(bilek|bileg|kol|bacak|bacag)[a-z]*( [a-z]+){0,2} (kes|kanat|kazi|ciz)",
+    "\\bjilet (at(tim|iyorum|iyom|arim|tik|icam|acagim|ti)|cek(tim|iyorum))",
+    "\\bjiletle(dim|nedim|iyorum)\\b",
+    "\\bkendime jilet"
+   ],
+   "haric": [
+    "\\b(dustum|dustu|carpti|carptim|kaza|bisiklet|kaykay|paten|mac|antrenman)\\w*",
+    "\\b(disci|doktor|hemsire|asi|hastane|eczane|kuafor)\\w*",
+    "\\b(kizarti|sebze|meyve|ekmek|kagit|karton|kumas|pasta|domates)\\w*"
+   ]
+  },
+  {
+   "ad": "cinsel-istismar",
+   "kaliplar": [
+    "\\bbana( [a-z]+){0,2} (dokun|ellesi|elledi|ellesti|parmak at|sarkint)",
+    "\\b(ellesiyo|elledi|ellesti)",
+    "\\bozel yer",
+    "\\b(pipimi|popomu|gogsumu|memelerimi|kalcami)( [a-z]+)? (tut|elle|dokun|sik)",
+    "\\bgece[a-z]* odama gir",
+    "\\bzorla( [a-z]+)? (opt|soy|dokun|yat)",
+    "\\bistemedigim halde",
+    "\\bsoyun(maya|durdu|dur)",
+    "\\b(fotograf|video|resim)[a-z]* yay(arim|acak|icam|acagim)",
+    "\\btecavuz",
+    "\\btaciz",
+    "\\bbeni( [a-z]+)? zorl(a|uyo|adi|adilar)",
+    "\\bbeni rahatsiz ed",
+    "\\bbulusalim diyo",
+    "\\b(kimseye|annene|babana|ailene) (soyleme|anlatma) (dedi|diyo|demis|dediler)",
+    "\\b(kimseye|annene|babana|ailene) (soylersen|anlatirsan)",
+    "\\bciplak(ken| (foto|resim|video|goruntu|halde|halimi))",
+    "\\bciplak[a-z]* (foto|resim|video|goruntu)",
+    "\\b(arabasina|arabaya|eve) (zorla )?(cek|bindir)(meye|di|mek)",
+    "\\belli(yo|yor)",
+    "\\bzorla( [a-z]+)? (saril|elle|sik|bindir)",
+    "\\b(banyoda|soyunurken|tuvalette)[a-z ]{0,20}\\b(cek|kayd|video)",
+    "\\b(dokun|elle)maya calis",
+    "\\byatagina (cagir|cek|gel)",
+    "\\b(kimseye|annene|babana|ailene) (soylememi|anlatmamami) (istedi|istiyo|soyledi|tembihledi)"
+   ],
+   "haric": [
+    "\\bsarki(lar|lari|yi|si|da|mi)?\\b",
+    "\\bkomik",
+    "\\b(filmde|dizide|haberde|haberlerde|belgeselde|farkindalik|egitimi|egitiminde|kampanya)\\w*\\b"
+   ]
+  },
+  {
+   "ad": "fiziksel-siddet",
+   "kaliplar": [
+    "\\bdov(uyo|du|ec|ul|er\\b|mus|meye|eceg)",
+    "\\bseni oldur(urum|ucem|ecegim)",
+    "\\bbog(maya|du|uyor|acak|dular)\\b",
+    "\\bbogaz[a-z]* sik(ti|iyo)",
+    "\\bbicak cek",
+    "\\bsiddet(e|ten)?( [a-z]+)? (gor|ugra|kork)",
+    "\\bcanimi yak",
+    "\\b(odaya|beni|eve) kilitl",
+    "\\btokat (yiyo|atiyo|atti|yedim)",
+    "\\b(kolumu|bacagimi|burnumu|kafami|disimi) kirdi",
+    "\\bbeni( [a-z]+)? yakti\\b",
+    "\\b[a-z]*den korkuyorum beni",
+    "\\bbana( [a-z]+){0,2} vur(uyo|du\\b|dular|ur\\b|acak)",
+    "\\btokatl(iyo|adi|ar)",
+    "\\b(bicak|silah|sopa)[a-z]* (ile |la |le )?tehdit",
+    "\\btehdit ed(iyo|ti|iyorlar|ildim)",
+    "\\boldurmekle tehdit",
+    "\\bsiddet uygul",
+    "\\b(bicag|jilet|bicak)[a-z]* (bilegime|boynuma|koluma|bogazima) daya",
+    "\\b(beni|bizi|onu|kardesimi)( [a-z]+){0,3} ac birak",
+    "\\b(beni|bana|bizi|annemi|anneme|kardesimi|kardesime|babami)\\b[a-z ]{0,40}\\b(yumrukl|tekmel|kirbacl|bicakl|surukl|firlatt|kilitl|tokatl|dov|vurd|vuruy|bogazla|kapatt|kapatiyo|hapsed|hapsett|bogm|bogd|yakt|yakiyo|it(ti|iyo|tiler)\\b)",
+    "\\bsacim(dan|i) (cek|surukl|yol)",
+    "\\bevden at(ti|ip|tilar|acak)",
+    "\\belinde (bicak|silah|sopa)",
+    "\\b(kafama|yuzume|karnima|sirtima|basima)( [a-z]+)? vur(du|uyo|dular|ur\\b)",
+    "\\b(odama|odaya|eve)( [a-z]+)? kilitl",
+    "\\byemek vermiyo"
+   ],
+   "haric": [
+    "\\boyun(da|un|u)\\b",
+    "\\b(film|dizi|karakter)[a-z]*\\b",
+    "\\bkurban",
+    "\\b(gulerek|guldum|guldu|gulduk|guluyorduk|kahkaha)\\b",
+    "\\b(havuza|suya|denize|kuma|cimlere|yataga) it"
+   ]
+  },
+  {
+   "ad": "olum-tehdidi",
+   "kaliplar": [
+    "\\b(beni|bizi|onu|annemi) oldur(ecek|ur|uce)"
+   ],
+   "haric": [
+    "\\b(kirdim|dusurdum|bozdum|kaybettim|gelmem|dokturdum|unuttum)\\b",
+    "\\b[a-z]+(irsa|ursa|arsa|ersa|irse|urse|arse|erse|azsa|ezse|maz|mez)(m|n|k|niz)?\\b",
+    "\\boyun",
+    "\\b(bu|su|o) (bulmaca|odev|ders|sinav|oyun|film|is|soru|sicak|soguk|yorgunluk|trafik|kuyruk|bekleme|proje|dizi|sarki)\\w*\\b",
+    "\\b(odev|bulmaca|ders|sinav|proje|is|trafik|merak)\\w* (beni|bizi) oldur",
+    "\\b(gulerek|saka|sakadan|sakaci)\\b",
+    "\\b(kir|ciz|dok|boz|kaybet|unut|kacir|batir|lekele|dusur|yirt|kopar|patlat|harca|sil)(dim|dik|tim|tik|dum|duk|tum|tuk)\\b",
+    "\\b[a-z]+(madim|medim|madik|medik)\\b"
+   ]
+  },
+  {
+   "ad": "zorbalik",
+   "kaliplar": [
+    "\\bolsen\\b",
+    "\\bgeber",
+    "\\bkendini oldur"
+   ],
+   "haric": [
+    "\\b(karakter|oyun|film|dizi|sarki|replik)"
+   ]
+  }
+ ]
+}

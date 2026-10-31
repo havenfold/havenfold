@@ -1,0 +1,282 @@
+{
+ "aciklama": "Uygulama ile çekirdek kanalının komut aralıkları (RFC-0003 §10 'Çekirdek komutları' satırı, RFC-0024, RFC-0027 §1a ve §2). 0–239 Yuva Hat çizelgesidir (packages/protocol/komutlar.js, a3df134): orada kullanılan numara yalnız aynı adla taşınır; 200–239'un boş kalanı Yuva Hat'ın büyüme alanıdır, ürün yöntemleri oraya girmez. sdk: true olan aralıklara SDK kanal komutu verilebilir. sdk/test/komut.js CHANNEL_COMMAND'u bu tabloyla denetler. rfc: aralığın numaralarını tanımlayan RFC'ler; sira: numaraların sırası RFC'de değil geçerli tabloda (channel-v4.json). sdk/test/command-ranges.js her numaranın bu RFC'lerde ya da tabloda yazılı olduğunu ve başka bir RFC onu \"ayrılmış\" sayıyorsa aralığın RFC'sinin onu etkilenenler arasında andığını denetler (D36, inceleme 13).",
+ "yuvaHatCizelgesi": {
+  "EVENT": 0,
+  "START": 1,
+  "CREATE_FAMILY": 2,
+  "INVITE_START": 3,
+  "INVITE_CONFIRM": 4,
+  "JOIN": 5,
+  "SEND": 6,
+  "INBOX_DRAIN": 7,
+  "CALL_START": 8,
+  "CALL_ANSWER": 9,
+  "CALL_END": 10,
+  "PTT_BEGIN": 11,
+  "PTT_END": 12,
+  "MEMBER_REMOVE": 13,
+  "LEDGER_SIGN": 14,
+  "MAILBOX_SYNC": 15,
+  "BELL_TICKET_REG": 16,
+  "BOX_MODE_START": 17,
+  "BOX_MODE_STOP": 18,
+  "LOCK": 19,
+  "WIPE": 20,
+  "BELL_KEYS": 21,
+  "CONV_LIST": 22,
+  "CALL_HISTORY": 23,
+  "MEDIA_OUT": 30,
+  "MEDIA_KEY": 31,
+  "SPIKE_STATUS": 100,
+  "SPIKE_CONNECT": 101,
+  "SPIKE_PROBE": 102,
+  "SPIKE_STOP": 103,
+  "FAMILY_INFO": 200,
+  "MEMBERS": 201,
+  "MEMBERS_DETAIL": 202,
+  "PENDING_REMOTE": 203,
+  "SET_PAKET": 204,
+  "INVITE_CANCEL": 205,
+  "MSG_LIST": 206,
+  "MSG_READ": 207,
+  "CONV_TTL_GET": 208,
+  "CONV_TTL_SET": 209,
+  "MSG_DELETE": 210,
+  "CALL_DECLINE": 211,
+  "PTT_CANCEL": 212,
+  "SERVERLESS_ONLY": 213,
+  "TRANSPORT_DETAIL": 214,
+  "BOX_STATUS": 215,
+  "STATUS": 216,
+  "ATTACHMENT_GET": 217,
+  "MEMBER_ACTIVATE": 218,
+  "NET_CHANGE": 219,
+  "WAKE": 220,
+  "MEDIA_KEYREQ": 221,
+  "READ_RECEIPTS": 222,
+  "CONV_FOR": 223,
+  "UNLOCK": 224,
+  "PROPOSALS": 225,
+  "PROPOSAL_REJECT": 226,
+  "SETTINGS_GET": 227,
+  "SETTINGS_SET": 228
+ },
+ "araliklar": [
+  {
+   "bas": 0,
+   "son": 239,
+   "sahip": "Yuva Hat çizelgesi",
+   "sdk": false,
+   "not": "yalnız yuvaHatCizelgesi'ndeki adla",
+   "rfc": []
+  },
+  {
+   "bas": 240,
+   "son": 249,
+   "sahip": "RFC-0001 kayıt (RFC-0024 §3)",
+   "sdk": true,
+   "rfc": [
+    "RFC-0001",
+    "RFC-0024",
+    "RFC-0027"
+   ]
+  },
+  {
+   "bas": 250,
+   "son": 259,
+   "sahip": "RFC-0002 görev",
+   "sdk": true,
+   "rfc": [
+    "RFC-0002",
+    "RFC-0025"
+   ]
+  },
+  {
+   "bas": 260,
+   "son": 269,
+   "sahip": "RFC-0006 olay",
+   "sdk": true,
+   "rfc": [
+    "RFC-0006"
+   ]
+  },
+  {
+   "bas": 270,
+   "son": 279,
+   "sahip": "RFC-0013 yapay zeka",
+   "sdk": true,
+   "rfc": [
+    "RFC-0013",
+    "RFC-0025"
+   ]
+  },
+  {
+   "bas": 280,
+   "son": 289,
+   "sahip": "RFC-0005 ekip (280–287 TeamApi, 288–289 köprü)",
+   "sdk": true,
+   "rfc": [
+    "RFC-0005"
+   ]
+  },
+  {
+   "bas": 290,
+   "son": 299,
+   "sahip": "RFC-0009",
+   "sdk": false,
+   "rfc": [
+    "RFC-0009"
+   ]
+  },
+  {
+   "bas": 300,
+   "son": 309,
+   "sahip": "RFC-0010",
+   "sdk": true,
+   "rfc": [
+    "RFC-0010"
+   ]
+  },
+  {
+   "bas": 310,
+   "son": 319,
+   "sahip": "RFC-0012",
+   "sdk": false,
+   "rfc": [
+    "RFC-0012"
+   ]
+  },
+  {
+   "bas": 320,
+   "son": 329,
+   "sahip": "RFC-0011",
+   "sdk": false,
+   "rfc": [
+    "RFC-0011"
+   ]
+  },
+  {
+   "bas": 330,
+   "son": 339,
+   "sahip": "RFC-0007",
+   "sdk": false,
+   "rfc": [
+    "RFC-0007"
+   ]
+  },
+  {
+   "bas": 340,
+   "son": 349,
+   "sahip": "RFC-0008",
+   "sdk": true,
+   "rfc": [
+    "RFC-0008"
+   ]
+  },
+  {
+   "bas": 350,
+   "son": 359,
+   "sahip": "RFC-0015 SDK ortak (352–359 ürün yöntemleri, RFC-0027 §1a)",
+   "sdk": true,
+   "rfc": [
+    "RFC-0015",
+    "RFC-0027"
+   ]
+  },
+  {
+   "bas": 360,
+   "son": 364,
+   "sahip": "RFC-0017 eşleşme",
+   "sdk": true,
+   "rfc": [
+    "RFC-0017"
+   ]
+  },
+  {
+   "bas": 365,
+   "son": 369,
+   "sahip": "RFC-0027 §1a kasa ürün yöntemleri",
+   "sdk": true,
+   "rfc": [
+    "RFC-0027"
+   ]
+  },
+  {
+   "bas": 370,
+   "son": 389,
+   "sahip": "RFC-0027 §1a bakım, Kalkan, yerel kanal ve kalan ürün yöntemleri",
+   "sdk": true,
+   "rfc": [
+    "RFC-0027"
+   ],
+   "sira": "channel-v4.json"
+  },
+  {
+   "bas": 390,
+   "son": 399,
+   "sahip": "RFC-0027 §2 kap ve dışa aktarma",
+   "sdk": true,
+   "rfc": [
+    "RFC-0027"
+   ]
+  },
+  {
+   "bas": 400,
+   "son": 409,
+   "sahip": "RFC-0027 §1a kasa kurtarma ve döndürme (RFC-0004 §5–§6, D67; 405 tabloda)",
+   "sdk": true,
+   "rfc": [
+    "RFC-0027"
+   ],
+   "sira": "channel-v4.json"
+  },
+  {
+   "bas": 410,
+   "son": 419,
+   "sahip": "RFC-0030 misafirin sınırlı yazması (410–413, 414–419 ayrılmış)",
+   "sdk": true,
+   "rfc": [
+    "RFC-0030"
+   ]
+  },
+  {
+   "bas": 420,
+   "son": 429,
+   "sahip": "RFC-0034 bir telefonda birden çok aile (420–422; 423–425 D93–D94; 426–429 ayrılmış)",
+   "sdk": true,
+   "rfc": [
+    "RFC-0034"
+   ]
+  },
+  {
+   "bas": 430,
+   "son": 439,
+   "sahip": "RFC-0003 §5.4 defter: varlık (430 BEING_ADD, 431 BEING_REMOVE; 432–439 ayrılmış)",
+   "sdk": true,
+   "rfc": [
+    "RFC-0003"
+   ],
+   "sira": "asset.json"
+  },
+  {
+   "bas": 440,
+   "son": 449,
+   "sahip": "RFC-0003 §5.5 defter: bakıcı (440 CAREGIVER_LIST, 441 CAREGIVER_REMOVE; 442–449 ayrılmış)",
+   "sdk": true,
+   "rfc": [
+    "RFC-0003"
+   ],
+   "sira": "guest-ceremony.json"
+  },
+  {
+   "bas": 450,
+   "son": 459,
+   "sahip": "RFC-0003 §5.1 defter: uzaktan üye (450 REMOTE_MEMBER_ACTIVATE, 451 MEMBER_REVOKE; 452–459 ayrılmış; D106)",
+   "sdk": true,
+   "rfc": [
+    "RFC-0003"
+   ],
+   "sira": "remote-decision.json"
+  }
+ ]
+}

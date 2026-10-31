@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# hf-ilk-acilis — ilk açılış (RFC-0007 §9). havenfold-ilk-acilis.service tty1'de çalıştırır; kök.
+#
+#   1 disk TPM'den açıldı (havenfold-luks-yenile bu açılışta bağı PCR 7'ye taşıdı)   2 ağ (kablolu yoksa Wi-Fi)
+#   3 saat eşitlemesi (60 sn)   4 yönetici parolası (≥ 12 karakter)   5 durum özeti   6 rol   7 kimlikler ve hostId
+#   8 tören (havenfold katil)   9 kök parmak izi denetimi telefonda   10 kurtarma anahtarı çekirdekten telefona
+#   11 görev imajları denetçide, arka planda   12 birim kendini kapatır, durum ekranına geçilir
+# Wi-Fi parolası USB'de hiç olmaz; burada sorulur ve netplan dosyasına 0600 yazılır.
+set -uo pipefail
+
+KURULUM=${HF_KURULUM:-/usr/lib/havenfold/kurulum}
+cli () { "$KURULUM/node" "$KURULUM/lib/cli.js" "$@"; }
+adim () { printf '\n— %s\n' "$1"; }
+umask 077
+
+clear 2>/dev/null || true
+printf 'Havenfold ilk açılış\n'
+
+# 2. Ağ
+varsayilan_yol () { ip -4 route show default 2>/dev/null | grep -q . || ip -6 route show default 2>/dev/null | grep -q .; }
+kablolu () { local i; for i in /sys/class/net/*; do [ -d "$i/wireless" ] && continue; [ "$(basename "$i")" = lo ] && continue; [ "$(cat "$i/carrier" 2>/dev/null)" = 1 ] && return 0; done; return 1; }
+adim "Ağ"
+AG=yok
+for _ in $(seq 1 20); do varsayilan_yol && break; sleep 1; done
+if varsayilan_yol && kablolu; then
+  AG=kablolu
+  echo "Kablolu ağ bağlı."
+else
+  WIFI=$(for i in /sys/class/net/*; do [ -d "$i/wireless" ] && basename "$i"; done | head -1)
+  if [ -z "$WIFI" ]; then
+    echo "Ağ yok ve Wi-Fi kartı bulunamadı. Kablo takın; kapalı sürücü isteyen Wi-Fi kartlarında kablolu ağ gerekir."
+  else
+    while ! varsayilan_yol; do
+      if command -v iw >/dev/null; then
+        ip link set "$WIFI" up 2>/dev/null
+        echo "Görünen ağlar:"
+        iw dev "$WIFI" scan 2>/dev/null | sed -n 's/^\s*SSID: //p' | grep -v '^$' | sort -u | head -20 | nl
+      fi
+      printf 'Ağ adı (SSID): '; IFS= read -r SSID
+      printf 'Parola (açık ağsa boş): '; IFS= read -rs PAROLA; printf '\n'
+      if printf '%s' "$PAROLA" | cli netplan-wifi --arayuz "$WIFI" --ssid "$SSID" > /etc/netplan/90-havenfold-wifi.yaml.yeni; then
+        chmod 0600 /etc/netplan/90-havenfold-wifi.yaml.yeni
+        mv /etc/netplan/90-havenfold-wifi.yaml.yeni /etc/netplan/90-havenfold-wifi.yaml
+        netplan apply 2>/dev/null
+        for _ in $(seq 1 30); do varsayilan_yol && break; sleep 1; done
+      fi
+      unset PAROLA
+      varsayilan_yol || echo "Bağlanılamadı; yeniden deneyin."
+    done
+    AG=wifi
+  fi
+fi
+
+# 3. Saat
+adim "Saat"
+for _ in $(seq 1 60); do [ "$(timedatectl show -p NTPSynchronized --value 2>/dev/null)" = yes ] && break; sleep 1; done
+if [ "$(timedatectl show -p NTPSynchronized --value 2>/dev/null)" = yes ]; then echo "Saat eşitlendi."; else echo "Uyarı: Saat eşitlenemedi. Tören QR'ının süresi yerel saate bağlıdır."; fi
+
+# 4. Yönetici parolası
+adim "Yerel yönetici parolası (kullanıcı: yonetici; yalnız bu konsol için, SSH yok)"
+while true; do
+  printf 'Parola: '; IFS= read -rs P1; printf '\n'
+  printf 'Yeniden: '; IFS= read -rs P2; printf '\n'
+  if [ "$P1" != "$P2" ]; then echo "Parolalar aynı değil."; continue; fi
+  if ! printf '%s' "$P1" | cli parola-denetle; then continue; fi
+  printf 'yonetici:%s\n' "$P1" | chpasswd && break
+  echo "Parola yazılamadı; yeniden deneyin."
+done
+unset P1 P2
+
+# 5. Durum özeti
+adim "Durum"
+RAM=$(awk '/^MemTotal:/ { print $2 * 1024 }' /proc/meminfo)
+KOKAYGIT=$(findmnt -no SOURCE / 2>/dev/null)
+DISK=$(lsblk -lnso NAME,TYPE "$KOKAYGIT" 2>/dev/null | awk '$2 == "disk" { print $1; exit }')
+[ -n "$DISK" ] || DISK=$(lsblk -dno NAME | head -1)
+TPM=yok; [ -e /dev/tpmrm0 ] && TPM=var
+# hf-luks-yenile her açılışta yazar (luks-tpm | luks); denetçi de aynı dosyayı okur (Codex 12. tur: yalnız yorum
+# satırlı crypttab ve TPM bağı kurulamamış disk luks-tpm görünüyordu)
+SIFRE=$(cat /etc/havenfold/disk-sifreleme 2>/dev/null || true)
+case "$SIFRE" in luks-tpm|luks) ;; *) SIFRE=sifresiz ;; esac
+PIL_EK=()
+for t in /sys/class/power_supply/*/type; do
+  [ -e "$t" ] || continue
+  d=$(dirname "$t")
+  if [ "$(cat "$t")" = Battery ] && [ "$(cat "$d/scope" 2>/dev/null || echo System)" != Device ]; then
+    PIL_EK=(--pil-yuzde "$(cat "$d/capacity" 2>/dev/null || echo 0)" --pil-sinir "$(awk -F'"' '/^sinir/ { print $2 }' /etc/havenfold/dugum.toml 2>/dev/null || echo yok)")
+    break
+  fi
+done
+cli durum-ozeti --ram-bayt "$RAM" --cekirdek "$(uname -r)" --disk-model "$(lsblk -dno MODEL "/dev/$DISK" 2>/dev/null | xargs)" \
+  --disk-boyut "$(lsblk -dbno SIZE "/dev/$DISK" 2>/dev/null || echo 0)" --tpm "$TPM" --sifreleme "$SIFRE" ${PIL_EK[@]+"${PIL_EK[@]}"} --ag "$AG"
+
+# 6. Rol
+adim "Rol"
+while true; do
+  printf '1) işçi (varsayılan)  2) kutu  3) birleşik\nSeçim: '
+  IFS= read -r g
+  ROL=$(printf '%s' "$g" | cli rol-sec) && break
+done
+sed -i "s/^rol = \"[a-z]*\"/rol = \"$ROL\"/" /etc/havenfold/dugum.toml
+
+# 7. Kimlikler ve hostId (§5): `havenfold ilk-ayar` (node/setup.js) kalıcı katmanda üretir, TPM'ye mühürler ve
+# /var/lib/havenfold/<rol>/kimlik işaretini yazar (birimlerin ConditionPathExists'i). Var olan kimliğe dokunmaz.
+adim "Kimlikler"
+if ! /usr/local/bin/havenfold ilk-ayar --rol "$ROL"; then
+  echo "HATA: kimlikler üretilemedi. Ayrıntı: journalctl -u havenfold-ilk-acilis. İlk açılış bir sonraki açılışta yeniden başlar."
+  exit 1
+fi
+case "$ROL" in
+  isci) systemctl start havenfold-isci.service; SOKETLER=(isci) ;;
+  kutu) systemctl start havenfold-kutu.service; SOKETLER=(kutu) ;;
+  birlesik) systemctl start havenfold-kutu.service havenfold-isci.service; SOKETLER=(kutu isci) ;;
+esac
+# Çekirdeğin yönetim soketi açılmadan `havenfold katil` ENOENT ile düşer (sanal makinede görüldü): en çok 60 sn bekle
+for s in "${SOKETLER[@]}"; do
+  for _ in $(seq 1 60); do [ -S "/run/havenfold/$s/yonetim.sock" ] && break; sleep 1; done
+done
+
+# 8. Tören: 10 dakikada tamamlanmazsa Enter ile yeniden
+adim "Tören"
+while true; do
+  /usr/local/bin/havenfold katil --rol "$ROL" && break
+  printf 'Yeniden denemek için Enter. '
+  IFS= read -r _
+done
+
+# 12. Bitti
+touch /var/lib/havenfold/ilk-acilis.tamam
+systemctl disable havenfold-ilk-acilis.service >/dev/null 2>&1
+systemctl enable --now havenfold-ekran.service >/dev/null 2>&1
+printf '\nKurulum tamamlandı. Ekran 60 saniye sonra kararır.\n'

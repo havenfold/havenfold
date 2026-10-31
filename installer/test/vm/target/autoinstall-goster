@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# autoinstall-goster — YALNIZ TEST ISO'SU: early-commands'ın değiştirdiği /autoinstall.yaml'ı yazar (geçici LUKS
+# parolası *** ile) ve kurulum ortamındaki Python YAML ayrıştırıcısıyla (varsa) denetler.
+P=/run/havenfold-kurulum/luks-gecici
+F=/autoinstall.yaml
+echo "===== $F"
+if [ -s "$P" ]; then sed "s/$(cat "$P")/***/g" "$F"; else cat "$F"; fi
+if command -v python3 >/dev/null && python3 -c 'import yaml' 2>/dev/null; then
+  python3 -c 'import sys, yaml; d = yaml.safe_load(open(sys.argv[1])); print("YAML geçerli; üst anahtarlar:", " ".join(sorted(d)))' "$F"
+fi
+exit 0

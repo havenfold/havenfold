@@ -1,0 +1,128 @@
+#!/bin/bash
+# SPDX-License-Identifier: Apache-2.0
+# hf-gorev — hf.task.ocr giriş betiği. Sözleşme: CONTRACT.md (RFC-0002 §5, §6.3, §11.1).
+#
+#   /in/params        TASK.params: UTF-8 JSON { "langs": [..], "pages": [a, b]?, "output": "text" | "pdf" }
+#   /in/girdiler.json [{ "ad": "0", "mime": "...", "size": n }] (tek girdi)
+#   /in/0             PDF ya da görüntü
+#   /out/metin.txt    output = text (sayfalar arası \f)
+#   /out/cikti.pdf    output = pdf (aranabilir PDF)
+#
+# Çıkış kodları: 0 tamam, 2 INVALID_INPUT, 3 DIL_YOK, 4 SAYFA_GECERSIZ, 5 PDF_SIFRELI, 10 ARAC_HATASI.
+# Günlüğe (stdout, stderr; son 4 KB TASK_RESULT.log olur) belgenin içeriği yazılmaz: yalnız kod ve aracın son satırları.
+set -euo pipefail
+umask 0027
+
+# HF_GIRIS, HF_CIKIS yalnız imaj dışında denemek için; konteynerde /in ve /out
+GIRIS=${HF_GIRIS:-/in}
+CIKIS=${HF_CIKIS:-/out}
+IS=${TMPDIR:-/work}
+ARAC_GUNLUK="$IS/arac.log"
+
+bitir () { # kod ad
+  echo "hf: $2" >&2
+  exit "$1"
+}
+
+# Aracın hatası: son birkaç satır (dosya yolları /in, /work; içerik yok), sonra kod
+arac_hatasi () { # aracın çıkış kodu
+  [ -f "$ARAC_GUNLUK" ] && tail -n 5 "$ARAC_GUNLUK" | cut -c1-300 >&2
+  case "$1" in
+    2) bitir 2 INVALID_INPUT ;;
+    8) bitir 5 PDF_SIFRELI ;;
+    *) bitir 10 "ARAC_HATASI ($1)" ;;
+  esac
+}
+
+calistir () { # komut...
+  local kod=0
+  "$@" >>"$ARAC_GUNLUK" 2>&1 || kod=$?
+  [ "$kod" -eq 0 ] || arac_hatasi "$kod"
+}
+
+[ -r "$GIRIS/params" ] && [ -r "$GIRIS/girdiler.json" ] && [ -r "$GIRIS/0" ] || bitir 2 INVALID_INPUT
+[ -d "$CIKIS" ] && [ -w "$CIKIS" ] || bitir 10 "ARAC_HATASI (/out yazılamıyor)"
+
+# Parametreler Python ile denetlenir (JSON); kabuğa yalnız denetlenmiş değerler gelir
+kod=0
+P=$(python3 -I - "$GIRIS/params" "$GIRIS/girdiler.json" <<'PY'
+import json, re, sys
+try:
+    p = json.load(open(sys.argv[1], encoding='utf-8'))
+    g = json.load(open(sys.argv[2], encoding='utf-8'))
+except Exception:
+    sys.exit(2)
+if not isinstance(p, dict) or set(p) - {'langs', 'pages', 'output'}:
+    sys.exit(2)
+langs = p.get('langs')
+if not isinstance(langs, list) or not 1 <= len(langs) <= 4:
+    sys.exit(2)
+if not all(isinstance(x, str) and re.fullmatch(r'[a-z]{3}(_[a-z]{2,8})?', x) for x in langs):
+    sys.exit(2)
+out = p.get('output')
+if out not in ('text', 'pdf'):
+    sys.exit(2)
+pages = p.get('pages')
+if pages is None:
+    a = b = '-'
+else:
+    if not (isinstance(pages, list) and len(pages) == 2 and all(type(x) is int for x in pages)):
+        sys.exit(2)
+    a, b = pages
+    if not 1 <= a <= b <= 100000:
+        sys.exit(4)
+mimes = ('application/pdf', 'image/png', 'image/jpeg', 'image/tiff')
+if not (isinstance(g, list) and len(g) == 1 and isinstance(g[0], dict) and g[0].get('ad') == '0' and g[0].get('mime') in mimes):
+    sys.exit(2)
+print('+'.join(langs), a, b, out, g[0]['mime'])
+PY
+) || kod=$?
+if [ "$kod" -ne 0 ]; then
+  [ "$kod" -eq 4 ] && bitir 4 SAYFA_GECERSIZ
+  bitir 2 INVALID_INPUT
+fi
+read -r DILLER BAS SON CIKTI MIME <<<"$P"
+
+# Dil verisi imajda olmalı (tesseract-ocr-<dil>)
+KURULU=$(tesseract --list-langs 2>/dev/null | tail -n +2)
+IFS='+' read -r -a ISTENEN <<<"$DILLER"
+for d in "${ISTENEN[@]}"; do
+  grep -qx -- "$d" <<<"$KURULU" || bitir 3 "DIL_YOK ($d)"
+done
+
+GIRDI="$GIRIS/0"
+
+if [ "$MIME" = application/pdf ]; then
+  KAYNAK="$GIRDI"
+  if [ "$BAS" != - ]; then
+    # Sayfa aralığı (bölünmüş iş, RFC-0002 §8): önce o sayfalar ayrı bir PDF'e alınır
+    N=0
+    N=$(qpdf --warning-exit-0 --show-npages "$GIRDI" 2>>"$ARAC_GUNLUK") || arac_hatasi 2
+    [ "$SON" -le "$N" ] || bitir 4 SAYFA_GECERSIZ
+    calistir qpdf --warning-exit-0 "$GIRDI" --pages . "$BAS-$SON" -- "$IS/parca.pdf"
+    KAYNAK="$IS/parca.pdf"
+  fi
+  if [ "$CIKTI" = text ]; then
+    # Metin: bütün sayfalar yeniden tanınır (var olan metin katmanı da); PDF çıktısı atılır
+    calistir ocrmypdf --quiet --force-ocr --output-type pdf -l "$DILLER" --sidecar "$IS/metin.txt" "$KAYNAK" "$IS/atilacak.pdf"
+    mv "$IS/metin.txt" "$CIKIS/metin.txt"
+  else
+    # Aranabilir PDF: metni olan sayfalara dokunulmaz
+    calistir ocrmypdf --quiet --skip-text --output-type pdf -l "$DILLER" "$KAYNAK" "$IS/cikti.pdf"
+    mv "$IS/cikti.pdf" "$CIKIS/cikti.pdf"
+  fi
+else
+  # Görüntü tek sayfadır
+  if [ "$BAS" != - ] && { [ "$BAS" -ne 1 ] || [ "$SON" -ne 1 ]; }; then bitir 4 SAYFA_GECERSIZ; fi
+  if [ "$CIKTI" = text ]; then
+    calistir tesseract "$GIRDI" "$IS/metin" -l "$DILLER" txt
+    mv "$IS/metin.txt" "$CIKIS/metin.txt"
+  else
+    # Görüntünün DPI bilgisi güvenilmez: sayfa boyutu 300 DPI'ya göre
+    calistir ocrmypdf --quiet --image-dpi 300 --output-type pdf -l "$DILLER" "$GIRDI" "$IS/cikti.pdf"
+    mv "$IS/cikti.pdf" "$CIKIS/cikti.pdf"
+  fi
+fi
+
+rm -f "$IS"/parca.pdf "$IS"/atilacak.pdf "$ARAC_GUNLUK"
+echo "hf: TAMAM"

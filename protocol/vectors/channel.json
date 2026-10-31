@@ -1,0 +1,29 @@
+{
+ "aciklama": "RFC-0025 §2: uygulama ile çekirdek kanalının eksik komutları ve gövdeleri (RFC-0024 eki). Numaralar Yuva Hat çizelgesindekilerle aynıdır. Öneri örneği ledger-v21.json ana zincirinin sonundaki defterdedir: Kerem (tek ebeveyn imzası) ts = TS0 + 50000'de İrem'in çıkarılmasını önerir (reason \"test\", wipe true); ikinci ebeveyn (Hüsniye) beklenir. Kimlikler createIdentity({seed: \"defter-vektor/<ad>\"}).",
+ "komutlar": [
+  { "no": 14, "ad": "LEDGER_SIGN", "govde": ["proposalId"], "sonuc": ["durum"], "sdk": "LedgerApi.sign" },
+  { "no": 225, "ad": "PROPOSALS", "govde": [], "sonuc": ["proposalId", "type", "hedef", "imzalar", "waitingFor", "zaman"], "sonucEk": ["wipe"], "sdk": "LedgerApi.listProposals" },
+  { "no": 226, "ad": "PROPOSAL_REJECT", "govde": ["proposalId"], "sonuc": null, "sdk": "LedgerApi.rejectProposal" },
+  { "no": 254, "ad": "TASK_CONSENT", "govde": ["deviceId", "allow"], "sonuc": null, "sdk": "TaskApi.consent" }
+ ],
+ "govdeler": {
+  "272": { "ad": "AI_EXTRACT", "govde": ["sema", "girdi", "kaynak"], "girdi": [["metin"], ["blobRef"], ["bytes", "mime"]] },
+  "273": { "ad": "AI_SAVE", "govde": ["collectionId", "cikarim"], "govdeEk": ["ek"], "sonuc": "recordId | null" },
+  "onayEkrani": { "veri": ["collectionId", "sema", "hedef", "alanlar", "sinif"], "sonuc": "{ son } | null", "isleyiciYoksa": "GERI_CAGRI_YOK" }
+ },
+ "oneri": {
+  "olay": "021552a23fd0cbe94282ffe64f670b4d54fb61a34a418f77264898095e01bb48e7f802ff502f51c4a001000016c277a4ade5c09e1afb524e33bb17470e04746573740101ee5dcee7a71a87c7bd1c2dc3a5748e2e42e25da6531b13b01ef070e2d74c9b4e3cc0a7c48dc40a08a0e6651db2e0a2a0cf5afc56f49c74564cdb29a35ecbff1fbbc54d9ab211d503f0221539f27a0c01",
+  "PROPOSALS": [
+   {
+    "proposalId": "d34f6c43f1ce4490a58d3ef18110ccdb71111cbe5b92ab667ec8052b24a57c49",
+    "type": "REMOVE_MEMBER",
+    "hedef": "c277a4ade5c09e1afb524e33bb17470e",
+    "wipe": true,
+    "imzalar": ["ee5dcee7a71a87c7bd1c2dc3a5748e2e"],
+    "waitingFor": ["b6f91e50fdc5a36b9b251d03b722f597"],
+    "zaman": 1790000050000
+   }
+  ],
+  "PROPOSAL_REJECT": { "sonra": [], "yeniden": "NO_PROPOSAL" }
+ }
+}

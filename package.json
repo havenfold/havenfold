@@ -1,0 +1,33 @@
+{
+  "name": "havenfold",
+  "private": true,
+  "description": "Open-source core that turns the devices in a home or a small business into their own end-to-end encrypted cloud, with no accounts and no centre",
+  "license": "MPL-2.0",
+  "repository": "github:havenfold/havenfold",
+  "homepage": "https://github.com/havenfold/havenfold#readme",
+  "bugs": "https://github.com/havenfold/havenfold/issues",
+  "engines": {
+    "node": "22.x"
+  },
+  "workspaces": [
+    "core/*",
+    "sdk",
+    "tools/export-open",
+    "node"
+  ],
+  "scripts": {
+    "test": "bash scripts/check.sh",
+    "check": "bash scripts/check.sh",
+    "demo": "node scripts/demo.js"
+  },
+  "devDependencies": {
+    "bare": "1.33.4",
+    "bare-runtime": "1.33.4",
+    "c8": "12.0.0"
+  },
+  "overrides": {
+    "bare-runtime": "1.33.4",
+    "sax": "1.2.4",
+    "usocket": "file:./node/disaster/usocket-stub"
+  }
+}

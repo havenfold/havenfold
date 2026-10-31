@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# hedefe-test-kur — YALNIZ TEST ISO'SU: kurulan sisteme sanal makine denemesinin kancalarını koyar (late-commands'ın
+# sonunda). Üretim kurulumunun yaptıklarına dokunmaz; yalnız ekler:
+#   - havenfold-ilk-acilis.service için drop-in: ilk açılış ekranı tty1 yerine ttyS1'de (CI sürücüsü yanıtlar)
+#   - hf-test-denetim.service: ilk açılışın sonuçlarını seri konsola yazar, sonra yeniden başlatır / kapatır
+#   - çekirdek satırına seri konsol (console=ttyS0 son: /dev/console = ttyS0)
+set -euo pipefail
+K=${1:?hedef kök}
+T=/cdrom/hf-test
+install -d -m 0700 "$K/var/lib/hf-test"
+install -D -m 0755 "$T/hf-test-denetim" "$K/usr/local/sbin/hf-test-denetim"
+install -m 0644 "$T/hf-test-denetim.service" "$K/etc/systemd/system/hf-test-denetim.service"
+install -d "$K/etc/systemd/system/havenfold-ilk-acilis.service.d"
+printf '[Service]\nTTYPath=/dev/ttyS1\n' > "$K/etc/systemd/system/havenfold-ilk-acilis.service.d/hf-test.conf"
+install -d "$K/etc/default/grub.d"
+# shellcheck disable=SC2016
+printf 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT console=tty1 console=ttyS0,115200"\nGRUB_TIMEOUT=2\nGRUB_TIMEOUT_STYLE=menu\n' \
+  > "$K/etc/default/grub.d/99-hf-test.cfg"
+hedefte () {
+  if command -v curtin >/dev/null; then curtin in-target --target="$K" -- "$@"; return; fi
+  local d
+  for d in dev proc sys run; do mountpoint -q "$K/$d" || mount --bind "/$d" "$K/$d"; done
+  chroot "$K" "$@"
+}
+hedefte systemctl enable hf-test-denetim.service
+hedefte update-grub
+echo "--- hedefteki havenfold birimleri"
+for f in "$K"/etc/systemd/system/havenfold* "$K"/etc/systemd/system/hf-test*; do [ -e "$f" ] && basename "$f"; done
+echo "--- /etc/crypttab"
+grep -v '^#' "$K/etc/crypttab" 2>/dev/null || echo "(yok)"
+echo "--- /var/log/installer"
+ls -la "$K/var/log/installer" 2>/dev/null || true
+echo "hedefe-test-kur: tamam"

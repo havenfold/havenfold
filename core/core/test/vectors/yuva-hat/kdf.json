@@ -1,0 +1,94 @@
+{
+ "aciklama": "derive = anahtarlı BLAKE2b-256(\"yuva/v2/\" + etiket ‖ parçalar); hash = anahtarsız. Sayılar 8 bayt big-endian, metinler UTF-8.",
+ "key": "0707070707070707070707070707070707070707070707070707070707070707",
+ "derive": [
+  {
+   "etiket": "pair",
+   "parcalar": [
+    {
+     "metin": "a"
+    },
+    {
+     "sayi": 1
+    }
+   ],
+   "sonuc": "b2159c1fc3b955e29fa2360d73aabd0c3789e759dc2ae264d58fb4679951eb83"
+  },
+  {
+   "etiket": "rv/listen",
+   "parcalar": [
+    {
+     "sayi": 489239
+    }
+   ],
+   "sonuc": "a3fb47769c8949b0df0ade057108a29e3c406c93d0b08927f9e917ae896100e6"
+  },
+  {
+   "etiket": "bell",
+   "parcalar": [],
+   "sonuc": "daa89cfe02b72774ba35da0ce596df0561a2095b2598fc99bce56a9323b8d48e"
+  },
+  {
+   "etiket": "mailbox",
+   "parcalar": [
+    {
+     "hex": "11111111111111111111111111111111"
+    },
+    {
+     "sayi": 20379
+    }
+   ],
+   "sonuc": "0fe9cfb534ed259844863ed24732f8a75a2794b09c19e9a6eef10b0fe57210f5"
+  },
+  {
+   "etiket": "dr/rk",
+   "parcalar": [
+    {
+     "hex": "2222222222222222222222222222222222222222222222222222222222222222"
+    }
+   ],
+   "sonuc": "057605c2c61d0de1dcfd6b1d4c21a52f5a30b0d6fa566791040fe70cc7b6eb5a"
+  },
+  {
+   "etiket": "vault",
+   "parcalar": [
+    {
+     "sayi": 1
+    }
+   ],
+   "sonuc": "88ccbed4965fe27c6b9febd7541dcb2c572f5c59d4a4eeb421e1e12d396662ad"
+  }
+ ],
+ "hash": [
+  {
+   "etiket": "member-id",
+   "parcalar": [
+    {
+     "metin": "x"
+    }
+   ],
+   "sonuc": "461cccee24a580ab0c43c3dc1efc814ae1aac4031e4f160bbfa5523947227454"
+  },
+  {
+   "etiket": "conv-dm",
+   "parcalar": [
+    {
+     "hex": "01010101010101010101010101010101"
+    },
+    {
+     "hex": "02020202020202020202020202020202"
+    }
+   ],
+   "sonuc": "a5d0ad6922eca04b3f515d224976895afadb1563aa65cc8417eaca5d4d74eb77"
+  },
+  {
+   "etiket": "family-id",
+   "parcalar": [
+    {
+     "hex": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+   ],
+   "sonuc": "583a3e883615a6359a722b9c8950f2707aa83e465c61681bad4797fd3dcd2da2"
+  }
+ ]
+}

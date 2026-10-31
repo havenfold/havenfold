@@ -1,0 +1,12 @@
+{
+  "aciklama": "D103 (RFC-0037 A2, RFC-0031 §6): afet SOS'u alıcı başına ayrı mid taşır (RFC-0012 §7.1). hf.sos kaydı bütün alıcı mid'lerini afet_midler (list<bytes 16>, en çok 32) alanında taşır; eski alıcılar için afet_mid ilk mid'dir. Her alıcı kendi aldığı mid'i listede bulur ve kayıt gelince ikinci bildirimi göstermez. Durumlar core/olay/test/afet-mid.js'te; beklenenler elle yazıldı.",
+  "alan": { "ad": "afet_midler", "deger": "list", "enCok": 32, "oge": "bytes 16" },
+  "alicilar": ["husniye", "irem", "ecem"],
+  "midler": ["a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1", "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2", "c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3"],
+  "durumlar": [
+    { "no": 1, "aciklama": "Üç alıcı afetle kendi mid'ini aldı (bildirim gösterildi); kayıt afet_midler ile gelince üçünde de bildirim bastırılır", "kayitBildirimi": [false, false, false] },
+    { "no": 2, "aciklama": "Eski biçim (yalnız afet_mid = ilk mid): yalnız ilk alıcıda bastırılır (düzeltilen sorun)", "kayitBildirimi": [false, true, true] },
+    { "no": 3, "aciklama": "Afetle hiç almayan alıcı: kayıt bildirimi gösterilir", "kayitBildirimi": [true] },
+    { "no": 4, "aciklama": "Biçim: boş liste, 33 öğe, 15 baytlık öğe → INVALID_SOS_DISASTER_MID", "hata": "INVALID_SOS_DISASTER_MID" }
+  ]
+}

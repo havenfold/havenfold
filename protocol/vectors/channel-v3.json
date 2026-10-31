@@ -1,0 +1,16 @@
+{
+ "aciklama": "D25: RFC-0027'nin çekirdek tarafı (kanal.json ve kanal-v2.json'un devamı). 249 RFC-0024 §3'te ayrılmıştı; 229 Yuva Hat çizelgesinin (228'e kadar dolu) ardından; 280–281 boş aralıktan. Numaralar RFC-0027'ye işlenecek (kollar/D-durum.md İstek 120).",
+ "komutlar": [
+  { "no": 249, "ad": "RECORD_MOVE", "govde": ["collectionId", "recordId", "hedefCollectionId", "degisiklik?"], "sonuc": "recordId", "sdk": "RecordApi.move" },
+  { "no": 229, "ad": "VAULT_STATUS", "govde": [], "sonuc": ["kilitli", "ya", "kasalar"], "sdk": "VaultApi.status" },
+  { "no": 280, "ad": "EXPORT", "govde": ["koleksiyonlar", "gizliDahil", "parola"], "sonuc": ["dosyaAdi", "bytes", "ogeSayisi", "eksikDosya"], "sdk": "ExportApi.export" },
+  { "no": 281, "ad": "IMPORT", "govde": ["bytes", "parola"], "sonuc": ["baslik", "icerik", "dosyalar"], "sdk": "ExportApi.import" }
+ ],
+ "olaylar": { "kasa": ["acildi", "kilitlendi", "kuruldu", "kagit_gerekli"] },
+ "tasima": {
+  "kaynak": { "_src": ["dosya:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"], "_ai": ["baslik", "bitis"], "_conf": 80 },
+  "degisiklik": { "bitis": "2027-06-01" },
+  "hedef": { "_ai": ["baslik"], "_conf": 80, "_srcSonuna": "kayit:<kaynak collectionId>/<kaynak recordId>" }
+ },
+ "kap": { "urun": "yuva-defteri", "bicim": "yuva-defter-arsiv", "bicimSurum": 1, "uzanti": ".yuvadefter", "parolaEnAz": 12, "telefonSiniri": "RFC-0021 h" }
+}

@@ -1,0 +1,59 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+name: RFC proposal
+description: Propose a change to the protocol, the core or the founding document.
+labels: ["rfc"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every change to the protocol or the core goes through an RFC (CONTRIBUTING.md, GOVERNANCE.md). Start here
+        to discuss the idea. If it is worth writing up, open a pull request that adds
+        `docs/rfc/RFC-NNNN-short-name.md`; RFCs are written in Turkish, and maintainers help with translation.
+        Existing RFCs and their English summaries: docs/en/RFC-INDEX.md.
+  - type: input
+    id: short-title
+    attributes:
+      label: Short title
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is missing or wrong today? Link code, RFC sections or founding document sections.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal in outline
+    validations:
+      required: true
+  - type: textarea
+    id: affected
+    attributes:
+      label: Affected RFCs and founding document sections
+  - type: dropdown
+    id: wire
+    attributes:
+      label: Does it change a wire format, a number allocation or the ledger?
+      description: New envelope types, event types, command numbers or derivation labels are allocated in an RFC.
+      options:
+        - "No"
+        - "Yes"
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: security
+    attributes:
+      label: Security and privacy impact
+      description: Who learns what that they did not before? What happens if a device is stolen?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered

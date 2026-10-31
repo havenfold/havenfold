@@ -1,0 +1,30 @@
+{
+  "name": "@havenfold/core",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Havenfold core: identity, key derivation, signatures, ledger, policy, quorum, sync, envelopes",
+  "license": "MPL-2.0",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "crypto/",
+    "ledger/",
+    "protocol/",
+    "core/",
+    "messaging/"
+  ],
+  "scripts": {
+    "test": "brittle-node test/*.js"
+  },
+  "dependencies": {
+    "b4a": "1.9.0",
+    "compact-encoding": "3.5.2",
+    "sodium-native": "5.2.0"
+  },
+  "devDependencies": {
+    "brittle": "4.5.0"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}

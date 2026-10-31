@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# hf-test-denetim.service — YALNIZ TEST ISO'SU: sanal makine denemesinde ilk açılışın sonuçlarını seri konsola yazar.
+[Unit]
+Description=Havenfold sanal makine denemesi: ilk açılış denetimi
+After=local-fs.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/hf-test-denetim
+StandardOutput=journal+console
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target

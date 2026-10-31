@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: MPL-2.0
+# This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL
+# was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# gitleaks ayarı: varsayılan kurallar + test vektörleri istisnası (RFC-0033 §5 adım 4).
+# Test vektörleri ve test yardımcıları, herkesin aynı sonucu yeniden üretebilmesi için sabit tohumlardan türetilmiş
+# örnek anahtarlar taşır; hiçbiri gerçek bir cihazın ya da hizmetin anahtarı değildir. Yeni bir istisna buraya
+# yalnız aynı gerekçeyle ve tek tek yol olarak eklenir.
+title = "havenfold"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Sabit tohumlu test vektörleri ve test yardımcıları"
+paths = [
+  # Yalnız gitleaks'in bugün örnek anahtar bulduğu vektör dosyaları, tek tek (25 Ekim 2026; İngilizce adlar 30 Ekim). Başka ya da yeni bir dosya
+  # taramaya girer; gerekiyorsa buraya gerekçeyle eklenir.
+  '''^protocol/vectors/(ai|ai-v2|disaster|edge|event|event-v2|guest-write|ledger-v21|ledger-v21-v2|record|record-v2|service|sos|vault|vault-share|vault-v2)\.json$''',
+  '''^core/core/test/vectors/yuva-hat/pair\.json$''',
+  '''^core/core/test/helpers/spike-family\.js$''',
+]
