@@ -169,11 +169,50 @@ function hostIdYaz ({ kok = '/', kokMu = false, passwd, izin = SAHIPLIK } = {}) 
   }
 }
 
-// Tek rolün kimliği. Dönüş: { rol, memberId, tpm, yeni }
-function kimlikOlustur (rol, { kok = '/', test = false, kokMu = false, passwd, now = Date.now, izin = SAHIPLIK, tpmAc } = {}) {
+const MEMBER_ID = /^[0-9a-f]{32}$/
+
+// Rol işareti (<rol dizini>/kimlik): yoksa null; bağ ya da tür hatası yukarı çıkar, okunamayan içerik bozuk sayılır
+function isaretOku (yol) {
+  try { fs.lstatSync(yol) } catch (err) { if (err.code === 'ENOENT') return null; throw err }
+  try { return JSON.parse(guvenliOku(yol).toString('utf8')) } catch (err) {
+    if (/^(SEMBOLIK_BAG|SABIT_BAG|DOSYA_TURU)/.test(err.message)) throw err
+    fail('IDENTITY_MARKER_CORRUPT')
+  }
+}
+
+// İlk açılış yarıda kalıp yeniden çalışınca (tören QR'ı beklenirken makine kapatıldı): 1. açılışta işaret yazıldığı için
+// rolün çekirdeği (havenfold-<rol>.service, ConditionPathExists=<rol dizini>/kimlik) bu açılışta ilk açılıştan önce başlar
+// ve kalıcı dizinin kilidini (worklet/persistence.js kilitAl, <rol dizini>/cekirdek/kilit) tutar. Kalici'yi yeniden açmak
+// DIR_LOCKED ile düşer; ağacı köke almak da çalışan çekirdeğin yazımlarını keser. İşaret varsa ve kilidi yaşayan bir süreç
+// (kökken: rol kullanıcısının süreci) tutuyorsa kimlik vardır ve kullanımdadır: ağaca dokunulmaz, işaretteki kimlik döner.
+// Kilidi başka kullanıcının süreci tutuyorsa (önceki açılıştan kalan kilidin PID'i başka sürece geçmiş) bu çekirdek
+// değildir: null, olağan yol (Kalici yine DIR_LOCKED der; kalan kilit kalıcı katmanın işidir). /proc yoksa null.
+function calisanKimlik (rol, dizin, { kokMu, passwd, proc = '/proc' }) {
+  const kilit = path.join(dizin, 'cekirdek', 'kilit')
+  let k
+  try { k = fs.lstatSync(kilit) } catch (err) { if (err.code === 'ENOENT') return null; throw err }
+  if (!k.isFile()) return null // bağ ya da başka tür: olağan yol (agacAl) reddeder
+  const onceki = isaretOku(path.join(dizin, 'kimlik'))
+  if (!onceki) return null // işaret yok: kimlik tahmin edilmez
+  const pid = parseInt(guvenliOku(kilit).toString('utf8'), 10)
+  if (!Number.isSafeInteger(pid) || pid <= 0 || pid === process.pid) return null
+  let s
+  try { s = fs.statSync(path.join(proc, String(pid))) } catch { return null } // ölü süreç ya da /proc yok
+  if (kokMu) {
+    const u = kullanici('havenfold-' + rol, passwd)
+    if (!u || s.uid !== u.uid) return null
+  }
+  if (onceki.v !== 1 || onceki.rol !== rol || typeof onceki.memberId !== 'string' || !MEMBER_ID.test(onceki.memberId)) fail('IDENTITY_MARKER_CORRUPT')
+  return { rol, memberId: onceki.memberId, tpm: onceki.tpm, tpmTur: null, yeni: false, calisiyor: true }
+}
+
+// Tek rolün kimliği. Dönüş: { rol, memberId, tpm, yeni } (çekirdek çalışıyorsa calisiyor: true)
+function kimlikOlustur (rol, { kok = '/', test = false, kokMu = false, passwd, now = Date.now, izin = SAHIPLIK, tpmAc, proc } = {}) {
   if (!['kutu', 'isci'].includes(rol)) fail('INVALID_ROLE')
   const dizin = path.join(kok, 'var/lib/havenfold', rol)
   ataDenetle(kok, dizin, { kokMu, izin })
+  const calisan = calisanKimlik(rol, dizin, { kokMu, passwd, proc })
+  if (calisan) return calisan
   dizinAl(dizin, { kokMu, izin })
   let tamam = false
   try {
@@ -197,10 +236,7 @@ function kimlikAgacta (rol, dizin, { test, now, kok = '/', tpmAc = require('./bo
   const { platformAnahtari, arsivAcik } = require('./box')
   const { Kalici } = require('../worklet/persistence')
   const isaret = path.join(dizin, 'kimlik')
-  let onceki = null
-  if (fs.existsSync(isaret)) {
-    try { onceki = JSON.parse(guvenliOku(isaret).toString('utf8')) } catch (err) { if (/^(SEMBOLIK_BAG|SABIT_BAG|DOSYA_TURU)/.test(err.message)) throw err; fail('IDENTITY_MARKER_CORRUPT') }
-  }
+  const onceki = isaretOku(isaret)
   const a = { dizin, test }
   const I = require('./worker')
   let tpm = null
@@ -232,11 +268,11 @@ function kimlikAgacta (rol, dizin, { test, now, kok = '/', tpmAc = require('./bo
   return { rol, memberId, tpm: bilgi.tpm, tpmTur: tur, yeni: !onceki }
 }
 
-function ilkAyar ({ rol = null, kurulum = false, kok = '/', test = false, kokMu = typeof process.getuid === 'function' && process.getuid() === 0, passwd, now, izin, tpmAc } = {}) {
+function ilkAyar ({ rol = null, kurulum = false, kok = '/', test = false, kokMu = typeof process.getuid === 'function' && process.getuid() === 0, passwd, now, izin, tpmAc, proc } = {}) {
   const host = hostIdYaz({ kok, kokMu, passwd, izin })
   if (kurulum) return { hostId: host.hostId, kimlikler: [] }
   if (!ROLLER[rol]) fail('INVALID_ROLE')
-  return { hostId: host.hostId, kimlikler: ROLLER[rol].map((r) => kimlikOlustur(r, { kok, test, kokMu, passwd, now, izin, tpmAc })) }
+  return { hostId: host.hostId, kimlikler: ROLLER[rol].map((r) => kimlikOlustur(r, { kok, test, kokMu, passwd, now, izin, tpmAc, proc })) }
 }
 
 // command.js kancası. Ortam (yalnız test): HF_KOK (kök öneki), HF_TEST_KIPI=1 (taklit TPM). İkisi de systemd altında,
@@ -257,7 +293,7 @@ async function ana (arg, { yaz = (s) => console.log(s), env = process.env, getui
   try {
     const r = ilkAyar({ rol, kurulum, kok: env.HF_KOK || '/', test, kokMu })
     yaz(`hostId ${r.hostId.slice(0, 8)}`)
-    for (const k of r.kimlikler) yaz(`${k.rol === 'kutu' ? 'Kutu' : 'İşçi'} kimliği ${k.memberId.slice(0, 8)} · TPM ${k.tpm}${k.yeni ? '' : ' (var olan)'}`)
+    for (const k of r.kimlikler) yaz(`${k.rol === 'kutu' ? 'Kutu' : 'İşçi'} kimliği ${k.memberId.slice(0, 8)} · TPM ${k.tpm}${k.yeni ? '' : k.calisiyor ? ' (var olan, çekirdek çalışıyor)' : ' (var olan)'}`)
     return KOD.TAMAM
   } catch (err) {
     yaz('İlk ayar yapılamadı: ' + err.message)

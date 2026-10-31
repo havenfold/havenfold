@@ -66,11 +66,46 @@ while IFS=$'\t' read -r ikili surum kaynak ksurum; do
   printf '%s\t%s\t%s\n' "$kaynak" "$ksurum" "$neden"
 done < /kaynak-liste/paketler.tsv | sort -u -k1,2 > /kaynak-liste/secilen.tsv
 # deb-src satırları (deb822 biçimi, Ubuntu 24.04)
-sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
-apt-get -o APT::Snapshot="$SNAP" update >/dev/null
+LISTE=/etc/apt/sources.list.d/ubuntu.sources
+sed -i 's/^Types: deb$/Types: deb deb-src/' "$LISTE"
+# Anlık görüntü sunucusu. İmaj apt listelerini sildiği için apt sunucuyu Release dosyasından bulamaz, deponun ana
+# makine adından arar. apt 2.7'nin tablosunda archive.ubuntu.com ve security.ubuntu.com var, ports.ubuntu.com
+# (arm64) yok. Bulamayınca APT::Snapshot ("?" kipi) o depoda anlık görüntüyü sessizce bırakır. Aynı Release dizinini
+# kullanan deb-src satırına gelince de debmetaindex.cc:1350'deki "List.back() == Deb" iddiasıyla çöker: "biz mi
+# açtık" denetimi (Deb != PreviousDeb) listede sonda olmayan eski bir dizini yeni sanır. ports için sunucu açıkça
+# verilir. snapshot.ubuntu.com ports mimarilerini de /ubuntu/ altında tutar (/ubuntu-ports/ yok). Derlemede Release
+# dosyasından bulunan adres de budur (Origin: Ubuntu). amd64 depoları apt'nin kendi tablosundan aynı adrese gider.
+APT_SNAP=(-o "APT::Snapshot=$SNAP" -o "Acquire::Snapshots::URI::Host::ports.ubuntu.com=https://snapshot.ubuntu.com/ubuntu/@SNAPSHOTID@/")
+for uri in $(sed -n 's/^URIs://p' "$LISTE"); do
+  u=${uri#http://}; u=${u#https://}; u=${u%/}/
+  case "$u" in
+    archive.ubuntu.com/ubuntu/|*.archive.ubuntu.com/ubuntu/|security.ubuntu.com/ubuntu/|ports.ubuntu.com/ubuntu-ports/) ;;
+    *) echo "HATA: anlık görüntü sunucusu bilinmeyen depo: $uri ($LISTE)" >&2; exit 2 ;;
+  esac
+done
+apt-get "${APT_SNAP[@]}" update >/dev/null
+# Her deb-src Suite/Component'i için anlık görüntü dizini inmiş olmalı: apt sunucu bulamazsa o depoda canlı arşive
+# sessizce döner, sürümler kayar. Canlı arşivin Sources dosyaları da iner ve kalır: apt anlık görüntü kipinde asıl
+# depoyu gölge (SHADOWED) girdi olarak tutar ve onun dizinlerini de indirir. Bu yüzden canlı dosyanın varlığı hata
+# değildir, anlık görüntü dosyasının yokluğu hatadır.
+beklenen=$(awk 'BEGIN { RS = "" }
+  { t = 0; s = ""; c = ""; n = split($0, L, "\n")
+    for (i = 1; i <= n; i++) {
+      if (L[i] ~ /^Types:/ && L[i] ~ /[ \t]deb-src([ \t]|$)/) t = 1
+      if (L[i] ~ /^Suites:/) s = substr(L[i], 8)
+      if (L[i] ~ /^Components:/) c = substr(L[i], 12)
+    }
+    if (!t) next
+    ns = split(s, S, " "); nc = split(c, C, " ")
+    for (i = 1; i <= ns; i++) for (j = 1; j <= nc; j++) print S[i] "_" C[j] }' "$LISTE")
+[ -n "$beklenen" ] || { echo "HATA: $LISTE içinde deb-src yok" >&2; exit 2; }
+for sc in $beklenen; do
+  compgen -G "/var/lib/apt/lists/snapshot.ubuntu.com_ubuntu_${SNAP}_dists_${sc}_source_Sources*" >/dev/null \
+    || { echo "HATA: anlık görüntüden kaynak dizini inmedi: ${sc/_//} ($SNAP)" >&2; exit 2; }
+done
 hata=0
 while IFS=$'\t' read -r kaynak ksurum neden; do
-  if apt-get -o APT::Snapshot="$SNAP" source --download-only "${kaynak}=${ksurum}" >/dev/null 2>&1; then
+  if apt-get "${APT_SNAP[@]}" source --download-only "${kaynak}=${ksurum}" >/dev/null 2>&1; then
     printf '%s\t%s\t%s\n' "$kaynak" "$ksurum" "$neden" >> /kaynak-liste/KAYNAKLAR.txt
   else
     printf 'EKSIK\t%s\t%s\n' "$kaynak" "$ksurum" >> /kaynak-liste/KAYNAKLAR.txt
@@ -88,7 +123,7 @@ kod=0
   "$IMAJ" -c "$IC" || kod=$?
 
 if [ "$kod" -ne 0 ]; then
-  echo "HATA: bazı kaynak paketler indirilemedi:" >&2
+  echo "HATA: kaynak paketler toplanamadı (kod $kod):" >&2
   grep '^EKSIK' "$IS/KAYNAKLAR.txt" >&2 || true
   exit 1
 fi

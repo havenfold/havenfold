@@ -223,3 +223,59 @@ test('TPM\'siz işçi (açılış öncesi inceleme): kimlik işçinin TPM\'siz a
   fs.writeFileSync(path.join(kok, 'dev/tpmrm0'), '')
   t.is(ilkAyar({ rol: 'isci', kok, kokMu: false, tpmAc: tpmYok }).kimlikler[0].memberId, r.kimlikler[0].memberId)
 })
+
+// İlk açılış yarıda kalıp (QR beklenirken makine kapatıldı) yeniden çalışınca: işaret 1. açılışta yazıldığı için rolün
+// çekirdeği (havenfold-isci.service, ConditionPathExists=…/kimlik) açılışta başlar ve kalıcı dizinin kilidini tutar.
+// Eski kod Kalici'yi yeniden açıp DIR_LOCKED ile düşüyordu (install.yml 41181620999, 2. açılış "İlk ayar yapılamadı:
+// DIR_LOCKED"). Kimlik var ve kullanımda: adım geçilir, ağaca dokunulmaz.
+const procVar = fs.existsSync('/proc/self')
+function calisanCekirdek (t, kok, rol) {
+  const c = require('child_process').spawn(process.execPath, ['-e', 'setTimeout(() => {}, 120000)'], { stdio: 'ignore' }) // test düşerse de 2 dk'da biter
+  t.teardown(() => { try { c.kill('SIGKILL') } catch {} })
+  const kilit = path.join(kok, 'var/lib/havenfold', rol, 'cekirdek/kilit')
+  fs.writeFileSync(kilit, String(c.pid))
+  return { pid: c.pid, kilit }
+}
+
+test('yeniden çalışan ilk açılış: çekirdek kilidi tutuyorsa kimlik adımı geçilir (DIR_LOCKED yok)', { skip: !procVar }, (t) => {
+  const kok = dizin(t)
+  const r1 = ilkAyar({ rol: 'isci', kok, test: true, kokMu: false })
+  const once = isaret(kok, 'isci')
+  const { pid, kilit } = calisanCekirdek(t, kok, 'isci')
+  const r2 = ilkAyar({ rol: 'isci', kok, test: true, kokMu: false })
+  t.is(r2.kimlikler[0].memberId, r1.kimlikler[0].memberId)
+  t.is(r2.kimlikler[0].yeni, false)
+  t.is(r2.kimlikler[0].calisiyor, true)
+  t.is(r2.kimlikler[0].tpm, 'taklit')
+  t.alike(isaret(kok, 'isci'), once, 'işaret aynen')
+  t.is(fs.readFileSync(kilit, 'utf8'), String(pid), 'çekirdeğin kilidine dokunulmaz')
+  // Komut kancası da 0 döner (hf-ilk-acilis "HATA: kimlikler" demez)
+  const satirlar = []
+  return ana(['--rol', 'isci'], { yaz: (s) => satirlar.push(s), env: { HF_KOK: kok, HF_TEST_KIPI: '1' }, getuid: () => 1000 }).then((kod) => {
+    t.is(kod, 0, satirlar.join(' | '))
+    t.ok(satirlar.some((s) => s.includes('çekirdek çalışıyor')))
+    // İşaret yoksa kimlik tahmin edilmez: kilit yine DIR_LOCKED
+    fs.unlinkSync(path.join(kok, 'var/lib/havenfold/isci/kimlik'))
+    t.exception(() => ilkAyar({ rol: 'isci', kok, test: true, kokMu: false }), /DIR_LOCKED/)
+  })
+})
+
+test('yeniden çalışan ilk açılış, kökken: kilit rol kullanıcısının sürecindeyse ağaç köke alınmaz; başka kullanıcının süreciyse geçilmez', { skip: !procVar }, (t) => {
+  const kok = dizin(t)
+  const passwd = path.join(kok, 'passwd')
+  const yaz = (uid) => fs.writeFileSync(passwd, `havenfold-isci:x:${uid}:${uid}::/:/usr/sbin/nologin\nhavenfold-denetci:x:4244:4245::/:/usr/sbin/nologin\n`)
+  yaz(process.getuid())
+  const kayit = []
+  const izin = { lchown: (p, u, g) => kayit.push(['chown', p, u]), chmod: (p, m) => kayit.push(['chmod', p, m]), kokUid: process.getuid() }
+  const r1 = ilkAyar({ rol: 'isci', kok, test: true, kokMu: true, passwd, izin })
+  calisanCekirdek(t, kok, 'isci')
+  kayit.length = 0
+  const r2 = ilkAyar({ rol: 'isci', kok, test: true, kokMu: true, passwd, izin })
+  t.is(r2.kimlikler[0].memberId, r1.kimlikler[0].memberId)
+  t.is(r2.kimlikler[0].calisiyor, true)
+  const rolDizini = path.join(kok, 'var/lib/havenfold/isci')
+  t.alike(kayit.filter(([, p]) => p.startsWith(rolDizini)), [], 'çalışan çekirdeğin dizini köke alınmaz')
+  // Kilidi rol kullanıcısı olmayan bir süreç tutuyor (önceki açılıştan kalan PID başka sürece geçmiş): çekirdek değil
+  yaz(4242)
+  t.exception(() => ilkAyar({ rol: 'isci', kok, test: true, kokMu: true, passwd, izin }), /DIR_LOCKED/)
+})
