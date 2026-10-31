@@ -105,6 +105,8 @@ sed -i "s/^rol = \"[a-z]*\"/rol = \"$ROL\"/" /etc/havenfold/dugum.toml
 
 # 7. Kimlikler ve hostId (§5): `havenfold ilk-ayar` (node/setup.js) kalıcı katmanda üretir, TPM'ye mühürler ve
 # /var/lib/havenfold/<rol>/kimlik işaretini yazar (birimlerin ConditionPathExists'i). Var olan kimliğe dokunmaz.
+# İlk açılış yarıda kalıp (tören beklenirken kapatıldı) yeniden çalışınca rolün çekirdeği işaret yüzünden açılışta
+# başlamış ve kalıcı dizini kilitlemiştir: ilk-ayar bunu görür, kimliği işaretten bildirir ve adımı geçer (DIR_LOCKED yok).
 adim "Kimlikler"
 if ! /usr/local/bin/havenfold ilk-ayar --rol "$ROL"; then
   echo "HATA: kimlikler üretilemedi. Ayrıntı: journalctl -u havenfold-ilk-acilis. İlk açılış bir sonraki açılışta yeniden başlar."
